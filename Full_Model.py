@@ -137,13 +137,6 @@ class VideoSegmentationNetwork(nn.Module):
             #chunk is a tensor of shape [BATCH, SEQUENCE_LENGTH, EMBEDDING_DIMENSION]
             chunks = self.__get_latent__chunks__().to(DEVICE)
 
-            #adding the mask
-            size = (CHUNK_LENGTH, EMBEDDED_DIMENSION)
-            mask = torch.empty(size)
-            nn.init.normal_(mask, mean=0.0, std=1.0)  
-
-            chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask
-
 
             #adding the positional encoding to the tensor just created
             chunks += self.positionalTensor
@@ -185,10 +178,12 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __reshape_split_and_stack__(self, x, sequence_at):
+
+        if sequence_at == 2:
+            size = (CHUNK_LENGTH, 32768)
+            x = torch.empty(size)
+            nn.init.normal_(x, mean=0.0, std=1.0)  
         
-        # if sequence_at == 2:
-
-
         x = x.view(x.shape[0], -1)
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
         sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
