@@ -325,6 +325,6 @@ def test_a_sample(batch_size=4):
             save_sample(epoch=None, x=image, img_pred=image_pred, mode='test')
             break
 
-train(70)
+# train(70)
 # test_a_sample()
 
