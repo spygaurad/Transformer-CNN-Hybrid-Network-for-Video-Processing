@@ -247,15 +247,15 @@ def train(epochs, lr=0.001):
     model = VideoSegmentationNetwork().to(DEVICE)
 
     #the pretrained decoder model
-    # decoderModel = model.cnndecoder
-    for params in model.cnndecoder.parameters():
+    decoderModel = model.cnndecoder
+    for params in decoderModel.parameters():
         params.requires_grad = True
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
 
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    # optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
+    optimizerCNNDecoder = optim.AdamW(decoderModel.parameters(), lr*0.1)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -279,7 +279,7 @@ def train(epochs, lr=0.001):
 
             #zero grading the optimizer
             optimizerTransformer.zero_grad()
-            # optimizerCNNDecoder.zero_grad()
+            optimizerCNNDecoder.zero_grad()
 
             #input the image into the model
             start_training, latent, image_pred = model(image)
@@ -293,9 +293,9 @@ def train(epochs, lr=0.001):
                 _loss += loss.item()
 
                 #backpropogation algorithm
-                loss.backward()
+                loss.backward() 
                 optimizerTransformer.step()
-                # optimizerCNNDecoder.step()
+                optimizerCNNDecoder.step()
 
                 #saving a sample
                 if i %2 == 0:
