@@ -244,8 +244,6 @@ def train(epochs, lr=0.001):
 
     #the pretrained decoder model
     decoderModel = model.cnndecoder
-    for params in decoderModel.parameters():
-        params.requires_grad = True
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
@@ -291,7 +289,13 @@ def train(epochs, lr=0.001):
                 #backpropogation algorithm
                 loss.backward()
                 optimizerTransformer.step()
+
+                for params in decoderModel.parameters():
+                    params.requires_grad = True
                 optimizerCNNDecoder.step()
+                for params in decoderModel.parameters():
+                    params.requires_grad = False
+
 
                 #saving a sample
                 if i==num and epoch%20==0:
