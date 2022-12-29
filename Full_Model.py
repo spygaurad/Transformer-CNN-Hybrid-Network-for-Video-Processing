@@ -123,7 +123,7 @@ class VideoSegmentationNetwork(nn.Module):
         #the sequence number of the sequence window that we are in
         nth_sequence = self.__sequence_counter__()
 
-        #tensor size [batch, 65536]
+        #tensor size [batch, 32K]
         latent_32K = self.cnnencoder(x)
 
         #tensor size [batch, 18, EMBEDDED_DIMENSION]
@@ -137,6 +137,9 @@ class VideoSegmentationNetwork(nn.Module):
             #chunk is a tensor of shape [BATCH, SEQUENCE_LENGTH, EMBEDDING_DIMENSION]
             chunks = self.__get_latent__chunks__().to(DEVICE)
 
+            #adding the mask to the latent exactly in the middle
+            mask = torch.empty(1, 8, 4096).normal_(mean=0.0, std=1.0)
+            chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + 1: (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2) -1, :] = mask
 
             #adding the positional encoding to the tensor just created
             chunks += self.positionalTensor
@@ -178,12 +181,10 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __reshape_split_and_stack__(self, x, sequence_at):
-
-        if sequence_at == 2:
-            size = (CHUNK_LENGTH, 32768)
-            x = torch.empty(size)
-            nn.init.normal_(x, mean=0.0, std=1.0)  
         
+        # if sequence_at == 2:
+
+
         x = x.view(x.shape[0], -1)
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
         sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
@@ -242,15 +243,15 @@ def train(epochs, lr=0.001):
     model = VideoSegmentationNetwork().to(DEVICE)
 
     #the pretrained decoder model
-    decoderModel = model.cnndecoder
-    for params in decoderModel.parameters():
+    # decoderModel = model.cnndecoder
+    for params in model.cnndecoder.parameters():
         params.requires_grad = True
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
 
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    optimizerCNNDecoder = optim.AdamW(decoderModel.parameters(), lr*0.1)
+    # optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -274,7 +275,7 @@ def train(epochs, lr=0.001):
 
             #zero grading the optimizer
             optimizerTransformer.zero_grad()
-            optimizerCNNDecoder.zero_grad()
+            # optimizerCNNDecoder.zero_grad()
 
             #input the image into the model
             start_training, latent, image_pred = model(image)
@@ -288,12 +289,12 @@ def train(epochs, lr=0.001):
                 _loss += loss.item()
 
                 #backpropogation algorithm
-                loss.backward() 
+                loss.backward()
                 optimizerTransformer.step()
-                optimizerCNNDecoder.step()
+                # optimizerCNNDecoder.step()
 
                 #saving a sample
-                if i%2 == 0:
+                if i %2 == 0:
                     __save_sample__(epoch+1, image, image_pred)
             writer.add_scalar("Training Loss", _loss, i)
 
@@ -302,7 +303,7 @@ def train(epochs, lr=0.001):
         if epoch%50==0:
             print('Saving Model...')
             torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model_epoch{epoch}.tar')
-            torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
+            # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
 
