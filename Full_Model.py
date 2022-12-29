@@ -298,7 +298,7 @@ def train(epochs, lr=0.001):
                 optimizerCNNDecoder.step()
 
                 #saving a sample
-                if i %2 == 0:
+                if i%2 == 0:
                     __save_sample__(epoch+1, image, image_pred)
             writer.add_scalar("Training Loss", _loss, i)
 
