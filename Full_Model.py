@@ -244,7 +244,7 @@ def train(epochs, lr=0.001):
 
     #the pretrained decoder model
     decoderModel = model.cnndecoder
-    for params in model.cnndecoder.parameters():
+    for params in decoderModel.parameters():
         params.requires_grad = True
 
     #initializing the optimizer for transformer
