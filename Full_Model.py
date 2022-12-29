@@ -251,7 +251,7 @@ def train(epochs, lr=0.001):
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
 
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    # optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
+    optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -294,7 +294,7 @@ def train(epochs, lr=0.001):
                 # optimizerCNNDecoder.step()
 
                 #saving a sample
-                if i %2 == 0:
+                if i==num and epoch%20:
                     __save_sample__(epoch+1, image, image_pred)
             writer.add_scalar("Training Loss", _loss, i)
 
@@ -303,7 +303,7 @@ def train(epochs, lr=0.001):
         if epoch%50==0:
             print('Saving Model...')
             torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model_epoch{epoch}.tar')
-            # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
+            torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
 
@@ -315,7 +315,8 @@ def __save_sample__(epoch, x, img_pred):
     elements[0] = elements[0].save(f"{path}_image.jpg")
     elements[1] = elements[1].save(f"{path}_image_pred_transformer.jpg")
 
-train(epochs=70)
+
+train(epochs=5000)
 
 # vsn = VideoSegmentationNetwork()
 
