@@ -251,7 +251,7 @@ def train(epochs, lr=0.001):
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
 
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
+    optimizerCNNDecoder = optim.AdamW(decoderModel.parameters(), lr*0.1)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -275,7 +275,7 @@ def train(epochs, lr=0.001):
 
             #zero grading the optimizer
             optimizerTransformer.zero_grad()
-            # optimizerCNNDecoder.zero_grad()
+            optimizerCNNDecoder.zero_grad()
 
             #input the image into the model
             start_training, latent, image_pred = model(image)
@@ -291,7 +291,7 @@ def train(epochs, lr=0.001):
                 #backpropogation algorithm
                 loss.backward()
                 optimizerTransformer.step()
-                # optimizerCNNDecoder.step()
+                optimizerCNNDecoder.step()
 
                 #saving a sample
                 if i==num and epoch%20==0:
