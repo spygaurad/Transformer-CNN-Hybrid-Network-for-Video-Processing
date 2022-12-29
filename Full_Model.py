@@ -243,7 +243,7 @@ def train(epochs, lr=0.001):
     model = VideoSegmentationNetwork().to(DEVICE)
 
     #the pretrained decoder model
-    # decoderModel = model.cnndecoder
+    decoderModel = model.cnndecoder
     for params in model.cnndecoder.parameters():
         params.requires_grad = True
 
@@ -296,7 +296,8 @@ def train(epochs, lr=0.001):
                 #saving a sample
                 if i==num and epoch%20:
                     __save_sample__(epoch+1, image, image_pred)
-            writer.add_scalar("Training Loss", _loss, i)
+
+        writer.add_scalar("Training Loss", _loss, epoch)
 
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
 
