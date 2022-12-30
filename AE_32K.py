@@ -219,7 +219,7 @@ def save_sample(epoch=0, x=None, mask=None, mask_pred=None, mode='train'):
 
 
 
-def train(epochs, batch_size=4, lr=0.001):
+def train(epochs, batch_size=8, lr=0.001):
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print(f"Using {device} device.")
@@ -325,6 +325,5 @@ def test_a_sample(batch_size=4):
             save_sample(epoch=None, x=image, img_pred=image_pred, mode='test')
             break
 
-# train(70)
+train(1000)
 # test_a_sample()
-
