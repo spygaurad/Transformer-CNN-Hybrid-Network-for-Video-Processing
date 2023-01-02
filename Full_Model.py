@@ -137,6 +137,10 @@ class VideoSegmentationNetwork(nn.Module):
             #chunk is a tensor of shape [BATCH, SEQUENCE_LENGTH, EMBEDDING_DIMENSION]
             chunks = self.__get_latent__chunks__().to(DEVICE)
 
+            #getting the middle latent as ground truth
+            middle_chunk = chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+            middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
+
             #adding the mask to the latent exactly in the middle
             mask = torch.empty(1, 8, 4096).normal_(mean=0.0, std=1.0)
             chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + 1: (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2) -1, :] = mask
@@ -160,9 +164,9 @@ class VideoSegmentationNetwork(nn.Module):
             self.sequence_window.pop()
 
             #returns both, Decoded image, and Latent to be decoded
-            return True, single_frame_merged_latent, decoded_latent
+            return True, single_frame_merged_latent, decoded_latent, middle_chunk
         
-        return False, None, None
+        return False, None, None, None
 
     
 
@@ -181,10 +185,6 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __reshape_split_and_stack__(self, x, sequence_at):
-        
-        # if sequence_at == 2:
-
-
         x = x.view(x.shape[0], -1)
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
         sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
@@ -253,6 +253,8 @@ def train(epochs, lr=0.001):
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
+    mseloss = torch.nn.MSELoss()
+
     writer = SummaryWriter(log_dir="logs")     
 
     loss_train = []
@@ -276,12 +278,18 @@ def train(epochs, lr=0.001):
             optimizerCNNDecoder.zero_grad()
 
             #input the image into the model
-            start_training, latent, image_pred = model(image)
+            start_training, latent, image_pred, middle_chunk = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
             if start_training:
                 # MS-SSIM loss + MSE Loss for model evaluation
                 loss = nvidia_mix_loss(image_pred, image)
+
+                #MSE loss for latent-to-latent prediction
+                loss_mid = mseloss(middle_chunk, latent)
+
+                #adding the both losses
+                loss += loss_mid
 
                 #getting the loss's number
                 _loss += loss.item()
