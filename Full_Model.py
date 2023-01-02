@@ -290,11 +290,12 @@ def train(epochs, lr=0.001):
                 # MS-SSIM loss + MSE Loss for model evaluation
                 loss = nvidia_mix_loss(image_pred, image)
 
-                #MSE loss for latent-to-latent prediction
-                loss_mid = mseloss(latent, middle_chunk)
+                if epoch<10:
+                    #MSE loss for latent-to-latent prediction
+                    loss_mid = mseloss(latent, middle_chunk)
 
-                #adding the both losses
-                loss = loss + loss_mid
+                    #adding the both losses
+                    loss = loss + loss_mid
 
                 #getting the loss's number
                 _loss += loss.item()
