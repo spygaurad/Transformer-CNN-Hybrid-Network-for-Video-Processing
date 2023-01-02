@@ -1,18 +1,21 @@
 from collections import deque
 import torch
 import torch.nn as nn
-import math
 import torch.optim as optim
-from AE_32K import Autoencoder32K
-from dataset import DataLoader
-from TransformerEncoder import TransformerEncoder
-from collections import deque
-from metric import MixedLoss
-import numpy as np
+import math
+import os
 import random
+
+from collections import deque
 from tqdm import tqdm
 from torchvision import transforms
 from tensorboardX import SummaryWriter
+
+from AE_32K import Autoencoder32K
+from dataset import DataLoader
+from TransformerEncoder import TransformerEncoder
+from metric import MixedLoss
+
 
 
 '''
@@ -322,11 +325,18 @@ def train(epochs, lr=0.001):
 
 
 def __save_sample__(epoch, x, img_pred):
-    path = f'Training_Sneakpeeks/Transformer_Training/{epoch}'
-    elements = [x, img_pred]
-    elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
-    elements[0] = elements[0].save(f"{path}_image.jpg")
-    elements[1] = elements[1].save(f"{path}_image_pred_transformer.jpg")
+    path = 'Training_Sneakpeeks/Transformer_Training'
+    try: 
+        os.makedirs(path)
+        os.makedirs('Training_Sneakpeeks/autoencoder_32K')
+        os.makedirs('Training_Sneakpeeks/latent_to_mask')
+    except:
+        pass
+    finally:
+        elements = [x, img_pred]
+        elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
+        elements[0] = elements[0].save(f"{path}/{epoch}_image.jpg")
+        elements[1] = elements[1].save(f"{path}/{epoch}_image_pred_transformer.jpg")
 
 
 train(epochs=5000)
