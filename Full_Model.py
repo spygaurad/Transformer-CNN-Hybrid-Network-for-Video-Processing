@@ -286,7 +286,7 @@ def train(epochs, lr=0.001):
                 loss = nvidia_mix_loss(image_pred, image)
 
                 #MSE loss for latent-to-latent prediction
-                loss_mid = mseloss(middle_chunk, latent)
+                loss_mid = mseloss(latent, middle_chunk)
 
                 #adding the both losses
                 loss += loss_mid
