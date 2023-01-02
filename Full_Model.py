@@ -271,7 +271,7 @@ def train(epochs, lr=0.001):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        num = random.randint(0, 6000)
+        num = random.randint(0, 100)
 
         for i, image in enumerate(tqdm(train_dataloader)):
 
@@ -305,7 +305,7 @@ def train(epochs, lr=0.001):
                 # optimizerCNNDecoder.step()
 
                 #saving a sample
-                if i%2==0:
+                if i==num and epoch%5==0:
                     __save_sample__(epoch+1, image, image_pred)
             # writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
