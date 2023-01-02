@@ -321,7 +321,7 @@ def train(epochs, lr=0.001):
 
 
 def __save_sample__(epoch, x, img_pred):
-    path = f'Training Sneakpeeks/Transformer_Training/{epoch}'
+    path = f'Training_Sneakpeeks/Transformer_Training/{epoch}'
     elements = [x, img_pred]
     elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
     elements[0] = elements[0].save(f"{path}_image.jpg")
