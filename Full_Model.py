@@ -222,7 +222,8 @@ class VideoSegmentationNetwork(nn.Module):
             T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
         '''
         PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH) 
-        PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
+        # PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
+        PE_imageSequence = torch.zeros((CHUNK_LENGTH, EMBEDDED_DIMENSION))
         T = []
         for seq in PE_imageSequence:
             t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
