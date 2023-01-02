@@ -98,7 +98,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #loading the custom transformer encoder class
         # self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2)
-        self.transenc = TransformerEncoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2, dropout=0.1)
+        self.transenc = TransformerEncoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=2, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -142,7 +142,8 @@ class VideoSegmentationNetwork(nn.Module):
             middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
 
             #adding the mask to the latent exactly in the middle
-            mask = torch.empty(1, 1, 32768).normal_(mean=0.0, std=1.0).to(DEVICE)
+            mask = torch.empty(1, 1, 32768)
+            nn.init.xavier_uniform_(mask)
             mask_new = self.__reshape_split_and_stack__(mask)
             chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
 
@@ -290,10 +291,10 @@ def train(epochs, lr=0.001):
                 loss = nvidia_mix_loss(image_pred, image)
 
                 #MSE loss for latent-to-latent prediction
-                # loss_mid = mseloss(latent, middle_chunk)
+                loss_mid = mseloss(latent, middle_chunk)
 
                 #adding the both losses
-                # loss = loss + loss_mid
+                loss = loss + loss_mid
 
                 #getting the loss's number
                 _loss += loss.item()

@@ -74,7 +74,7 @@ class DataLoader():
         self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
 
     def make_data(self):
-        path = 'Datasets/Driving_Dataset'
+        path = 'Datasets/Driving_Dataset_Mini'
         traindata = []
         for image in os.listdir(f'{path}/train_images'):
             traindata.append(f'{path}/train_images/{image}')
