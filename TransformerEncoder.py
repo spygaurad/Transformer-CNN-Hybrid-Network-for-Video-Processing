@@ -99,10 +99,6 @@ class TransformerEncoder(nn.Module):
         self.num_heads = num_heads
         self.dropout = dropout
 
-        for i in range(num_layers):
-            weight = getattr(self, f'layer_{i}').weight
-            nn.init.xavier_uniform_(weight)
-
         if input_dim % num_heads != 0:
             raise ValueError(f"Input dimension must be divisible by number of heads. Here, Input dimension = {input_dim} is not divisible by number of heads = {num_heads}")
 
