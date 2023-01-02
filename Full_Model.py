@@ -312,9 +312,9 @@ def train(epochs, lr=0.001):
 
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
 
-        if loss_train[-1] == min(loss_train):
+        if epoch%50==0:
             print('Saving Model...')
-            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model.tar')
+            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model{epoch}.tar')
             # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
