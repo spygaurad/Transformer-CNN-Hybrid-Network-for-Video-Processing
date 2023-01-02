@@ -142,7 +142,7 @@ class VideoSegmentationNetwork(nn.Module):
             middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
 
             #adding the mask to the latent exactly in the middle
-            mask = torch.empty(1, 1, 32768)
+            mask = torch.empty(1, 1, 32768).to(DEVICE)
             nn.init.xavier_uniform_(mask)
             mask_new = self.__reshape_split_and_stack__(mask)
             chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
