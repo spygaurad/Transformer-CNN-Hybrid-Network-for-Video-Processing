@@ -14,6 +14,7 @@ from pytorch_msssim import ms_ssim
 from metric import DiceLoss, MixedLoss
 from PIL import Image
 import random
+import os
 
 
 
@@ -80,13 +81,16 @@ class Encoder_32K(nn.Module):
         self.conv5 = nn.Conv2d(16, 8, 3, 1, 1)
         self.bn5 = nn.BatchNorm2d(8)
 
+        #initializing the vector for mean and standard deviation 
+        '''
+        self.fc_mu = nn.Linear(32768, 32768)
+        self.fc_var = nn.Linear(32768, 32768)
+        '''
+
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout2d(0.3)
 
         self.scale_img = nn.AvgPool2d(2, 2)
-
-
-
 
 
     def _make_layer(self, block, planes, blocks, stride=1):
@@ -106,14 +110,36 @@ class Encoder_32K(nn.Module):
         x = self.layer1(x)
         x = self.dropout(x)
         x = self.layer2(x)
-        x = self.dropout(x)
         x = self.relu(self.bn2(self.conv2(x)))
         x = self.relu(self.bn3(self.conv3(x)))
         x = self.relu(self.bn4(self.conv4(x)))
-        x = self.relu(self.bn5(self.dropout(self.conv5(x))))
-        
+        x = self.relu(self.bn5(self.conv5(x)))
+        x = self.dropout(x)
+
+
+        #to run in a VAE setup, use the following part of code
+        '''
+        #flattening the layers
+        x = x.view(x.size(0), -1)
+
+        #getting the distribution of mean and the standard deviation
+        mu = self.relu(self.fc_mu(x))
+        sigma = self.relu(self.fc_var(x))
+
+        #re-parameterizing the vector picking up samples from the distribution defined above
+        x = self.reparameterize(mu, sigma)
+        return x, mu, sigma
+        '''
+
+        #just return the latent if we're not using the VAE
         return x
 
+
+    #reparameterization function which constructs a vector picking upsamples from the distributions that we have 
+    def reparameterize(self, mu, sigma):
+        std = torch.exp(0.5*sigma)
+        eps = torch.randn_like(std)
+        return eps*std + mu
 
 
 
@@ -123,8 +149,8 @@ class Decoder_32K(nn.Module):
         super(Decoder_32K, self).__init__()
 
         self.outputDeterminer = outputDeterminer
-
-        self.conv1 = nn.Conv2d(8, 16, 3, 1, 1)
+            
+        self.conv1= nn.Conv2d(8, 16, 3, 1, 1)
         self.bn1 = nn.BatchNorm2d(16)
 
         self.conv2 = nn.Conv2d(16, 64, 3, 1, 1)
@@ -160,11 +186,13 @@ class Decoder_32K(nn.Module):
 
 
     def forward(self,x):
-        x = self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x))))))))))))
-        x = self.relu(self.dbn2(self.transConv1(x)))
-        x = self.relu(self.dbn3(self.transConv2(x)))
-        x = self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(x))))))
-        x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(x)))
+
+        #we now convert a linear vector to a volume of a desired shape
+        '''
+        x = x.view(-1, 8, 64, 64)
+        '''
+
+        x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
         return x
 
 
@@ -174,7 +202,9 @@ class Decoder_32K(nn.Module):
 class Autoencoder32K(nn.Module):
     def __init__(self, outputType):
         super(Autoencoder32K, self).__init__()
+
         self.encoder = Encoder_32K(Bottleneck, [3, 4])
+
         if outputType.lower() == "image":
             self.decoder = Decoder_32K("image")
         else:
@@ -191,16 +221,17 @@ class Autoencoder32K(nn.Module):
 
 
 
-def save_sample(epoch=0, x=None, mask=None, mask_pred=None, mode='train'):
-    path = f'Training Sneakpeeks/latent_to_mask/{epoch}'
-    elements = [x, mask, mask_pred]
+def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
+    path = f'Training Sneakpeeks/image_to_mask/{epoch}'
+    elements = [x,  mask_pred]
     elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
 
     if mode == 'train':
         elements[0] = elements[0].save(f"{path}_image.jpg")
-        elements[1] = elements[1].save(f"{path}_mask.jpg")
-        elements[2] = elements[2].save(f"{path}_mask_pred.jpg")
-    elif mode == 'test':
+        elements[1] = elements[1].save(f"{path}_image_pred.jpg")
+
+    '''
+        elif mode == 'test':
         x = elements[0]
         x_hat = elements[1]
         images = [x, x_hat]
@@ -213,117 +244,84 @@ def save_sample(epoch=0, x=None, mask=None, mask_pred=None, mode='train'):
           new_im.paste(im, (x_offset,0))
           x_offset += im.size[0] + 4
         new_im.show()
+    '''
 
 
 
 
-
-
-def train(epochs, batch_size=8, lr=0.001):
+def train(epochs, batch_size=8, lr=0.0001):
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print(f"Using {device} device.")
     print("Loading Datasets...")
-    train_dataloader, test_dataloader = DataLoader().load_data(batch_size)
+    train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", return_train_and_test=False).load_data("dataImages.csv")
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
-    #loading the model
-    AE_model = Autoencoder32K("image").to("cuda:0")
-    AE_model.load_state_dict(torch.load('saved_model/EncoderDecoder_road_image2image32K.tar')['model_state_dict'])
+    model = Autoencoder32K("image").to(device)    
+    optimizer = optim.AdamW(model.parameters(), lr=lr)
 
-    #extracting the encoder from the autoencoder
-    encoder = AE_model.encoder
-    for params in encoder.parameters():
-        params.requires_grad = False
-
-    #using a new CNN decoder to train the latent
-    decoder = Decoder_32K("mask")
-
-    #a model comprised of forzen encoder and the decoder
-    model = nn.Sequential(encoder, decoder).to("cuda:0")
-    model.load_state_dict(torch.load('saved_model/latent_to_mask.tar')['model_state_dict'])
-
-
-
-    #initializing the optimizer
-    optimizerImg = optim.AdamW(model.parameters(), lr)
-    # mseloss = torch.nn.MSELoss()
-
-    nvidia_mix_loss = MixedLoss(0.5, 0.5)
-    diceLoss = DiceLoss()
+    nvidia_mix_loss = MixedLoss(0.5, 0.5) 
     loss_train = []
     start = 0
     epochs = epochs
     print(f"Parameters Initialized...")
     print(f"Starting to train for {epochs} epochs.")
 
-    for epoch in range(start, epochs):
 
+    #training for n epochs
+    for epoch in range(start, epochs):
+        
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        num = random.randint(0, 200)
+        num = random.randint(0, len(train_dataloader)//batch_size - 1)
 
-        for i, (image, mask) in enumerate(tqdm(train_dataloader)):
+        for i, image in enumerate(tqdm(train_dataloader)):
 
             #converting the image to cuda decice
-            image = image.to("cuda:0")
-            mask = mask.to("cuda:0") 
+            image = image.to(device)
 
             #zero grading the optimizer
-            optimizerImg.zero_grad()    
+            optimizer.zero_grad()    
 
             #input the image into the model and getting the reconstructed image
-            mask_pred = model(image)   
+            output = model(image)   
 
             #Loss functions for evaluation
-            # loss = nvidia_mix_loss(image_pred, image)
-            loss = diceLoss(mask_pred, mask)
-
+            loss = nvidia_mix_loss(output, image)
+            # loss = diceLoss(output, mask)
 
             #adding a loss function 
             _loss += loss.item()    
 
             #backpropogation algorithm
             loss.backward()
-            optimizerImg.step() 
+            optimizer.step() 
 
             #saving a sample of this epoch
-            if i == num:
-                save_sample(epoch+1, image, mask, mask_pred, 'train')
+            if epoch%5==0 and i==num:
+                save_sample(epoch+1, image, output)
 
         loss_train.append(_loss)
 
         #Saving the minimum loss wala model
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
-        if loss_train[-1] == min(loss_train):
+        if epoch%10 == 0 and loss_train[-1] == min(loss_train):
             print('Saving Model...')
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizerImg.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss_train
-            }, f'saved_model/latent_to_mask.tar')
+            }, f'saved_model/autoencoder_32K_VOS_{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
 
 
 
+train(60)
 
-def test_a_sample(batch_size=4):
-    train_dataloader = DataLoader().load_data(batch_size)
-    model = Autoencoder32K(outputType="Image")
-    check = torch.load('saved_model/EncoderDecoder_road_image2image32K.tar')
-    model.load_state_dict(check['model_state_dict'])
-    model = model.to("cuda:0")
 
-    num = random.randint(0, 100)
-    for i, image in enumerate(train_dataloader):
-        if i==num:
-            image = image.to("cuda:0")
-            image_pred = model(image)
-            save_sample(epoch=None, x=image, img_pred=image_pred, mode='test')
-            break
 
-# train(1000)
-# test_a_sample()
+
+            
