@@ -7,24 +7,6 @@ import csv
 
 
 
-class CSVDataset(torch.utils.data.Dataset):
-    def __init__(self, csv_file, transforms):
-        self.transform = transforms
-        self.rows = []
-        with open(csv_file, "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                self.rows.append(row)
-
-    def __len__(self):
-        return len(self.rows)
-
-    def __getitem__(self, row):
-        img_path = self.rows[row]
-        for items in img_path:
-            image = Image.open(items)
-            image = self.transform(image)
-            return image
 
 
 
@@ -64,16 +46,52 @@ class DataLoader():
 
     def make_data(self, csvfile):
         with open(csvfile, "r") as csv_file:
-            traindata_path = [row[:-1] for row in csv_file]
-            return traindata_path
+            datapaths = [row[:-1] for row in csv_file]
+            return datapaths
 
 
-    def load_data(self, csvfile):
-        traindata = self.make_data(csvfile)
-        train_dataset = Dataset(traindata, self.trainingType, self.transform)
-        train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
-        return train_dataloader
+    def load_data(self, trainDataCSV, testDataCSV):
+        if self.return_train_and_test:
+            assert testDataCSV != None , "Please enter the path to csv file for the TEST dataset too."
 
+        traindata_paths = self.make_data(trainDataCSV)
+        train_dataset = Dataset(traindata_paths, self.trainingType, self.transform)
+        trainLoadedData = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
+        if self.return_train_and_test:
+            testdata_paths = self.make_data(testDataCSV)
+            test_dataset = Dataset(testdata_paths, self.trainingType, self.transform)
+            testLoadedData = torch.utils.data.DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+            return trainLoadedData, testLoadedData
+        else:
+            return trainLoadedData
+
+
+
+
+'''------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'''
+'''------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'''
+
+
+
+
+class CSVDataset(torch.utils.data.Dataset):
+    def __init__(self, csv_file, transforms):
+        self.transform = transforms
+        self.rows = []
+        with open(csv_file, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                self.rows.append(row)
+
+    def __len__(self):
+        return len(self.rows)
+
+    def __getitem__(self, row):
+        img_path = self.rows[row]
+        for items in img_path:
+            image = Image.open(items)
+            image = self.transform(image)
+            return image
 
 
 class DataLoaderSequential():

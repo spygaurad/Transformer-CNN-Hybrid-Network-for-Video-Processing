@@ -311,7 +311,8 @@ class FCT_FLOW():
         
         
         print("Loading Datasets...")
-        train_data, test_data = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True).load_data("data_train_car.csv", "data_test_car.csv")
+        dl = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True)
+        train_data, test_data = dl.load_data("data_train_car.csv", "data_test_car.csv")
         print("Dataset Loaded... initializing parameters...")
         
         model = self.network
