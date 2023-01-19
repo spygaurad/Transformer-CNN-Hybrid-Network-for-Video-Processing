@@ -6,8 +6,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from dataset import DataLoader
-from segmentationFCT import FCT
-from segmentationUNet import UNet
+from FCT import FCT
 from metric import DiceLoss, JaccardScore
 from tensorboardX import SummaryWriter 
 
@@ -51,10 +50,7 @@ class Trainer():
         print("Dataset Loaded... initializing parameters...")
         model = self.network
         optimizer = optim.AdamW(model.parameters(), lr)
-        # crossentloss = torch.nn.CrossEntropyLoss() 
-        # bceloss = torch.nn.BCEWithLogitsLoss() 
-        dsc_loss = DiceLoss()  
-        # iou = JaccardScore()
+        dsc_loss = DiceLoss()
         writer = SummaryWriter(log_dir="logs")        
         loss_train, loss_test = [], []
         start = 1
@@ -69,10 +65,7 @@ class Trainer():
                 x, y = x.to(self.device), y.to(self.device)
                 optimizer.zero_grad()
                 y_pred = model(x)
-                loss1 = dsc_loss(y_pred, y)
-                # loss2 = bceloss(y_pred, y)
-                loss = loss1
-                # loss = crossentloss(y_pred, y)
+                loss = dsc_loss(y_pred, y)
                 _loss_train += loss.item()
                 loss.backward()
                 optimizer.step()
@@ -80,19 +73,18 @@ class Trainer():
                     self.save_sample(epoch, x, y, y_pred)
 
             
-            # if epoch%20 == 0:
-            #     print(f'Evaluating the performace of {epoch} epoch.')
-            #     for i, (x, y) in enumerate(tqdm(test_dataloader)):
-            #         x, y = x.to(self.device), y.to(self.device)
-            #         y_pred = model(x)
-            #         # loss = crossentloss(y_pred, y)
-            #         loss = dsc_loss(y_pred, y)
-            #         measure = iou(y_pred, y)
-            #         _measure += measure.item()
-            #         _loss_test += loss.item()
+            if epoch%20 == 0:
+                print(f'Evaluating the performace of {epoch} epoch.')
+                for i, (x, y) in enumerate(tqdm(test_dataloader)):
+                    x, y = x.to(self.device), y.to(self.device)
+                    y_pred = model(x)
+                    # loss = crossentloss(y_pred, y)
+                    loss = dsc_loss(y_pred, y)
+                    measure = iou(y_pred, y)
+                    _measure += measure.item()
+                    _loss_test += loss.item()
 
-            #     writer.add_scalar("Testing Loss", _loss_test, epoch)
-
+            writer.add_scalar("Testing Loss", _loss_test, epoch)
             writer.add_scalar("Training Loss", _loss_train, epoch)
             
             loss_train.append(_loss_train)
@@ -113,6 +105,6 @@ class Trainer():
 
     
 
-model = "unet"
+model = "focusnet"
 seg = Trainer(model, pretrained=False)
 seg.train(epochs=70) 

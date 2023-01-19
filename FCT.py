@@ -199,7 +199,6 @@ class FCT(nn.Module):
     def __init__(self):
         super().__init__()
 
-        
         att_heads = [2, 2, 2, 2, 2, 2, 2, 2, 2]
         filters = [8, 16, 32, 64, 128, 64, 32, 16, 8] 
         blocks = len(filters)
@@ -221,7 +220,7 @@ class FCT(nn.Module):
 
         self.ds7 = DS_out(filters[6], 1)
         self.ds8 = DS_out(filters[7], 1)
-        self.ds9 = DS_out(filters[8], 3)
+        self.ds9 = DS_out(filters[8], 1)
         
     def forward(self,x):
 
@@ -254,8 +253,8 @@ class FCT(nn.Module):
         return out9
 
 
-# data = (torch.rand(size=(1, 3, 256, 256)))
-# focusnet = FCT()
-# out = focusnet(data)
-# print(out.shape)
-# summary(fousnet, (3, 256, 256))
+data = (torch.rand(size=(1, 3, 256, 256)))
+focusnet = FCT()
+out = focusnet(data)
+print(out.shape)
+# summary(focusnet, (3, 256, 256))

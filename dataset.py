@@ -1,28 +1,106 @@
-import os
-
 import cv2
 import numpy as np
 import torch
 from PIL import Image
 from torchvision import transforms
+import csv
 
 
 
-# class Dataset(torch.utils.data.Dataset):
-#     def __init__(self, data, transforms=None):
-#         self.dataset = data
-#         self.transform = transforms
+class CSVDataset(torch.utils.data.Dataset):
+    def __init__(self, csv_file, transforms):
+        self.transform = transforms
+        self.rows = []
+        with open(csv_file, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                self.rows.append(row)
 
-#     def __len__(self):
-#         return len(self.dataset)
+    def __len__(self):
+        return len(self.rows)
 
-#     def __getitem__(self, idx):
-#         img_path, mask_path = self.dataset[idx]
-#         image = Image.open(img_path)
-#         image = self.transform(image)
-#         mask = Image.open(mask_path).convert("L")
-#         mask = self.transform(mask)
-#         return image, mask
+    def __getitem__(self, row):
+        img_path = self.rows[row]
+        for items in img_path:
+            image = Image.open(items)
+            image = self.transform(image)
+            return image
+
+
+
+class Dataset(torch.utils.data.Dataset):
+    def __init__(self, data, trainingType, transforms=None):
+        self.data = data
+        self.transform = transforms
+        self.trainingType = trainingType
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        if self.trainingType.lower() == "supervised":
+            img_path, mask_path = self.data[idx].split(",")[0], self.data[idx].split(",")[1]
+            image = Image.open(img_path)
+            image = self.transform(image)
+            mask = Image.open(mask_path).convert("L")
+            mask = self.transform(mask)
+            return image, mask
+        else:
+            img_path = self.data[idx]
+            image = Image.open(img_path)
+            image = self.transform(image)
+            return image
+        
+        
+
+class DataLoader():
+
+    def __init__(self, batch_size, trainingType, return_train_and_test):
+        self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+        self.batch_size = batch_size
+        self.trainingType = trainingType
+        self.return_train_and_test = return_train_and_test
+
+
+    def make_data(self, csvfile):
+        with open(csvfile, "r") as csv_file:
+            traindata_path = [row[:-1] for row in csv_file]
+            return traindata_path
+
+
+    def load_data(self, csvfile):
+        traindata = self.make_data(csvfile)
+        train_dataset = Dataset(traindata, self.trainingType, self.transform)
+        train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
+        return train_dataloader
+
+
+
+class DataLoaderSequential():
+
+    def __init__(self, batch_size):
+        self.transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+        self.batch_size = batch_size
+
+    def load_data(self):
+        dataset = CSVDataset("data.csv", self.transform)
+        l1 = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
+        return l1
+
+
+
+
+l1 = DataLoaderSequential(4).load_data()
+
+for items in l1:
+    print(items)
+    image = items[0]
+    image = image.numpy()
+    img = np.moveaxis(image, 0, 2)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imshow('img', img)
+    cv2.waitKey(500)
+
 
 
 
@@ -32,59 +110,89 @@ from torchvision import transforms
 #     def __init__(self):
 #         self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
 
-#     def make_data(self):
-#         path = 'Datasets/Driving_Dataset'
-#         traindata, testdata = [], []
-#         for image, label  in zip(os.listdir(f'{path}/train_images'), os.listdir(f'{path}/train_masks')):
-#             traindata.append([f'{path}/train_images/{image}', f'{path}/train_masks/{label}'])
-
-#         for image, label  in zip(os.listdir(f'{path}/test_images'), os.listdir(f'{path}/test_masks')):
-#             testdata.append([f'{path}/test_images/{image}', f'{path}/test_masks/{label}'])
-#         return traindata, testdata
+#     def get_filenames(self):
+#         path = 'Datasets/Driving_Dataset_Mini'
+#         traindata = []
+#         dataset = os.listdir(f'{path}/train_images')
+#         dataset = sorted(dataset, key=self.sort_key)
+#         for image in dataset:
+#             traindata.append(f'{path}/train_images/{image}')
+#         return traindata
 
 #     def load_data(self, batch_size):
-#         traindata, testdata = self.make_data()
+#         traindata = self.get_filenames()
 #         train_dataset = Dataset(traindata, self.transform)
-#         test_dataset = Dataset(testdata, self.transform)
 #         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
-#         test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-#         return train_dataloader, test_dataloader
+#         return train_dataloader
+
+#     def sort_key(self, filename):
+#         base, ext = filename.rsplit('.', 1)
+#         num = int(re.sub(r'\D', '', base))
+#         return num
 
 
 
-class Dataset(torch.utils.data.Dataset):
-    def __init__(self, data, transforms=None):
-        self.dataset = data
-        self.transform = transforms
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, idx):
-        img_path = self.dataset[idx]
-        image = Image.open(img_path)
-        image = self.transform(image)
-        return image
 
 
 
-class DataLoader():
 
-    def __init__(self):
-        self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
 
-    def make_data(self):
-        path = 'Datasets/Driving_Dataset_Mini'
-        traindata = []
-        for image in os.listdir(f'{path}/train_images'):
-            traindata.append(f'{path}/train_images/{image}')
-        return traindata
 
-    def load_data(self, batch_size):
-        traindata = self.make_data()
-        train_dataset = Dataset(traindata, self.transform)
-        train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
-        return train_dataloader
+
+
+
+
+
+
+
+# class TrainDataset(torch.utils.data.Dataset):
+
+#     def __init__(self, data, transforms=None):
+#         self.dataset = data
+#         self.transform = transforms
+
+#     def __len__(self):
+#         return len(self.dataset)
+
+#     def __getitem__(self, idx):
+#         img_path = self.dataset[idx]
+#         image = Image.open(img_path)
+#         image = self.transform(image)
+#         return image
+
+
+
+# class DataLoader():
+
+#     def __init__(self):
+#         self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+#         self.datasetWindow = deque()
+
+#     def get_filenames(self):
+#         path = 'Datasets/Driving_Dataset_Mini'
+#         traindata = []
+#         dataset = os.listdir(f'{path}/train_images')
+#         dataset = sorted(dataset, key=self.sort_key)
+#         for image in dataset:
+#             traindata.append(f'{path}/train_images/{image}')
+#         return traindata
+
+#     def load_data(self, batch_size):
+#         traindata = self.get_filenames()
+#         train_dataset = Dataset(traindata, self.transform)
+#         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
+#         return train_dataloader
+
+#     def sort_key(self, filename):
+#         base, ext = filename.rsplit('.', 1)
+#         num = int(re.sub(r'\D', '', base))
+#         return num
+
+
+
+
+
+
 
 
 
@@ -103,3 +211,15 @@ class DataLoader():
 #         img = np.moveaxis(image, 0, 2)
 #         cv2.imshow('img', img)
 #         cv2.waitKey(1)
+
+
+
+# create = DataLoader(batch_size=1, trainingType="unsupervised", return_train_and_test=False)
+# l1 = create.load_data()
+# for items in l1:
+#     image = items[0]
+#     image = image.numpy()
+#     img = np.moveaxis(image, 0, 2)
+#     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+#     cv2.imshow('img', img)
+#     cv2.waitKey(1)
