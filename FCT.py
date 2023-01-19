@@ -2,6 +2,23 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torchsummary import summary
+import random
+import os 
+import numpy as np
+from scipy.ndimage import sobel
+
+import torch
+import torch.optim as optim
+from torchvision import transforms
+from tqdm import tqdm
+
+from dataset import DataLoader
+from metric import DiceLoss, JaccardScore
+
+from PIL import Image
+from torchvision import transforms
+
+from tensorboardX import SummaryWriter 
 
 
 class Attention(nn.Module):
@@ -253,8 +270,158 @@ class FCT(nn.Module):
         return out9
 
 
-data = (torch.rand(size=(1, 3, 256, 256)))
-focusnet = FCT()
-out = focusnet(data)
-print(out.shape)
-# summary(focusnet, (3, 256, 256))
+# data = (torch.rand(size=(1, 3, 256, 256)))
+# focusnet = FCT()
+# out = focusnet(data)
+# print(out.shape)
+# # summary(focusnet, (3, 256, 256))
+
+
+
+
+
+
+
+
+
+
+class FCT_FLOW():
+
+    def __init__(self) -> None:
+        # self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device = "cpu"
+        self.network = FCT()
+    
+
+    def save_sample(self, epoch, x, y, y_pred):
+        path = f'Training_Sneakpeeks/FCT'
+        try:
+            os.makedirs(path)
+        except:
+            pass
+
+        elements = [x, y, y_pred]
+        elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
+        for i, element in enumerate(elements):
+            element.save(f"{path}/{epoch}_{['input','actual','predicted'][i]}.jpg")
+
+
+
+    def train(self, batch_size, epochs, lr=0.0001):
+        
+        
+        print("Loading Datasets...")
+        train_data, test_data = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True).load_data("data_train_car.csv", "data_test_car.csv")
+        print("Dataset Loaded... initializing parameters...")
+        
+        model = self.network
+
+        optimizer = optim.AdamW(model.parameters(), lr)
+        dsc_loss = DiceLoss() 
+        iou = JaccardScore()
+
+        writer = SummaryWriter(log_dir="logs")        
+        
+        loss_train, loss_test, measure = [], [], []
+        start = 1
+        epochs = epochs+1
+        
+        print(f"Starting to train for {epochs} epochs.")
+
+        for epoch in range(start, epochs):
+
+            _loss_train, _loss_test, _measure = 0, 0, 0
+
+            print(f"Training... at Epoch no: {epoch}")
+
+
+            for i, (x, y) in enumerate(tqdm(train_data)):
+
+                x, y = x.to(self.device), y.to(self.device)
+
+                optimizer.zero_grad()
+
+                y_pred = model(x)
+
+                #taking the loss 
+                loss = dsc_loss(y_pred, y)
+                _loss_train += loss.item()
+
+                #backprop algorithm
+                loss.backward()
+                optimizer.step()
+                self.save_sample(epoch, x, y, y_pred)
+
+            
+            if epoch%5 == 0:
+
+                num = random.randint((len(train_data)//batch_size) - 1)
+                print(f'Evaluating the performace of {epoch} epoch.')
+
+                for i, (x, y) in enumerate(tqdm(test_data)):
+                    x, y = x.to(self.device), y.to(self.device)
+                    y_pred = model(x)
+                    loss = dsc_loss(y_pred, y)
+                    measure = iou(y_pred, y)
+                    _measure += measure.item()
+                    _loss_test += loss.item()
+                    if i == num:
+                        self.save_sample(epoch, x, y, y_pred)
+
+
+            writer.add_scalar("Testing Loss", _loss_test, epoch)
+            writer.add_scalar("Training Loss", _loss_train, epoch)
+            writer.add_scalar("Evaluation Metric", _measure, epoch)
+            
+            loss_train.append(_loss_train)
+            loss_test.append(_loss_test)
+            measure.append(_measure)
+
+            print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
+
+            if loss_train[-1] == min(loss_train):
+                print('Saving Model...')
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': loss_train
+                }, f'saved_model/FCT_for_cars.tar')
+            print('\nProceeding to the next epoch...')
+
+
+    def get_output(self, img):
+        model = self.network
+        model.load_state_dict(torch.load("saved_model/FCT_for_cars.tar")['model_state_dict'])
+        model = model.to(self.device)
+        out = model(img)
+        return out
+
+
+    def infer(self):
+        path_for_image_inference = 'Datasets/Driving_Dataset/inference'
+        path_for_saving_inference_samples = "Inference_For_Cars/generated_images"
+        try:
+            os.makedirs(path_for_saving_inference_samples)
+        except:
+            pass
+        file_paths = [ f'{path_for_image_inference}/{x}' for x in os.listdir(path_for_image_inference)]
+        for i, image in tqdm(enumerate(file_paths)):
+            img = Image.open(image)
+            out = self.get_output(img)
+            out = np.array(out)
+            sobel_x = sobel(out, axis=0)
+            sobel_y = sobel(out, axis=1)
+            sobel_img = np.sqrt(np.square(sobel_x) + np.square(sobel_y))
+            sobel_img = (sobel_img / np.max(sobel_img)) * 255
+            sobel_img = sobel_img.astype(np.uint8)
+            out = Image.fromarray(sobel_img)
+            img, out = img.convert("RGB"), out.convert("RGB")
+            result = Image.concatenate(img, out, axis=1)
+            result.save(f"{path_for_saving_inference_samples}/image_{i}")
+
+    
+
+seg = FCT_FLOW()
+seg.train(epochs=70) 
+seg.infer()
