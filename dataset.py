@@ -90,16 +90,16 @@ class DataLoaderSequential():
 
 
 
-l1 = DataLoaderSequential(4).load_data()
+# l1 = DataLoaderSequential(4).load_data()
 
-for items in l1:
-    print(items)
-    image = items[0]
-    image = image.numpy()
-    img = np.moveaxis(image, 0, 2)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    cv2.imshow('img', img)
-    cv2.waitKey(500)
+# for items in l1:
+#     print(items)
+#     image = items[0]
+#     image = image.numpy()
+#     img = np.moveaxis(image, 0, 2)
+#     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+#     cv2.imshow('img', img)
+#     cv2.waitKey(500)
 
 
 
