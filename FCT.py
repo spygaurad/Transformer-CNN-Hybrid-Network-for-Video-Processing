@@ -423,5 +423,5 @@ class FCT_FLOW():
     
 
 seg = FCT_FLOW()
-seg.train(epochs=70) 
+seg.train(batch_size=4, epochs=70) 
 seg.infer()
