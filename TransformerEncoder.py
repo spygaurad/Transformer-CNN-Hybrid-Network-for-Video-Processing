@@ -108,20 +108,23 @@ class TransformerEncoder(nn.Module):
         self.layer_norm = nn.ModuleList([nn.LayerNorm(input_dim) for _ in range(num_layers)])
 
     def forward(self, input, mask):
-        # input is of shape (batch_size, seq_len, input_dim)
-        # mask is of shape (batch_size, seq_len)
 
         # apply the attention and feedforward layers in a loop
         for i in range(self.num_layers):
+            skip1 = input
             input = self.attention_layers[i](input, input, input, mask)
             input = self.layer_norm[i](input)
+            input += skip1
+            skip2 = input
             input = self.feedforward_layers[i](input)
             input = self.layer_norm[i](input)
+            input += skip2
             input = input * math.sqrt(0.5)
             input = nn.Dropout(self.dropout)(input)
 
         # return the output of the encoder
         return input
+
 
 
 

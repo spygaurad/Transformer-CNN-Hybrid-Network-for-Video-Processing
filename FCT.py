@@ -354,7 +354,7 @@ class FCT_FLOW():
             
             if epoch%5 == 0:
 
-                num = random.randint((len(train_data)//batch_size) - 1)
+                num = random.randint(0, (len(train_data)//batch_size) - 1)
                 print(f'Evaluating the performace of {epoch} epoch.')
 
                 for i, (x, y) in enumerate(tqdm(test_data)):
