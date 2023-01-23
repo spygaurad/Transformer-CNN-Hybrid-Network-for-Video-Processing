@@ -157,6 +157,7 @@ class Block_encoder_bottleneck(nn.Module):
             x1 = self.relu(self.conv2(x1))
             x1 = self.maxpool(self.dropout(x1))
             # out = self.trans(x1)
+            out = x1
         else:
             skip_x = self.relu(self.conv1_b(scale_img))
             x1 = torch.cat([skip_x, x], dim=1)
