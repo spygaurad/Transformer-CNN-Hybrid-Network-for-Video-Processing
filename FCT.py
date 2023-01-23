@@ -149,14 +149,14 @@ class Block_encoder_bottleneck(nn.Module):
         self.trans = Transformer(in_channels=out_channels, out_channels=out_channels, num_heads=att_heads, dpr=dpr)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.3)
-        self.maxpool = nn.MaxPool2d(kernel_size=(2, 2)) 
+        self.maxpool = nn.MaxPool2d(kernel_size=(2, 2))
 
     def forward(self, x, scale_img="none"):
-        if ((self.blk=="first") or (self.blk=="bottleneck")):
+        if ((self.blk=="first")):
             x1 = self.relu(self.conv1_a(x))
             x1 = self.relu(self.conv2(x1))
             x1 = self.maxpool(self.dropout(x1))
-            out = self.trans(x1)
+            # out = self.trans(x1)
         else:
             skip_x = self.relu(self.conv1_b(scale_img))
             x1 = torch.cat([skip_x, x], dim=1)
@@ -170,7 +170,7 @@ class Block_encoder_bottleneck(nn.Module):
 
 
 class Block_decoder(nn.Module):
-    def __init__(self, in_channels, out_channels, att_heads, dpr):
+    def __init__(self, blk, in_channels, out_channels, att_heads, dpr):
         super().__init__()
         self.upsample = nn.Upsample(scale_factor=2)
         self.conv1 = nn.Conv2d(in_channels, out_channels, 3, 1, padding="same")
@@ -179,6 +179,7 @@ class Block_decoder(nn.Module):
         self.trans = Transformer(in_channels=out_channels, out_channels=out_channels, num_heads=att_heads, dpr=dpr)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.3)
+        self.blk = blk
         
     def forward(self, x, skip):
         x1 = self.upsample(x)
@@ -187,7 +188,10 @@ class Block_decoder(nn.Module):
         x1 = self.relu(self.conv2(x1))
         x1 = self.relu(self.conv3(x1))
         x1 = self.dropout(x1)
-        out = self.trans(x1)
+        if self.blk == "d4":
+            out = x1
+        else:
+            out = self.trans(x1)
         return out
 
 
@@ -230,13 +234,11 @@ class FCT(nn.Module):
         self.block_3 = Block_encoder_bottleneck("third", filters[1], filters[2], att_heads[2], dpr[2])
         self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads[3], dpr[3])
         self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads[4], dpr[4])
-        self.block_6 = Block_decoder(filters[4], filters[5], att_heads[5], dpr[5])
-        self.block_7 = Block_decoder(filters[5], filters[6], att_heads[6], dpr[6])
-        self.block_8 = Block_decoder(filters[6], filters[7], att_heads[7], dpr[7])
-        self.block_9 = Block_decoder(filters[7], filters[8], att_heads[8], dpr[8])
+        self.block_6 = Block_decoder("d1", filters[4], filters[5], att_heads[5], dpr[5])
+        self.block_7 = Block_decoder("d2", filters[5], filters[6], att_heads[6], dpr[6])
+        self.block_8 = Block_decoder("d3", filters[6], filters[7], att_heads[7], dpr[7])
+        self.block_9 = Block_decoder("d4", filters[7], filters[8], att_heads[8], dpr[8])
 
-        self.ds7 = DS_out(filters[6], 1)
-        self.ds8 = DS_out(filters[7], 1)
         self.ds9 = DS_out(filters[8], 1)
         
     def forward(self,x):
@@ -257,17 +259,14 @@ class FCT(nn.Module):
         x = self.block_5(x)
         x = self.block_6(x, skip4)
         x = self.block_7(x, skip3)
-        skip7 = x
         x = self.block_8(x, skip2)
-        skip8 = x
         x = self.block_9(x, skip1)
         skip9 = x
 
-        out7 = self.ds7(skip7)
-        out8 = self.ds8(skip8)
         out9 = self.ds9(skip9)
 
         return out9
+
 
 
 # data = (torch.rand(size=(1, 3, 256, 256)))
@@ -308,7 +307,6 @@ class FCT_FLOW():
 
 
     def train(self, batch_size, epochs, lr=0.0001):
-        
         
         print("Loading Datasets...")
         dl = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True)
