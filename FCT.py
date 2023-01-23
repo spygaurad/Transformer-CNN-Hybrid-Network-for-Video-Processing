@@ -352,7 +352,7 @@ class FCT_FLOW():
                 self.save_sample(epoch, x, y, y_pred)
 
             
-            if ((epoch%5 == 0) or (epoch==0)):
+            if ((epoch%5 == 0) or (epoch==1)):
 
                 num = random.randint(0, (len(train_data)//batch_size) - 1)
                 print(f'Evaluating the performace of {epoch} epoch.')
