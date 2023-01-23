@@ -313,6 +313,7 @@ class FCT_FLOW():
         print("Dataset Loaded... initializing parameters...")
         
         model = self.network
+        model.to(self.device)
 
         optimizer = optim.AdamW(model.parameters(), lr)
         dsc_loss = DiceLoss() 
