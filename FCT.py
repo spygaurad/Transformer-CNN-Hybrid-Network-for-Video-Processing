@@ -149,10 +149,10 @@ class Block_encoder_bottleneck(nn.Module):
         self.trans = Transformer(in_channels=out_channels, out_channels=out_channels, num_heads=att_heads, dpr=dpr)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.3)
-        self.maxpool = nn.MaxPool2d(kernel_size=(2, 2))
+        self.maxpool = nn.MaxPool2d(kernel_size=(2, 2)) 
 
     def forward(self, x, scale_img="none"):
-        if ((self.blk=="first")):
+        if ((self.blk=="first") or (self.blk=="bottleneck")):
             x1 = self.relu(self.conv1_a(x))
             x1 = self.relu(self.conv2(x1))
             x1 = self.maxpool(self.dropout(x1))
@@ -181,18 +181,17 @@ class Block_decoder(nn.Module):
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.3)
         self.blk = blk
-        
+
     def forward(self, x, skip):
         x1 = self.upsample(x)
         x1 = self.relu(self.conv1(x1))
         x1 = torch.cat((skip, x1), axis=1)
         x1 = self.relu(self.conv2(x1))
         x1 = self.relu(self.conv3(x1))
-        x1 = self.dropout(x1)
         if self.blk == "d4":
-            out = x1
+            out = self.dropout(x1)
         else:
-            out = self.trans(x1)
+            out = self.dropout(self.trans(x1))
         return out
 
 
@@ -262,12 +261,10 @@ class FCT(nn.Module):
         x = self.block_7(x, skip3)
         x = self.block_8(x, skip2)
         x = self.block_9(x, skip1)
-        skip9 = x
 
-        out9 = self.ds9(skip9)
+        out9 = self.ds9(x)
 
         return out9
-
 
 
 # data = (torch.rand(size=(1, 3, 256, 256)))
@@ -309,13 +306,13 @@ class FCT_FLOW():
 
     def train(self, batch_size, epochs, lr=0.0001):
         
+        
         print("Loading Datasets...")
         dl = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True)
         train_data, test_data = dl.load_data("data_train_car.csv", "data_test_car.csv")
         print("Dataset Loaded... initializing parameters...")
         
         model = self.network
-        model.to(self.device)
 
         optimizer = optim.AdamW(model.parameters(), lr)
         dsc_loss = DiceLoss() 
