@@ -321,7 +321,7 @@ class FCT_FLOW():
 
         writer = SummaryWriter(log_dir="logs")        
         
-        loss_train, loss_test, measure = [], [], []
+        loss_train, loss_test, measur = [], [], []
         start = 1
         epochs = epochs+1
         
@@ -352,7 +352,7 @@ class FCT_FLOW():
                 self.save_sample(epoch, x, y, y_pred)
 
             
-            if epoch%5 == 0:
+            if ((epoch%5 == 0) or (epoch==0)):
 
                 num = random.randint(0, (len(train_data)//batch_size) - 1)
                 print(f'Evaluating the performace of {epoch} epoch.')
@@ -374,7 +374,7 @@ class FCT_FLOW():
             
             loss_train.append(_loss_train)
             loss_test.append(_loss_test)
-            measure.append(_measure)
+            measur.append(_measure)
 
             print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
 
