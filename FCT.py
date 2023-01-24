@@ -170,7 +170,7 @@ class Block_encoder_bottleneck(nn.Module):
 
 
 class Block_decoder(nn.Module):
-    def __init__(self, blk, in_channels, out_channels, att_heads, dpr):
+    def __init__(self, in_channels, out_channels, att_heads, dpr):
         super().__init__()
         self.upsample = nn.Upsample(scale_factor=2)
         self.conv1 = nn.Conv2d(in_channels, out_channels, 3, 1, padding="same")
@@ -179,7 +179,6 @@ class Block_decoder(nn.Module):
         self.trans = Transformer(in_channels=out_channels, out_channels=out_channels, num_heads=att_heads, dpr=dpr)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.3)
-        self.blk = blk
 
     def forward(self, x, skip):
         x1 = self.upsample(x)
@@ -230,10 +229,10 @@ class FCT(nn.Module):
         self.block_3 = Block_encoder_bottleneck("third", filters[1], filters[2], att_heads[2], dpr[2])
         self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads[3], dpr[3])
         self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads[4], dpr[4])
-        self.block_6 = Block_decoder("d1", filters[4], filters[5], att_heads[5], dpr[5])
-        self.block_7 = Block_decoder("d2", filters[5], filters[6], att_heads[6], dpr[6])
-        self.block_8 = Block_decoder("d3", filters[6], filters[7], att_heads[7], dpr[7])
-        self.block_9 = Block_decoder("d4", filters[7], filters[8], att_heads[8], dpr[8])
+        self.block_6 = Block_decoder(filters[4], filters[5], att_heads[5], dpr[5])
+        self.block_7 = Block_decoder(filters[5], filters[6], att_heads[6], dpr[6])
+        self.block_8 = Block_decoder(filters[6], filters[7], att_heads[7], dpr[7])
+        self.block_9 = Block_decoder(filters[7], filters[8], att_heads[8], dpr[8])
 
         self.ds9 = DS_out(filters[8], 1)
         
@@ -328,6 +327,8 @@ class FCT_FLOW():
             _loss_train, _loss_test, _measure = 0, 0, 0
             print(f"Training... at Epoch no: {epoch}")
 
+            num = random.randint(0, (len(train_data)//batch_size) - 1)
+
             for i, (x, y) in enumerate(tqdm(train_data)):
 
                 x, y = x.to(self.device), y.to(self.device)
@@ -343,31 +344,32 @@ class FCT_FLOW():
                 #backprop algorithm
                 loss.backward()
                 optimizer.step()
+                if i == num:
+                    self.save_sample(epoch, x, y, y_pred)
 
             
-            if epoch%5 == 0:
-                num = random.randint(0, (len(train_data)//batch_size) - 1)
-                print(f'Evaluating the performace of {epoch} epoch.')
-                for i, (x, y) in enumerate(tqdm(test_data)):
-                    x, y = x.to(self.device), y.to(self.device)
-                    y_pred = model(x)
-                    loss = dsc_loss(y_pred, y)
-                    measure = iou(y_pred, y)
-                    _measure += measure.item()
-                    _loss_test += loss.item()
-                    if i == num:
-                        self.save_sample(epoch, x, y, y_pred)
+            # if epoch%5 == 0:
+            #     num = random.randint(0, (len(train_data)//batch_size) - 1)
+            #     print(f'Evaluating the performace of {epoch} epoch.')
+            #     for i, (x, y) in enumerate(tqdm(test_data)):
+            #         x, y = x.to(self.device), y.to(self.device)
+            #         y_pred = model(x)
+            #         loss = dsc_loss(y_pred, y)
+            #         measure = iou(y_pred, y)
+            #         _measure += measure.item()
+            #         _loss_test += loss.item()
 
 
-            writer.add_scalar("Testing Loss", _loss_test, epoch)
+            # writer.add_scalar("Testing Loss", _loss_test, epoch)
             writer.add_scalar("Training Loss", _loss_train, epoch)
-            writer.add_scalar("Evaluation Metric", _measure, epoch)
+            # writer.add_scalar("Evaluation Metric", _measure, epoch)
             
             loss_train.append(_loss_train)
-            loss_test.append(_loss_test)
-            measur.append(_measure)
+            # loss_test.append(_loss_test)
+            # measur.append(_measure)
 
-            print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
+            # print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
+            print(f"Epoch: {epoch+1}, Training loss: {_loss_train}")
  
             if loss_train[-1] == min(loss_train):
                 print('Saving Model...')
@@ -413,5 +415,5 @@ class FCT_FLOW():
     
 
 seg = FCT_FLOW()
-seg.train(batch_size=2, epochs=70) 
+seg.train(batch_size=1, epochs=70) 
 seg.infer()
