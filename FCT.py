@@ -285,8 +285,8 @@ class FCT(nn.Module):
 class FCT_FLOW():
 
     def __init__(self) -> None:
-        # self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        self.device = "cpu"
+        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        # self.device = "cpu"
         self.network = FCT()
     
 
@@ -347,14 +347,11 @@ class FCT_FLOW():
                 #backprop algorithm
                 loss.backward()
                 optimizer.step()
-                self.save_sample(epoch, x, y, y_pred)
 
             
             if epoch%5 == 0:
-
                 num = random.randint(0, (len(train_data)//batch_size) - 1)
                 print(f'Evaluating the performace of {epoch} epoch.')
-
                 for i, (x, y) in enumerate(tqdm(test_data)):
                     x, y = x.to(self.device), y.to(self.device)
                     y_pred = model(x)
