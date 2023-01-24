@@ -285,8 +285,8 @@ class FCT(nn.Module):
 class FCT_FLOW():
 
     def __init__(self) -> None:
-        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        # self.device = "cpu"
+        # self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device = "cpu"
         self.network = FCT()
     
 
@@ -304,12 +304,12 @@ class FCT_FLOW():
 
 
 
-    def train(self, batch_size, epochs, lr=0.0001):
+    def train(self, batch_size, epochs, lr=0.001):
         
         
         print("Loading Datasets...")
         dl = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True)
-        train_data, test_data = dl.load_data("data_train_car.csv", "data_test_car.csv")
+        train_data, test_data = dl.load_data("car_train_data.csv", "car_test_data.csv")
         print("Dataset Loaded... initializing parameters...")
         
         model = self.network
@@ -330,9 +330,7 @@ class FCT_FLOW():
         for epoch in range(start, epochs):
 
             _loss_train, _loss_test, _measure = 0, 0, 0
-
             print(f"Training... at Epoch no: {epoch}")
-
 
             for i, (x, y) in enumerate(tqdm(train_data)):
 
@@ -352,7 +350,7 @@ class FCT_FLOW():
                 self.save_sample(epoch, x, y, y_pred)
 
             
-            if ((epoch%5 == 0) or (epoch==1)):
+            if epoch%5 == 0:
 
                 num = random.randint(0, (len(train_data)//batch_size) - 1)
                 print(f'Evaluating the performace of {epoch} epoch.')
@@ -377,7 +375,7 @@ class FCT_FLOW():
             measur.append(_measure)
 
             print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
-
+ 
             if loss_train[-1] == min(loss_train):
                 print('Saving Model...')
                 torch.save({
@@ -389,25 +387,25 @@ class FCT_FLOW():
             print('\nProceeding to the next epoch...')
 
 
-    def get_output(self, img):
+
+    def infer(self):
+
         model = self.network
         model.load_state_dict(torch.load("saved_model/FCT_for_cars.tar")['model_state_dict'])
         model = model.to(self.device)
-        out = model(img)
-        return out
 
-
-    def infer(self):
         path_for_image_inference = 'Datasets/Driving_Dataset/inference'
         path_for_saving_inference_samples = "Inference_For_Cars/generated_images"
+
         try:
             os.makedirs(path_for_saving_inference_samples)
         except:
             pass
+
         file_paths = [ f'{path_for_image_inference}/{x}' for x in os.listdir(path_for_image_inference)]
         for i, image in tqdm(enumerate(file_paths)):
             img = Image.open(image)
-            out = self.get_output(img)
+            out = model(img)
             out = np.array(out)
             sobel_x = sobel(out, axis=0)
             sobel_y = sobel(out, axis=1)
