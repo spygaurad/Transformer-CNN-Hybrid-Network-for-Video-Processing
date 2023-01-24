@@ -156,8 +156,7 @@ class Block_encoder_bottleneck(nn.Module):
             x1 = self.relu(self.conv1_a(x))
             x1 = self.relu(self.conv2(x1))
             x1 = self.maxpool(self.dropout(x1))
-            # out = self.trans(x1)
-            out = x1
+            out = self.trans(x1)
         else:
             skip_x = self.relu(self.conv1_b(scale_img))
             x1 = torch.cat([skip_x, x], dim=1)
@@ -188,10 +187,7 @@ class Block_decoder(nn.Module):
         x1 = torch.cat((skip, x1), axis=1)
         x1 = self.relu(self.conv2(x1))
         x1 = self.relu(self.conv3(x1))
-        if self.blk == "d4":
-            out = self.dropout(x1)
-        else:
-            out = self.dropout(self.trans(x1))
+        out = self.dropout(self.trans(x1))
         return out
 
 
@@ -417,5 +413,5 @@ class FCT_FLOW():
     
 
 seg = FCT_FLOW()
-seg.train(batch_size=4, epochs=70) 
+seg.train(batch_size=2, epochs=70) 
 seg.infer()
