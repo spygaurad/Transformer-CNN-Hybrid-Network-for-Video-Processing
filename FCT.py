@@ -211,8 +211,7 @@ class FCT(nn.Module):
     def __init__(self):
         super().__init__()
 
-        
-        att_heads = [2, 2, 2, 2, 2, 2, 2, 2, 2]
+        att_heads = 2
         filters = [8, 16, 32, 64, 128, 64, 32, 16, 8] 
         blocks = len(filters)
         stochastic_depth_rate = 0.0
@@ -221,19 +220,17 @@ class FCT(nn.Module):
         self.scale_img = nn.AvgPool2d(2,2)   
 
         # model
-        self.block_1 = Block_encoder_bottleneck("first", 3, filters[0], att_heads[0], dpr[0])
-        self.block_2 = Block_encoder_bottleneck("second", filters[0], filters[1], att_heads[1], dpr[1])
-        self.block_3 = Block_encoder_bottleneck("third", filters[1], filters[2], att_heads[2], dpr[2])
-        self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads[3], dpr[3])
-        self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads[4], dpr[4])
-        self.block_6 = Block_decoder(filters[4], filters[5], att_heads[5], dpr[5])
-        self.block_7 = Block_decoder(filters[5], filters[6], att_heads[6], dpr[6])
-        self.block_8 = Block_decoder(filters[6], filters[7], att_heads[7], dpr[7])
-        self.block_9 = Block_decoder(filters[7], filters[8], att_heads[8], dpr[8])
+        self.block_1 = Block_encoder_bottleneck("first", 3, filters[0], att_heads, dpr[0])
+        self.block_2 = Block_encoder_bottleneck("second", filters[0], filters[1], att_heads, dpr[1])
+        self.block_3 = Block_encoder_bottleneck("third", filters[1], filters[2], att_heads, dpr[2])
+        self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads, dpr[3])
+        self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads, dpr[4])
+        self.block_6 = Block_decoder(filters[4], filters[5], att_heads, dpr[5])
+        self.block_7 = Block_decoder(filters[5], filters[6], att_heads, dpr[6])
+        self.block_8 = Block_decoder(filters[6], filters[7], att_heads, dpr[7])
+        self.block_9 = Block_decoder(filters[7], filters[8], att_heads, dpr[8])
 
-        self.ds7 = DS_out(filters[6], 1)
-        self.ds8 = DS_out(filters[7], 1)
-        self.ds9 = DS_out(filters[8], 3)
+        self.ds = DS_out(filters[8], 1)
         
     def forward(self,x):
 
@@ -242,26 +239,17 @@ class FCT(nn.Module):
         scale_img_3 = self.scale_img(scale_img_2)
         scale_img_4 = self.scale_img(scale_img_3)  
 
-        x = self.block_1(x)
-        skip1 = x
-        x = self.block_2(x, scale_img_2)
-        skip2 = x
-        x = self.block_3(x, scale_img_3)
-        skip3 = x
-        x = self.block_4(x, scale_img_4)
-        skip4 = x
-        x = self.block_5(x)
-        x = self.block_6(x, skip4)
-        x = self.block_7(x, skip3)
-        skip7 = x
-        x = self.block_8(x, skip2)
-        skip8 = x
-        x = self.block_9(x, skip1)
-        skip9 = x
+        x1 = self.block_1(x)
+        x2 = self.block_2(x1, scale_img_2)
+        x3 = self.block_3(x2, scale_img_3)
+        x4 = self.block_4(x3, scale_img_4)
+        x = self.block_5(x4)
+        x = self.block_6(x, x4)
+        x = self.block_7(x, x3)
+        x = self.block_8(x, x2)
+        x = self.block_9(x, x1)
 
-        out7 = self.ds7(skip7)
-        out8 = self.ds8(skip8)
-        out9 = self.ds9(skip9)
+        out9 = self.ds(x)
 
         return out9
 
@@ -271,7 +259,7 @@ class FCT(nn.Module):
 # focusnet = FCT()
 # out = focusnet(data)
 # print(out.shape)
-# # summary(focusnet, (3, 256, 256))
+# summary(focusnet, (3, 256, 256))
 
 
 
@@ -285,7 +273,8 @@ class FCT(nn.Module):
 class FCT_FLOW():
 
     def __init__(self) -> None:
-        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        # self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device =   "cpu"
     
 
     def save_sample(self, epoch, x, y, y_pred):
@@ -401,6 +390,7 @@ class FCT_FLOW():
             pass
 
         file_paths = [ f'{path_for_image_inference}/{x}' for x in os.listdir(path_for_image_inference)]
+        print(file_paths)
         for i, image in tqdm(enumerate(file_paths)):
             img = Image.open(image)
             out = model(img)
