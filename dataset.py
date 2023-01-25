@@ -84,7 +84,7 @@ class CSVDataset(torch.utils.data.Dataset):
             for row in reader:
                 self.rows.append(row)
                 i+=1
-                if i>99:
+                if i>100:
                     break
 
     def __len__(self):
