@@ -83,6 +83,7 @@ class CSVDataset(torch.utils.data.Dataset):
             i = 0
             for row in reader:
                 self.rows.append(row)
+                i+=1
                 if i>100:
                     break
 
