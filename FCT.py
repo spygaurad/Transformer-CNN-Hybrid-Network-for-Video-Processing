@@ -28,18 +28,13 @@ class Attention(nn.Module):
         self.stride_q = stride_q
         self.num_heads = num_heads
         self.proj_drop = proj_drop
-
         self.conv_q = nn.Conv2d(channels, channels, kernel_size, stride_q, padding_q, bias=attention_bias, groups=channels)
         self.layernorm_q = nn.LayerNorm(channels, eps=1e-5)
-
         self.conv_k = nn.Conv2d(channels, channels, kernel_size, stride_kv, stride_kv, bias=attention_bias, groups=channels)
         self.layernorm_k = nn.LayerNorm(channels, eps=1e-5)
-
         self.conv_v = nn.Conv2d(channels, channels, kernel_size, stride_kv, stride_kv, bias=attention_bias, groups=channels)
         self.layernorm_v = nn.LayerNorm(channels, eps=1e-5)
-
         self.attention = nn.MultiheadAttention(embed_dim=channels, bias=attention_bias, batch_first=True, num_heads=self.num_heads)
-        
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout()
 
@@ -179,14 +174,15 @@ class Block_decoder(nn.Module):
         self.trans = Transformer(in_channels=out_channels, out_channels=out_channels, num_heads=att_heads, dpr=dpr)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.3)
-
+        
     def forward(self, x, skip):
         x1 = self.upsample(x)
         x1 = self.relu(self.conv1(x1))
         x1 = torch.cat((skip, x1), axis=1)
         x1 = self.relu(self.conv2(x1))
         x1 = self.relu(self.conv3(x1))
-        out = self.dropout(self.trans(x1))
+        x1 = self.dropout(x1)
+        out = self.trans(x1)
         return out
 
 
@@ -215,6 +211,7 @@ class FCT(nn.Module):
     def __init__(self):
         super().__init__()
 
+        
         att_heads = [2, 2, 2, 2, 2, 2, 2, 2, 2]
         filters = [8, 16, 32, 64, 128, 64, 32, 16, 8] 
         blocks = len(filters)
@@ -234,7 +231,9 @@ class FCT(nn.Module):
         self.block_8 = Block_decoder(filters[6], filters[7], att_heads[7], dpr[7])
         self.block_9 = Block_decoder(filters[7], filters[8], att_heads[8], dpr[8])
 
-        self.ds9 = DS_out(filters[8], 1)
+        self.ds7 = DS_out(filters[6], 1)
+        self.ds8 = DS_out(filters[7], 1)
+        self.ds9 = DS_out(filters[8], 3)
         
     def forward(self,x):
 
@@ -254,10 +253,15 @@ class FCT(nn.Module):
         x = self.block_5(x)
         x = self.block_6(x, skip4)
         x = self.block_7(x, skip3)
+        skip7 = x
         x = self.block_8(x, skip2)
+        skip8 = x
         x = self.block_9(x, skip1)
+        skip9 = x
 
-        out9 = self.ds9(x)
+        out7 = self.ds7(skip7)
+        out8 = self.ds8(skip8)
+        out9 = self.ds9(skip9)
 
         return out9
 
