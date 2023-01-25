@@ -266,6 +266,7 @@ class FCT(nn.Module):
         return out9
 
 
+
 # data = (torch.rand(size=(1, 3, 256, 256)))
 # focusnet = FCT()
 # out = focusnet(data)
@@ -285,8 +286,6 @@ class FCT_FLOW():
 
     def __init__(self) -> None:
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        # self.device = "cpu"
-        self.network = FCT()
     
 
     def save_sample(self, epoch, x, y, y_pred):
@@ -295,7 +294,6 @@ class FCT_FLOW():
             os.makedirs(path)
         except:
             pass
-
         elements = [x, y, y_pred]
         elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
         for i, element in enumerate(elements):
@@ -311,12 +309,13 @@ class FCT_FLOW():
         train_data, test_data = dl.load_data("car_train_data.csv", "car_test_data.csv")
         print("Dataset Loaded... initializing parameters...")
         
-        model = self.network
+        
+        model = FCT()
         model.to(self.device)
 
         optimizer = optim.AdamW(model.parameters(), lr)
         dsc_loss = DiceLoss() 
-        iou = JaccardScore()
+        # iou = JaccardScore()
 
         writer = SummaryWriter(log_dir="logs")        
         
