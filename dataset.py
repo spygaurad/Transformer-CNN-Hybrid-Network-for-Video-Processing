@@ -80,8 +80,11 @@ class CSVDataset(torch.utils.data.Dataset):
         self.rows = []
         with open(csv_file, "r") as f:
             reader = csv.reader(f)
+            i = 0
             for row in reader:
                 self.rows.append(row)
+                if i>100:
+                    break
 
     def __len__(self):
         return len(self.rows)
