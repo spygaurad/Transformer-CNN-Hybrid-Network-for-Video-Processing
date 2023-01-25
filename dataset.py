@@ -106,7 +106,7 @@ class DataLoaderSequential():
 
     def load_data(self):
         dataset = CSVDataset("data_sequential_VOS.csv", self.transform)
-        l1 = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
+        l1 = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False, drop_last=True)
         return l1
 
 
