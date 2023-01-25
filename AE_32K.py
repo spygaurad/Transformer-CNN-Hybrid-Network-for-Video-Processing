@@ -262,10 +262,10 @@ def train(epochs, batch_size=8, lr=0.0001):
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
-    model = Autoencoder32K("image").to(device)    
+    model = Autoencoder32K("image").to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
-    nvidia_mix_loss = MixedLoss(0.5, 0.5) 
+    nvidia_mix_loss = MixedLoss(0.5, 0.5)
     loss_train = []
     start = 0
     epochs = epochs
@@ -286,17 +286,17 @@ def train(epochs, batch_size=8, lr=0.0001):
             image = image.to(device)
 
             #zero grading the optimizer
-            optimizer.zero_grad()    
+            optimizer.zero_grad()
 
             #input the image into the model and getting the reconstructed image
-            output = model(image)   
+            output = model(image)
 
             #Loss functions for evaluation
             loss = nvidia_mix_loss(output, image)
             # loss = diceLoss(output, mask)
 
             #adding a loss function 
-            _loss += loss.item()    
+            _loss += loss.item()
 
             #backpropogation algorithm
             loss.backward()
@@ -321,4 +321,11 @@ def train(epochs, batch_size=8, lr=0.0001):
         print('\nProceeding to the next epoch...')
 
 
-train(60)
+
+
+# train(60)
+
+
+
+
+            

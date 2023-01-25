@@ -4,13 +4,14 @@ import torch.nn as nn
 import math
 import torch.optim as optim
 from AE_32K import Autoencoder32K
-from dataset import DataLoader
+from dataset import DataLoaderSequential
 from TransformerEncoder import TransformerEncoder
 from collections import deque
 from metric import MixedLoss
 import numpy as np
 import random
 from tqdm import tqdm
+import os
 from torchvision import transforms
 from tensorboardX import SummaryWriter
 
@@ -36,18 +37,19 @@ from tensorboardX import SummaryWriter
     Total number of vectors that we will be resulting in is 126
 '''
 
-SEQUENCE_LENGTH = 7
+SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
 BATCH_SIZE = 1
+# DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
 encoderdecoder = Autoencoder32K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/EncoderDecoder_road_image2image32K.tar')['model_state_dict'])
-for params in encoderdecoder.parameters():
-    params.requires_grad = False
+# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_60.tar')['model_state_dict'])
+# for params in encoderdecoder.parameters():
+#     params.requires_grad = False
 
 
 
@@ -59,15 +61,14 @@ class CNN_Encoder(nn.Module):
     def forward(self, x):
         bottleneck_32K = self.encoder(x)
         return bottleneck_32K
+    
 
-
+#generate a code 
 
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, num_layers, num_heads):
         super(Transformer_Encoder, self).__init__()
         self.transformerencoder = TransformerEncoder(input_dim=input_dim, hidden_dim=input_dim, num_layers=num_layers, num_heads=num_heads, dropout=0.1)
-        # self.encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads)
-        # self.transformerencoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
     def forward(self, x):
         transformer_latent = self.transformerencoder(x, mask=None)
@@ -98,7 +99,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #loading the custom transformer encoder class
         # self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2)
-        self.transenc = TransformerEncoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=2, dropout=0.1)
+        self.transenc = TransformerEncoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=6, num_heads=4, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -120,9 +121,6 @@ class VideoSegmentationNetwork(nn.Module):
 
     def forward(self, x):
 
-        #the sequence number of the sequence window that we are in
-        nth_sequence = self.__sequence_counter__()
-
         #tensor size [batch, 32K]
         latent_32K = self.cnnencoder(x)
 
@@ -142,16 +140,15 @@ class VideoSegmentationNetwork(nn.Module):
             middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
 
             #adding the mask to the latent exactly in the middle
-            mask = torch.empty(1, 1, 32768).to(DEVICE)
-            nn.init.xavier_uniform_(mask)
-            mask_new = self.__reshape_split_and_stack__(mask)
-            chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
+            # mask = torch.empty(1, 1, 32768).to(DEVICE)
+            # mask_new = self.__reshape_split_and_stack__(mask)
+            # chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
 
             #adding the positional encoding to the tensor just created
-            chunks += self.positionalTensor
+            chunk = chunks+self.positionalTensor
 
             #sending the encoded latent to the transformer
-            latent_from_transformer = self.transenc(chunks, mask=None)
+            latent_from_transformer = self.transenc(chunk, mask=None)
 
             #taking the latent which is exacty in the middle
             transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
@@ -222,8 +219,7 @@ class VideoSegmentationNetwork(nn.Module):
             T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
         '''
         PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH) 
-        # PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
-        PE_imageSequence = torch.zeros((CHUNK_LENGTH, EMBEDDED_DIMENSION))
+        PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
         T = []
         for seq in PE_imageSequence:
             t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
@@ -238,7 +234,7 @@ def train(epochs, lr=0.001):
 
     print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
-    train_dataloader = DataLoader().load_data(BATCH_SIZE)
+    train_data = DataLoaderSequential(BATCH_SIZE).load_data()
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
@@ -246,10 +242,6 @@ def train(epochs, lr=0.001):
     model = VideoSegmentationNetwork().to(DEVICE)
     # model.load_state_dict(torch.load('saved_model/transformer_full_model.tar')['model_state_dict'])
 
-    #the pretrained decoder model
-    # decoderModel = model.cnndecoder
-    for params in model.cnndecoder.parameters():
-        params.requires_grad = True
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
@@ -259,7 +251,6 @@ def train(epochs, lr=0.001):
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
-    mseloss = torch.nn.MSELoss()
 
     writer = SummaryWriter(log_dir="logs")     
 
@@ -272,9 +263,9 @@ def train(epochs, lr=0.001):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        num = random.randint(0, 100)
+        num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
 
-        for i, image in enumerate(tqdm(train_dataloader)):
+        for i, image in enumerate(tqdm(train_data)):
 
             #converting the image to cuda device
             image = image.to(DEVICE)
@@ -291,12 +282,10 @@ def train(epochs, lr=0.001):
                 # MS-SSIM loss + MSE Loss for model evaluation
                 loss = nvidia_mix_loss(image_pred, image)
 
-                if epoch<10:
-                    #MSE loss for latent-to-latent prediction
-                    loss_mid = mseloss(latent, middle_chunk)
+                #MSE loss for latent-to-latent prediction
+                # loss_mid = mseloss(latent, middle_chunk)
 
-                    #adding the both losses
-                    loss = loss + loss_mid
+                #adding the both losses
 
                 #getting the loss's number
                 _loss += loss.item()
@@ -307,30 +296,35 @@ def train(epochs, lr=0.001):
                 # optimizerCNNDecoder.step()
 
                 #saving a sample
-                if i==num and epoch%5==0:
+                if i%2==0:
                     __save_sample__(epoch+1, image, image_pred)
-            writer.add_scalar("Training Loss", _loss, i)
+
+        writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
 
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
 
-        if epoch%50==0:
+        if loss_train[-1] == min(loss_train):
             print('Saving Model...')
-            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model{epoch}.tar')
+            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model.tar')
             # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
 
 
 def __save_sample__(epoch, x, img_pred):
-    path = f'Training_Sneakpeeks/Transformer_Training/{epoch}'
+    path = f'Training_Sneakpeeks/Transformer_Training/'
+    try:
+        os.makedirs(path)
+    except:
+        pass
     elements = [x, img_pred]
     elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
-    elements[0] = elements[0].save(f"{path}_image.jpg")
-    elements[1] = elements[1].save(f"{path}_image_pred_transformer.jpg")
+    for i, element in enumerate(elements):
+        element.save(f"{path}{epoch}_{['image', 'image_trans_pred'][i]}.jpg")
 
 
-train(epochs=5000)
+train(epochs=500)
 
 # vsn = VideoSegmentationNetwork()
 
