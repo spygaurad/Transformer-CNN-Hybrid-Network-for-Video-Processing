@@ -273,8 +273,8 @@ class FCT(nn.Module):
 class FCT_FLOW():
 
     def __init__(self) -> None:
-        # self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        self.device =   "cpu"
+        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        # self.device =   "cpu"
     
 
     def save_sample(self, epoch, x, y, y_pred):
