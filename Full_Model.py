@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 2
+BATCH_SIZE = 1
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -68,10 +68,13 @@ class CNN_Encoder(nn.Module):
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, num_layers, num_heads):
         super(Transformer_Encoder, self).__init__()
-        self.transformerencoder = TransformerEncoder(input_dim=input_dim, hidden_dim=input_dim, num_layers=num_layers, num_heads=num_heads, dropout=0.1)
+        # self.transformerencoder = TransformerEncoder(input_dim=input_dim, hidden_dim=input_dim, num_layers=num_layers, num_heads=num_heads, dropout=0.1)
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads)
+        self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
     def forward(self, x):
-        transformer_latent = self.transformerencoder(x, mask=None)
+        # transformer_latent = self.transformerencoder(x, mask=None)
+        transformer_latent = self.transformer_encoder(x, mask=None)
         return transformer_latent
 
 
@@ -93,7 +96,7 @@ class VideoSegmentationNetwork(nn.Module):
     def __init__(self):
 
         super(VideoSegmentationNetwork, self).__init__()
-        
+         
         #the pre trained encoder which encodes the input into total number of 32K parameters 
         self.cnnencoder = CNN_Encoder()
 
@@ -184,7 +187,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __reshape_split_and_stack__(self, x):
-        x = x.view(x.shape[0], -1)
+        # x = x.view(x.shape[0], -1)
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
         sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
         return sequence
@@ -197,7 +200,7 @@ class VideoSegmentationNetwork(nn.Module):
         chunks = x.split(1, dim=1)
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
         merged_x = torch.cat(chunks, dim=1)
-        merged_x = merged_x.view(BATCH_SIZE, 8, 64, 64)
+        # merged_x = merged_x.view(BATCH_SIZE, 8, 64, 64)
         return sof_pred, eof_pred, merged_x
 
 
