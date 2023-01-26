@@ -273,10 +273,11 @@ def train(epochs, batch_size=8, lr=0.0001):
     print(f"Parameters Initialized...")
     print(f"Starting to train for {epochs} epochs.")
 
+    # try:
 
     #training for n epochs
     for epoch in range(start, epochs):
-        
+
         print(f"Epoch no: {epoch+1}")
         _loss = 0
         num = random.randint(0, len(train_dataloader)//batch_size - 1)
@@ -309,6 +310,7 @@ def train(epochs, batch_size=8, lr=0.0001):
 
         loss_train.append(_loss)
 
+
         #Saving the minimum loss wala model
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
         if epoch%10 == 0 and loss_train[-1] == min(loss_train):
@@ -322,6 +324,18 @@ def train(epochs, batch_size=8, lr=0.0001):
         print('\nProceeding to the next epoch...')
 
 
+    # except torch.cuda.CudaError as e:
+    #     if "out of memory" in str(e):
+    #         return True
+    
+
+    return False
 
 
-train(60)
+
+
+
+error = train(61, batch_size=4)
+# if error:
+#     torch.cuda.empty_cache()
+#     train(epochs=61, batch_size=4)

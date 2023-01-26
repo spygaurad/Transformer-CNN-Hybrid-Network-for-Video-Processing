@@ -47,9 +47,9 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 encoderdecoder = Autoencoder32K(outputType="image")
-# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_60.tar')['model_state_dict'])
-# for params in encoderdecoder.parameters():
-#     params.requires_grad = False
+encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_60.tar')['model_state_dict'])
+for params in encoderdecoder.parameters():
+    params.requires_grad = False
 
 
 
@@ -108,8 +108,8 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
-        self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
-        self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
         self.positionalTensor = self.__get_positional__tensor().to(DEVICE)
@@ -139,8 +139,10 @@ class VideoSegmentationNetwork(nn.Module):
             chunks = self.__get_latent__chunks__().to(DEVICE)
             
             #getting the middle latent as ground truth
-            middle_chunk = chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+            middle_chunk = chunks[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
             middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
+            # middle_chunk = chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+            # middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
 
             #adding the mask to the latent exactly in the middle
             # mask = torch.empty(1, 1, 32768).to(DEVICE)
@@ -148,16 +150,17 @@ class VideoSegmentationNetwork(nn.Module):
             # chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
 
             #adding the positional encoding to the tensor just created
-            chunk = chunks+self.positionalTensor
+            chunk = chunks + self.positionalTensor
 
             #sending the encoded latent to the transformer
             latent_from_transformer = self.transenc(chunk, mask=None)
 
             #taking the latent which is exacty in the middle
-            transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+            transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
+            # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
 
             #removing the start of frame token, and end of frame token from the middle-latent and reshaping it back to its original spatial orientation
-            sof_pred, eof_pred, single_frame_merged_latent = self.__reshape_unstack_and_merge__(transformer_predicted_latent)
+            single_frame_merged_latent = self.__reshape_unstack_and_merge__(transformer_predicted_latent)
 
             #decoding the latent to reconstruct the image
             decoded_latent = self.cnndecoder(single_frame_merged_latent)
@@ -189,19 +192,17 @@ class VideoSegmentationNetwork(nn.Module):
     def __reshape_split_and_stack__(self, x):
         # x = x.view(x.shape[0], -1)
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
-        sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
-        return sequence
+        # sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
+        return latent_sequence
 
 
     def __reshape_unstack_and_merge__(self, x):
-        sof_pred = x[:, 0]
-        eof_pred = x[:, -1]
-        x = x[:, 1:-1]
+        # x = x[:, 1:-1]
         chunks = x.split(1, dim=1)
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
         merged_x = torch.cat(chunks, dim=1)
         # merged_x = merged_x.view(BATCH_SIZE, 8, 64, 64)
-        return sof_pred, eof_pred, merged_x
+        return merged_x
 
 
     def __positionalencoding__(self, d_model, length):
@@ -221,14 +222,14 @@ class VideoSegmentationNetwork(nn.Module):
             B = [B1, B2, B3, B4, B5]
             T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
         '''
-        PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH) 
-        PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
-        T = []
-        for seq in PE_imageSequence:
-            t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
-            T.append(t)
-        positional_tensor = torch.cat(T, dim=0)
-        return positional_tensor
+        PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH*SEQUENCE_LENGTH) 
+        # PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
+        # T = []
+        # for seq in PE_imageSequence:
+        #     t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
+        #     T.append(t)
+        # positional_tensor = torch.cat(T, dim=0)
+        return PE_latentSequence
 
 
 
