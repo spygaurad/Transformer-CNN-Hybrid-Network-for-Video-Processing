@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 1
+BATCH_SIZE = 2
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -48,8 +48,8 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 encoderdecoder = Autoencoder32K(outputType="image")
 encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_60.tar')['model_state_dict'])
-for params in encoderdecoder.parameters():
-    params.requires_grad = False
+# for params in encoderdecoder.parameters():
+#     params.requires_grad = False
 
 
 
@@ -246,12 +246,17 @@ def train(epochs, lr=0.001):
     model = VideoSegmentationNetwork().to(DEVICE)
     # model.load_state_dict(torch.load('saved_model/transformer_full_model.tar')['model_state_dict'])
 
+    #the CNN's encoder and decoder model
+    decodermodel = model.cnndecoder
+    encodermodel = model.cnnencoder
+
+
 
     #initializing the optimizer for transformer
-    optimizerTransformer = optim.AdamW(model.parameters(), lr)
-
+    optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    # optimizerCNNDecoder = optim.AdamW(model.parameters(), lr*0.1)
+    optimizerCNNDecoder = optim.AdamW(decodermodel.parameters(), lr*0.1)
+    optimizerCNNEncoder = optim.AdamW(encodermodel.parameters(), lr*0.1)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -275,8 +280,6 @@ def train(epochs, lr=0.001):
             image = image.to(DEVICE)
 
             #zero grading the optimizer
-            optimizerTransformer.zero_grad()
-            # optimizerCNNDecoder.zero_grad()
 
             #input the image into the model
             start_training, latent, image_pred, middle_chunk = model(image)
@@ -294,10 +297,16 @@ def train(epochs, lr=0.001):
                 #getting the loss's number
                 _loss += loss.item()
 
+                optimizerCNNEncoder.zero_grad()
+                optimizerTransformer.zero_grad()
+                optimizerCNNDecoder.zero_grad()
+
                 #backpropogation algorithm
                 loss.backward()
                 optimizerTransformer.step()
-                # optimizerCNNDecoder.step()
+                optimizerCNNEncoder.step()
+                optimizerCNNDecoder.step()
+
 
                 #saving a sample
                 if  ((epoch%5 == 0) and (i == num)):
