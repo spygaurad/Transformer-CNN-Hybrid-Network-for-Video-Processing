@@ -66,7 +66,7 @@ class CNN_Encoder(nn.Module):
 #generate a code 
 
 class Transformer_Encoder(nn.Module):
-    def __init__(self, input_dim, num_layers, num_heads):
+    def __init__(self, input_dim, hidden_dim, num_layers, num_heads, dropout):
         super(Transformer_Encoder, self).__init__()
         # self.transformerencoder = TransformerEncoder(input_dim=input_dim, hidden_dim=input_dim, num_layers=num_layers, num_heads=num_heads, dropout=0.1)
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads)
@@ -102,7 +102,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #loading the custom transformer encoder class
         # self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2)
-        self.transenc = TransformerEncoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=4, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=4, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
