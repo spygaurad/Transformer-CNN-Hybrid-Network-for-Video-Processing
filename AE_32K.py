@@ -264,6 +264,7 @@ def train(epochs, batch_size=8, lr=0.0001):
     print("Initializing Parameters...")
 
     model = Autoencoder32K("image").to(device)
+
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -335,7 +336,7 @@ def train(epochs, batch_size=8, lr=0.0001):
 
 
 
-error = train(61, batch_size=4)
+# error = train(61, batch_size=4)
 # if error:
 #     torch.cuda.empty_cache()
 #     train(epochs=61, batch_size=4)

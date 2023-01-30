@@ -165,8 +165,9 @@ class VideoSegmentationNetwork(nn.Module):
             #decoding the latent to reconstruct the image
             decoded_latent = self.cnndecoder(single_frame_merged_latent)
 
-            #shifting the sequence window
-            self.sequence_window.pop()
+            #emptying the buffer
+            self.sequence_window.clear()
+            assert len(self.sequence_window) == 0, "The buffer is not empty"
 
             #returns both, Decoded image, and Latent to be decoded
             return True, single_frame_merged_latent, decoded_latent, middle_chunk
