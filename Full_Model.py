@@ -155,11 +155,13 @@ class VideoSegmentationNetwork(nn.Module):
             #sending the encoded latent to the transformer
             latent_from_transformer = self.transenc(chunk, mask=None)
 
-            l0 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 0, :])
-            l1 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 1, :])
-            l2 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 2, :])
-            l3 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 3, :])
-            l4 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 4, :])
+
+            l0 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 0: CHUNK_LENGTH, :])
+            l1 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH: CHUNK_LENGTH*2 :])
+            l2 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*2: CHUNK_LENGTH*3, :])
+            l3 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*3: CHUNK_LENGTH*4, :])
+            l4 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*4: CHUNK_LENGTH*5, :])
+
 
             i0_hat, i1_hat, i2_hat, i3_hat, i4_hat = self.cnndecoder(l0), self.cnndecoder(l1), self.cnndecoder(l2), self.cnndecoder(l3), self.cnndecoder(l4)
 
