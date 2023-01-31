@@ -301,7 +301,7 @@ def train(epochs, lr=0.001):
                 # MS-SSIM loss + MSE Loss for model evaluation
                 loss = nvidia_mix_loss(imageDeck_pred[2], imageDeck[2])
 
-                image_stack.clear()
+                imageDeck.clear()
 
                 #getting the loss's number
                 _loss += loss.item()
