@@ -155,24 +155,32 @@ class VideoSegmentationNetwork(nn.Module):
             #sending the encoded latent to the transformer
             latent_from_transformer = self.transenc(chunk, mask=None)
 
-            #taking the latent which is exacty in the middle
-            transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
-            # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+            l0 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 0, :])
+            l1 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 1, :])
+            l2 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 2, :])
+            l3 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 3, :])
+            l4 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 4, :])
 
-            #removing the start of frame token, and end of frame token from the middle-latent and reshaping it back to its original spatial orientation
-            single_frame_merged_latent = self.__reshape_unstack_and_merge__(transformer_predicted_latent)
+            i0_hat, i1_hat, i2_hat, i3_hat, i4_hat = self.cnndecoder(l0), self.cnndecoder(l1), self.cnndecoder(l2), self.cnndecoder(l3), self.cnndecoder(l4)
 
-            #decoding the latent to reconstruct the image
-            decoded_latent = self.cnndecoder(single_frame_merged_latent)
+            # #taking the latent which is exacty in the middle
+            # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
+            # # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
+
+            # #removing the start of frame token, and end of frame token from the middle-latent and reshaping it back to its original spatial orientation
+            # single_frame_merged_latent = self.__reshape_unstack_and_merge__(transformer_predicted_latent)
+
+            # #decoding the latent to reconstruct the image
+            # decoded_latent = self.cnndecoder(single_frame_merged_latent)
 
             #emptying the buffer
             self.sequence_window.clear()
             assert len(self.sequence_window) == 0, "The buffer is not empty"
 
             #returns both, Decoded image, and Latent to be decoded
-            return True, single_frame_merged_latent, decoded_latent, middle_chunk
+            return True, i0_hat, i1_hat, i2_hat, i3_hat, i4_hat 
         
-        return False, None, None, None
+        return False, None, None, None, None, None
 
     
 
