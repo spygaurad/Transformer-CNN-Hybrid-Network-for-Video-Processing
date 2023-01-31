@@ -108,8 +108,8 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
-        self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
-        self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
         self.positionalTensor = self.__get_positional__tensor().to(DEVICE)
@@ -256,8 +256,8 @@ def train(epochs, lr=0.001):
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    optimizerCNNDecoder = optim.AdamW(decodermodel.parameters(), lr*0.1)
-    optimizerCNNEncoder = optim.AdamW(encodermodel.parameters(), lr*0.1)
+    optimizerCNNDecoder = optim.AdamW(decodermodel.parameters(), lr)
+    optimizerCNNEncoder = optim.AdamW(encodermodel.parameters(), lr)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
