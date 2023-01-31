@@ -178,7 +178,7 @@ class VideoSegmentationNetwork(nn.Module):
             assert len(self.sequence_window) == 0, "The buffer is not empty"
 
             #returns both, Decoded image, and Latent to be decoded
-            return True, i0_hat, i1_hat, i2_hat, i3_hat, i4_hat 
+            return True, [i0_hat, i1_hat, i2_hat, i3_hat, i4_hat]
         
         return False, None, None, None, None, None
 
@@ -282,26 +282,24 @@ def train(epochs, lr=0.001):
         print(f"Epoch no: {epoch+1}")
         _loss = 0
         num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
+        imageDeck = []
 
         for i, image in enumerate(tqdm(train_data)):
 
             #converting the image to cuda device
             image = image.to(DEVICE)
-
-            #zero grading the optimizer
+            imageDeck.append(image)
 
             #input the image into the model
-            start_training, latent, image_pred, middle_chunk = model(image)
+            start_training, imageDeck_pred = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
             if start_training:
+
                 # MS-SSIM loss + MSE Loss for model evaluation
-                loss = nvidia_mix_loss(image_pred, image)
+                loss = nvidia_mix_loss(imageDeck_pred[2], imageDeck[2])
 
-                #MSE loss for latent-to-latent prediction
-                # loss_mid = mseloss(latent, middle_chunk)
-
-                #adding the both losses
+                image_stack.clear()
 
                 #getting the loss's number
                 _loss += loss.item()
@@ -316,10 +314,10 @@ def train(epochs, lr=0.001):
                 optimizerCNNEncoder.step()
                 optimizerCNNDecoder.step()
 
-
                 #saving a sample
                 if  ((epoch%5 == 0) and (i == num)):
                     __save_sample__(epoch+1, image, image_pred)
+                
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
