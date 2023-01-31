@@ -318,7 +318,7 @@ def train(epochs, lr=0.001):
 
                 #saving a sample
                 if  ((epoch%5 == 0) and (i == num)):
-                    __save_sample__(epoch+1, image, image_pred)
+                    __save_sample__(epoch+1, imageDeck[2], imageDeck_pred[2])
                 
 
         writer.add_scalar("Training Loss", _loss, i)
