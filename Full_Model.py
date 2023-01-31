@@ -180,7 +180,7 @@ class VideoSegmentationNetwork(nn.Module):
             #returns both, Decoded image, and Latent to be decoded
             return True, [i0_hat, i1_hat, i2_hat, i3_hat, i4_hat]
         
-        return False, None, None, None, None, None
+        return False, [None, None, None, None, None]
 
     
 
