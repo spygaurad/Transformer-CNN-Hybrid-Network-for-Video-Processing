@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 2
+BATCH_SIZE = 16
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
