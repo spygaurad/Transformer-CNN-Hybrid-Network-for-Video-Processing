@@ -38,7 +38,7 @@ class Dataset(torch.utils.data.Dataset):
 class DataLoader():
 
     def __init__(self, batch_size, trainingType, return_train_and_test):
-        self.transform =  transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+        self.transform =  transforms.Compose([transforms.Resize((64, 64)), transforms.ToTensor()])
         self.batch_size = batch_size
         self.trainingType = trainingType
         self.return_train_and_test = return_train_and_test
@@ -91,23 +91,26 @@ class CSVDataset(torch.utils.data.Dataset):
         return len(self.rows)
 
     def __getitem__(self, row):
-        img_path = self.rows[row]
-        for items in img_path:
+        img_paths = self.rows[row]
+        images = []
+        for items in img_paths:
             image = Image.open(items)
             image = self.transform(image)
-            return image
+            images.append(image)
+        return images
 
 
-class DataLoaderSequential():
-
-    def __init__(self, batch_size):
-        self.transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+class DataloaderSequential():
+    
+    def __init__(self, csv_file, batch_size) -> None:
+        self.csv_file = csv_file
+        self.transform = transforms.Compose([transforms.Resize((64, 64)), transforms.ToTensor()])
         self.batch_size = batch_size
-
-    def load_data(self):
-        dataset = CSVDataset("data_sequential_VOS.csv", self.transform)
-        l1 = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=False, drop_last=True)
-        return l1
+    
+    def load_images(self):
+        dataset = CSVDataset(self.csv_file, self.transform)
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        return dataloader
 
 
 
