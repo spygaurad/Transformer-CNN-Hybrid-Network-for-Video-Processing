@@ -20,14 +20,14 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 16
-# DEVICE =  "cpu"
-DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+BATCH_SIZE = 4
+DEVICE =  "cpu"
+# DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
 encoderdecoder = Autoencoder4K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_4k_VOS_30.tar')['model_state_dict'])
+encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_4K_VOS_30.tar')['model_state_dict'])
 for params in encoderdecoder.encoder.parameters():
     params.requires_grad = False
 
@@ -142,7 +142,7 @@ def train(epochs, lr=0.00001):
 
     print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
-    train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=BATCH_SIZE).load_images()
+    train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=4).load_images()
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
@@ -175,7 +175,7 @@ def train(epochs, lr=0.00001):
             image = torch.stack(image).to(DEVICE)
 
             #input the image into the model
-            imagePred = model(x)
+            imagePred = model(image)
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
@@ -191,13 +191,13 @@ def train(epochs, lr=0.00001):
             loss.backward()
             #saving a sample
             optimizerTransformer.step()
-            # if i%3 ==0:
-
-            __save_sample__(epoch+1, image[0], imagePred[0], "1")
-            __save_sample__(epoch+1, image[1], imagePred[1], "2")
-            __save_sample__(epoch+1, image[2], imagePred[2], "3")
-            __save_sample__(epoch+1, image[3], imagePred[3], "4")
-            __save_sample__(epoch+1, image[4], imagePred[4], "5")
+            
+            if i%3 ==0:
+                __save_sample__(epoch+1, image[0], imagePred[0], "1")
+                __save_sample__(epoch+1, image[1], imagePred[1], "2")
+                __save_sample__(epoch+1, image[2], imagePred[2], "3")
+                __save_sample__(epoch+1, image[3], imagePred[3], "4")
+                __save_sample__(epoch+1, image[4], imagePred[4], "5")
             
   
         writer.add_scalar("Training Loss", _loss, i)
@@ -230,15 +230,3 @@ def __save_sample__(epoch, x, img_pred, iter):
 
 train(epochs=500)
 
-# vsn = VideoSegmentationNetwork()
-
-# for i in range(100):
-#     input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
-#     state, throughput0, throughput1 = vsn(x=input_tensor)
-#     print(f'Iteration: {i+1}')
-#     if state:
-#         print(throughput1.shape)
-    
-
-
-# print(f'Input tensor {input_tensor.shape} -> {splitandstack.shape} -> {unstackandmerge.shape}') 
