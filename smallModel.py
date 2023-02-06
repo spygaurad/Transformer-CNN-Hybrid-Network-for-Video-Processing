@@ -21,13 +21,13 @@ SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
 BATCH_SIZE = 4
-DEVICE =  "cpu"
-# DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+# DEVICE =  "cpu"
+DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
 encoderdecoder = Autoencoder4K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_4K_VOS_30.tar')['model_state_dict'])
+encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_4k_VOS_30.tar')['model_state_dict'])
 for params in encoderdecoder.encoder.parameters():
     params.requires_grad = False
 
