@@ -19,7 +19,7 @@ from tensorboardX import SummaryWriter
 
 SEQUENCE_LENGTH = 5
 CHUNK_LENGTH = 4
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 EMBEDDED_DIMENSION = 4096
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -189,7 +189,7 @@ def train(epochs, lr=0.000001):
         print(f"Epoch no: {epoch+1}")
         _loss = 0
         # num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
-        accumulation_steps = 8
+        accumulation_steps = 4
 
         for i, image in enumerate(tqdm(train_data)):
             
