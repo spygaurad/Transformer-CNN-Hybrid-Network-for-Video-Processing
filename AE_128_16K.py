@@ -17,6 +17,10 @@ import random
 import os
 
 
+BATCH_SIZE = 16
+DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+
 
 class Bottleneck(nn.Module):
     expansion = 4
@@ -166,10 +170,13 @@ class Decoder_32K(nn.Module):
         self.transConv1 = nn.ConvTranspose2d(256, 384, 2, 2, padding = 0)
         self.dbn2 = nn.BatchNorm2d(384)
 
-        self.transConv2 = nn.ConvTranspose2d(384, 192, 2, 2, padding = 0)
-        self.dbn3 = nn.BatchNorm2d(192)
+        self.transConv2 = nn.ConvTranspose2d(384, 128, 2, 2, padding = 0)
+        self.dbn3 = nn.BatchNorm2d(128)
 
-        self.conv5 = nn.Conv2d(192, 64, 3, padding=1)
+        # self.transConv3= nn.ConvTranspose2d(192, 128, 2, 2, padding = 0)
+        # self.dbn4 = nn.BatchNorm2d(128)
+
+        self.conv5 = nn.Conv2d(128, 64, 3, padding=1)
         self.bn5 = nn.BatchNorm2d(64)
 
         self.conv6 = nn.Conv2d(64, 8, 3, padding=1)
@@ -190,7 +197,7 @@ class Decoder_32K(nn.Module):
 
         #we now convert a linear vector to a volume of a desired shape
         # '''
-        x = x.view(-1, 16, 16, 16)
+        x = x.view(x.shape[0], 16, 32, 32)
         # '''
 
         x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
@@ -200,7 +207,7 @@ class Decoder_32K(nn.Module):
 
 
 
-class Autoencoder16K(nn.Module):
+class Autoencoder4K(nn.Module):
     def __init__(self, outputType):
         super(Autoencoder4K, self).__init__()
 
@@ -225,7 +232,7 @@ class Autoencoder16K(nn.Module):
 
 
 def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
-    path = f'Training_Sneakpeeks/image_to_image_4k/'
+    path = f'Training_Sneakpeeks/image_to_image_16k/'
     try:
         os.makedirs(path)
     except:
@@ -235,35 +242,19 @@ def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
     for i, element in enumerate(elements):
         element.save(f"{path}{epoch}_{['image', 'image_pred'][i]}.jpg")
 
-    '''
-        elif mode == 'test':
-        x = elements[0]
-        x_hat = elements[1]
-        images = [x, x_hat]
-        widths, heights = zip(*(i.size for i in images))
-        total_width = sum(widths)
-        max_height = max(heights)
-        new_im = Image.new('RGB', (total_width, max_height), (0, 200, 200))
-        x_offset = 0
-        for im in images:
-          new_im.paste(im, (x_offset,0))
-          x_offset += im.size[0] + 4
-        new_im.show()
-    '''
 
 
 
 
-def train(epochs, batch_size=16, lr=0.0001):
+def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
 
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    print(f"Using {device} device.")
+    print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
     train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", return_train_and_test=False).load_data("data_image_train_VOS.csv", testDataCSV=None)
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
-    model = Autoencoder16K("image").to(device)
+    model = Autoencoder4K("image").to(DEVICE)
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
@@ -285,7 +276,7 @@ def train(epochs, batch_size=16, lr=0.0001):
         for i, image in enumerate(tqdm(train_dataloader)):
 
             #converting the image to cuda decice
-            image = image.to(device)
+            image = image.to(DEVICE)
 
             #zero grading the optimizer
             optimizer.zero_grad()
@@ -305,8 +296,8 @@ def train(epochs, batch_size=16, lr=0.0001):
             optimizer.step() 
 
             #saving a sample of this epoch
-            if i%batch_size==0:
-                save_sample(epoch+1, image, output)
+            # if i%batch_size==0:
+            save_sample(epoch+1, image, output)
         loss_train.append(_loss)
 
 
@@ -334,7 +325,7 @@ def train(epochs, batch_size=16, lr=0.0001):
 
 
 
-error = train(61, batch_size=16)
+error = train(31, batch_size=BATCH_SIZE)
 # if error:
 #     torch.cuda.empty_cache()
 #     train(epochs=61, batch_size=4)
