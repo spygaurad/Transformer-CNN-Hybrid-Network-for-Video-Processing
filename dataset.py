@@ -38,7 +38,7 @@ class Dataset(torch.utils.data.Dataset):
 class DataLoader():
 
     def __init__(self, batch_size, trainingType, return_train_and_test):
-        self.transform =  transforms.Compose([transforms.Resize((64, 64)), transforms.ToTensor()])
+        self.transform =  transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
         self.batch_size = batch_size
         self.trainingType = trainingType
         self.return_train_and_test = return_train_and_test
@@ -80,12 +80,13 @@ class CSVDataset(torch.utils.data.Dataset):
         self.rows = []
         with open(csv_file, "r") as f:
             reader = csv.reader(f)
-            # i = 0
+            row_count = sum(1 for row in reader)
+            i = 0
             for row in reader:
                 self.rows.append(row)
-                # i+=1
-                # if i>100:
-                #     break
+                if i > (row_count//4):
+                    break
+                i+=1
 
     def __len__(self):
         return len(self.rows)
@@ -104,7 +105,7 @@ class DataloaderSequential():
     
     def __init__(self, csv_file, batch_size) -> None:
         self.csv_file = csv_file
-        self.transform = transforms.Compose([transforms.Resize((64, 64)), transforms.ToTensor()])
+        self.transform = transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
         self.batch_size = batch_size
     
     def load_images(self):
@@ -114,18 +115,16 @@ class DataloaderSequential():
 
 
 
-
-# l1 = DataLoaderSequential(4).load_data()
-
-# for items in l1:
-#     print(items)
-#     image = items[0]
-#     image = image.numpy()
-#     img = np.moveaxis(image, 0, 2)
-#     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-#     cv2.imshow('img', img)
-#     cv2.waitKey(500)
-
+l1 = DataloaderSequential("data_sequential_VOS.csv", 4).load_images()
+print(len(l1))
+for images in l1:
+    for image in images:
+        img = [np.moveaxis(image[i].numpy(), 0, 2) for i in range(4)]
+        img = [cv2.cvtColor(img, cv2.COLOR_RGB2BGR) for img in img]
+        vertical_stack = cv2.hconcat(img)
+        cv2.imshow('img', vertical_stack)
+        cv2.waitKey(500)
+    print("sequence_break")
 
 
 
