@@ -111,8 +111,9 @@ class VideoSegmentationNetwork(nn.Module):
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
         
-        #decoding all the sequence of the latents
-        latents_pred = latents_pred.permute(1, 0, 2)
+        
+        
+        # decoding all the sequence of the latents
         for i in range(latents_pred.shape[0]):
             image_preds.append(self.cnndecoder(latents_pred[i]))
 
