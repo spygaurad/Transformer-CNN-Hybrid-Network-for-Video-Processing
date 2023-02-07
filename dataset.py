@@ -47,8 +47,9 @@ class DataLoader():
     def make_data(self, csvfile):
         with open(csvfile, "r") as csv_file:
             datapaths = [row[:-1] for row in csv_file]
-            random.shuffle(datapaths)
-            return datapaths[0:len(datapaths//DATA_SIZE)]
+            # random.shuffle(datapaths)
+            # return datapaths[0:len(datapaths//DATA_SIZE)]
+            return datapaths
 
 
     def load_data(self, trainDataCSV, testDataCSV):
