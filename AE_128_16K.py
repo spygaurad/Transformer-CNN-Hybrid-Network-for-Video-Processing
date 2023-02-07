@@ -257,7 +257,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
     model = Autoencoder4K("image").to(DEVICE)
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
-    nvidia_mix_loss = MixedLoss(0.5, 0.5)
+    mseloss = torch.nn.MSELoss()
     loss_train = []
     start = 0
     epochs = epochs
@@ -285,8 +285,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
             output = model(image)
 
             #Loss functions for evaluation
-            loss = nvidia_mix_loss(output, image)
-            # loss = diceLoss(output, mask)
+            loss = mseloss(output, image)
 
             #adding a loss function 
             _loss += loss.item()
