@@ -313,12 +313,6 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
             }, f'saved_model/autoencoder_16k_VOS_{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
-
-    # except torch.cuda.CudaError as e:
-    #     if "out of memory" in str(e):
-    #         return True
-    
-
     return False
 
 
