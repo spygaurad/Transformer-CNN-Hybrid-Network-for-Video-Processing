@@ -4,10 +4,10 @@ import torch
 from PIL import Image
 from torchvision import transforms
 import csv
+import random
 
 
-
-
+DATA_SIZE = 4
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -47,7 +47,8 @@ class DataLoader():
     def make_data(self, csvfile):
         with open(csvfile, "r") as csv_file:
             datapaths = [row[:-1] for row in csv_file]
-            return datapaths
+            random.shuffle(datapaths)
+            return datapaths[0:len(datapaths//DATA_SIZE)]
 
 
     def load_data(self, trainDataCSV, testDataCSV):
@@ -84,7 +85,7 @@ class CSVDataset(torch.utils.data.Dataset):
             i = 0
             for row in reader:
                 self.rows.append(row)
-                if i > (row_count//4):
+                if i > (row_count//DATA_SIZE):
                     break
                 i+=1
 
