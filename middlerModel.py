@@ -160,7 +160,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 def train(epochs, lr=0.000001):
 
-    print(f"Using {DEVICE} device.")
+    print(f"Using {DEVICE} device...")
     print("Loading Datasets...")
     train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=BATCH_SIZE).load_images()
     print("Dataset Loaded.")
