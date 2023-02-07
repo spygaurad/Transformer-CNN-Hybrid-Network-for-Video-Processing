@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import math
 import torch.optim as optim
-from AE_128_16k import Autoencoder4K
+from AE_128_16K import Autoencoder4K
 from dataset import DataloaderSequential
 from TransformerEncoder import TransformerEncoder
 from collections import deque
