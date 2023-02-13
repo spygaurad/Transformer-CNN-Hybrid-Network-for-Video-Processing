@@ -77,18 +77,20 @@ class DataLoader():
 
 
 class CSVDataset(torch.utils.data.Dataset):
+
     def __init__(self, csv_file, transforms):
         self.transform = transforms
         self.rows = []
         with open(csv_file, "r") as f:
             reader = csv.reader(f)
-            row_count = sum(1 for row in reader)
+            data = list(reader)
+            row_count = len(data)
             i = 0
-            for row in reader:
+            for row in data:
                 self.rows.append(row)
-                if i > ((row_count//DATA_SIZE) + 1):
+                if i >= (row_count//DATA_SIZE):
                     break
-                i+=1
+                i += 1
 
     def __len__(self):
         return len(self.rows)
