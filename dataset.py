@@ -34,8 +34,8 @@ class Dataset(torch.utils.data.Dataset):
             image = Image.open(img_path)
             image = self.transform(image)
             return image
-        
-        
+
+
 
 class DataLoader():
 
