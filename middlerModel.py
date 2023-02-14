@@ -221,7 +221,7 @@ def train(epochs, lr=1e-5):
                 __save_sample__(epoch+1, image[3], imagePred[3], "4")
                 __save_sample__(epoch+1, image[4], imagePred[4], "5")
             
-  
+
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
 
