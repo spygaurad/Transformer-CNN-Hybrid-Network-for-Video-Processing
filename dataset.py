@@ -88,12 +88,12 @@ class CSVDataset(torch.utils.data.Dataset):
             i = 0
             for row in data:
                 self.rows.append(row)
-                if i >= (row_count//DATA_SIZE) + 1:
+                if i >= (row_count//DATA_SIZE):
                     break
                 i += 1
 
     def __len__(self):
-        return len(self.rows)
+        return len(self.rows) - len(self.rows) % self.batch_size
 
     def __getitem__(self, row):
         img_paths = self.rows[row]
