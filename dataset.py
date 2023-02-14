@@ -88,7 +88,7 @@ class CSVDataset(torch.utils.data.Dataset):
             i = 0
             for row in data:
                 self.rows.append(row)
-                if i >= (row_count//DATA_SIZE):
+                if i >= (row_count//DATA_SIZE) + 1:
                     break
                 i += 1
 
