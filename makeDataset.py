@@ -58,3 +58,4 @@ savepath = "Datasets/VOS/train/masks/"
 folders = os.listdir(path)
 
 for folder in tqdm(folders):
+    files = os.listdir(f'{path}{folder}')
