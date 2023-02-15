@@ -16,7 +16,10 @@ gdown.download(f"https://drive.google.com/uc?id={file_id}", output_file, quiet=F
 
 '''Now we extract the downloaded file to a particular folder'''
 destination_directory = 'Datasets/VOS/train'
-os.makedirs(destination_directory)
+try:
+    os.makedirs(destination_directory)
+except:
+    print("Dataset Directory already exists.")
+    pass
 with zipfile.ZipFile(output_file, "r") as zip_ref:
     zip_ref.extractall(destination_directory)
-    
