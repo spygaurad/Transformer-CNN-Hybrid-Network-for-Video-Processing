@@ -10,7 +10,7 @@ import pandas as pd
 
 
 
-DATA_SIZE = 4
+DATA_SIZE = 1
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, data, trainingType, transforms=None):
