@@ -50,3 +50,9 @@ for subdirectory in tqdm(subdirectories):
     shutil.move(os.path.join(source_directory, subdirectory), destination_directory)
 shutil.rmtree(source_directory)
 print("Labels moved.")
+
+
+# Now we just generate a segmentation mask.
+path = "Datasets/VOS/train/labels/"
+savepath = "Datasets/VOS/train/masks/"
+folders = os.listdir(path)
