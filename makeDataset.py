@@ -59,3 +59,9 @@ folders = os.listdir(path)
 
 for folder in tqdm(folders):
     files = os.listdir(f'{path}{folder}')
+    os.makedirs(f'{savepath}/{folder}')
+    for unitfile in files:
+        filepath = f'{path}{folder}/{unitfile}'
+        img = np.array(Image.open(filepath).convert("RGB"))
+        old_color = np.array([236, 95, 103])
+        new_color = np.array([255, 255, 255])
