@@ -56,3 +56,5 @@ print("Labels moved.")
 path = "Datasets/VOS/train/labels/"
 savepath = "Datasets/VOS/train/masks/"
 folders = os.listdir(path)
+
+for folder in tqdm(folders):
