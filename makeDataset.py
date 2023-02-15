@@ -65,3 +65,8 @@ for folder in tqdm(folders):
         img = np.array(Image.open(filepath).convert("RGB"))
         old_color = np.array([236, 95, 103])
         new_color = np.array([255, 255, 255])
+        mask = np.all(img == old_color, axis=-1)
+        img[mask] = new_color
+        img[~mask] = 0
+        img = Image.fromarray(img, mode="RGB")
+        img.save(f"{savepath}/{folder}/{unitfile}.png")
