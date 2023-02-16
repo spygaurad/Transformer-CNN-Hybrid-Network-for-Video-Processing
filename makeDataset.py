@@ -14,12 +14,10 @@ def downloadDataset():
     print("Downloading the dataset from google drive...")
     file_id = "13Eqw0gVK-AO5B-cqvJ203mZ2vzWck9s4"
     output_file = "file.zip"
+    
     gdown.download(f"https://drive.google.com/uc?id={file_id}", output_file, quiet=False)
     print("Dataset Downloaded!")
 
-
-# Now we extract the downloaded file to a particular folder
-def extractDataset():
     print("Extracting data...")
     destination_directory = 'Datasets/VOS/train'
     try:
