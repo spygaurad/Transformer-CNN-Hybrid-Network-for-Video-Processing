@@ -14,7 +14,7 @@ def downloadDataset():
     print("Downloading the dataset from google drive...")
     file_id = "13Eqw0gVK-AO5B-cqvJ203mZ2vzWck9s4"
     output_file = "file.zip"
-    
+
     gdown.download(f"https://drive.google.com/uc?id={file_id}", output_file, quiet=False)
     print("Dataset Downloaded!")
 
@@ -31,9 +31,9 @@ def downloadDataset():
 
 
 
+# Now we make our folder's structure, compatible with how our dataloader class does it.
 def manageFolderStructure():
-    # Now we make our folder's structure, compatible with how our dataloader class does it.
-    #For moving images
+    #For images
     source_directory = 'Datasets/VOS/train/train/JPEGImages/'
     destination_directory = 'Datasets/VOS/train/images/'
     os.makedirs(destination_directory)
