@@ -120,6 +120,8 @@ class Encoder_32K(nn.Module):
         x = self.relu(self.bn5(self.conv5(x)))
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
+
+        #breaking the latents into 4 chunks, linearly
         x = x.view(batch_size, 4, 4096)
 
 
@@ -196,7 +198,7 @@ class Decoder_32K(nn.Module):
 
     def forward(self,x):
 
-        #we now convert a linear vector to a volume of a desired shape
+        #we now convert a broken linear vector to a volume of a desired shape
         # '''
         x = x.view(batch_size, 4, 4096)
         x = x.view(x.shape[0], 16, 32, 32)
