@@ -283,7 +283,8 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
             optimizer.zero_grad()
 
             #input the image into the model and getting the reconstructed image
-            output = model(image)
+            noise_image = image + torch.randn(tensor.size())*0.1  + 0.0 
+            output = model(noise_image)
 
             #Loss functions for evaluation
             loss = mseloss(output, image)
