@@ -283,7 +283,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
             optimizer.zero_grad()
 
             #input the image into the model and getting the reconstructed image
-            noise_image = image + torch.randn(tensor.size())*0.1  + 0.0 
+            noise_image = image + torch.randn(image.size()).to(DEVICE)*0.05 + 0.0
             output = model(noise_image)
 
             #Loss functions for evaluation
@@ -320,7 +320,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
 
 
 
-# error = train(31, batch_size=BATCH_SIZE)
+error = train(31, batch_size=BATCH_SIZE)
 # if error:
 #     torch.cuda.empty_cache()
 #     train(epochs=61, batch_size=4)
