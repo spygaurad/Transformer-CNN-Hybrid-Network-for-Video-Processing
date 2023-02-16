@@ -198,6 +198,7 @@ class Decoder_32K(nn.Module):
 
         #we now convert a linear vector to a volume of a desired shape
         # '''
+        x = x.view(batch_size, 4, 4096)
         x = x.view(x.shape[0], 16, 32, 32)
         # '''
 
