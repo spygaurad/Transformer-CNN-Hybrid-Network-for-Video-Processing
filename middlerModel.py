@@ -112,7 +112,6 @@ class VideoSegmentationNetwork(nn.Module):
                 l = self.cnnencoder(x[i])
             l = self.__split_and_stack__(l)
             latents.append(l)
-
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
