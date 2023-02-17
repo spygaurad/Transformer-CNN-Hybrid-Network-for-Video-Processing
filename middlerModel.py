@@ -41,10 +41,9 @@ class CNN_Encoder(nn.Module):
     def forward(self, x):
         bottleneck_4K = self.encoder(x)
         return bottleneck_4K
-    
 
-#generate a code 
 
+#generate a code
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, num_layers, num_heads, dropout):
         super(Transformer_Encoder, self).__init__()
@@ -187,7 +186,7 @@ def train(epochs, lr=1e-6):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        # num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
+        num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
         accumulation_steps = 4
 
         for i, image in enumerate(tqdm(train_data)):
@@ -213,7 +212,7 @@ def train(epochs, lr=1e-6):
             else:
                 loss.backward()
 
-            if i%50==0 and epoch%5==0:
+            if i%num==0 and epoch%5==0:
                 __save_sample__(epoch+1, image[0], imagePred[0], "1")
                 __save_sample__(epoch+1, image[1], imagePred[1], "2")
                 __save_sample__(epoch+1, image[2], imagePred[2], "3")
