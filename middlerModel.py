@@ -192,7 +192,7 @@ def train(epochs, lr=1e-6):
         for i, image in enumerate(tqdm(train_data)):
             
             optimizerTransformer.zero_grad()
-            
+
             image = torch.stack(image).to(DEVICE)
 
             #input the image into the model
@@ -218,7 +218,7 @@ def train(epochs, lr=1e-6):
                 __save_sample__(epoch+1, image[2], imagePred[2], "3")
                 __save_sample__(epoch+1, image[3], imagePred[3], "4")
                 __save_sample__(epoch+1, image[4], imagePred[4], "5")
-            
+
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
