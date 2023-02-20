@@ -21,7 +21,6 @@ BATCH_SIZE = 16
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
-
 class Bottleneck(nn.Module):
     expansion = 4
     def __init__(self, in_channels, out_channels, stride=1, downsample=None):
