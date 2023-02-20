@@ -228,7 +228,6 @@ class Autoencoder4K(nn.Module):
 
 
 
-
 def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
     path = f'Training_Sneakpeeks/image_to_image_16k/'
     try:
