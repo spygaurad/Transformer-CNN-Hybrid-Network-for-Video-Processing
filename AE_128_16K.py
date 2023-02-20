@@ -17,7 +17,7 @@ import random
 import os
 
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
