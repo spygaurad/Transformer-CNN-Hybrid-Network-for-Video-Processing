@@ -8,7 +8,6 @@ import numpy as np
 import shutil
 import csv
 
-
 # First we download the youtube VOS dataset from the Google Drive's link provided
 def downloadDataset():
     print("Downloading the dataset from google drive...")
