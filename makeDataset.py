@@ -110,7 +110,7 @@ for subdir in subdirs:
         file_paths.append(file_path)
 
 # Write the file paths to a CSV file
-with open('file_paths.csv', 'w', newline='') as csvfile:
+with open('data_image_train_VOS.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     for file_path in file_paths:
         writer.writerow([file_path])
