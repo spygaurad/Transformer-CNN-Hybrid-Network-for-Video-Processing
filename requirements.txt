@@ -6,7 +6,7 @@ Pillow==9.4.0
 pytorch_msssim==0.2.1
 scipy==1.8.0
 tensorboardX==2.6
-torch==1.11.0+cu115
+torch==1.13.1+cu115
 torchsummary==1.5.1
 torchvision==0.12.0
 tqdm==4.63.0
