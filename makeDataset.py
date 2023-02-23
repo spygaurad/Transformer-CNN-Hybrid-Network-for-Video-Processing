@@ -123,7 +123,7 @@ import csv
 dataset_path = "Datasets/VOS/train/images"
 
 # Open the CSV file for writing
-with open("data_sequential_VOS.csv", "w") as f:
+with open("sequebtual_VOS_data.csv", "w") as f:
     writer = csv.writer(f)
 
     # Iterate through all the folders in the "Dataset" folder
@@ -142,8 +142,8 @@ with open("data_sequential_VOS.csv", "w") as f:
 
 
 
-input_file = 'data_sequential_VOS.csv'
-output_file = 'sequential_VOS_data.csv'
+input_file = 'sequential_VOS_data.csv'
+output_file = 'data_sequential_VOS.csv'
 
 with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
     reader = csv.reader(f_in)
