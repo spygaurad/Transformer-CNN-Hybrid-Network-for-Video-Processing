@@ -9,17 +9,17 @@ import pandas as pd
 import makeDataset
 
 
-
 DATA_SIZE = 1
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, data, trainingType, transforms=None):
+    def __init__(self, data, trainingType, batch_size, transforms=None):
         self.data = data
+        self.batch_size = batch_size
         self.transform = transforms
         self.trainingType = trainingType
 
     def __len__(self):
-        return len(self.data)
+        return len(self.data) - len(self.data) % self.batch_size
 
     def __getitem__(self, idx):
         if self.trainingType.lower() == "supervised":
@@ -31,9 +31,16 @@ class Dataset(torch.utils.data.Dataset):
             return image, mask
         else:
             img_path = self.data[idx]
+            # try:
             image = Image.open(img_path)
             image = self.transform(image)
             return image
+            # except:
+            #     tensor = torch.rand(3, 128, 128)
+            #     transform = transforms.ToPILImage()
+            #     image = transform(tensor)
+            #     return image
+
 
 
 
@@ -57,7 +64,7 @@ class DataLoader():
             assert testDataCSV != None , "Please enter the path to csv file for the TEST dataset too."
 
         traindata_paths = self.make_data(trainDataCSV)
-        train_dataset = Dataset(traindata_paths, self.trainingType, self.transform)
+        train_dataset = Dataset(traindata_paths, self.trainingType, self.transform, self.batch_size)
         trainLoadedData = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         if self.return_train_and_test:
             testdata_paths = self.make_data(testDataCSV)
@@ -103,6 +110,7 @@ class CSVDataset(torch.utils.data.Dataset):
             image = self.transform(image)
             images.append(image)
         return images
+
 
 
 class DataloaderSequential():
