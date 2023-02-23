@@ -291,7 +291,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
             optimizer.step() 
 
             #saving a sample of this epoch
-            if epoch%5==0:
+            if epoch%5==0 and i==num:
                 save_sample(epoch+1, image, output)
         loss_train.append(_loss)
 
