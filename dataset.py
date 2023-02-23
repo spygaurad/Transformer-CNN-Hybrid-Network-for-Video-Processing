@@ -64,7 +64,7 @@ class DataLoader():
             assert testDataCSV != None , "Please enter the path to csv file for the TEST dataset too."
 
         traindata_paths = self.make_data(trainDataCSV)
-        train_dataset = Dataset(traindata_paths, self.trainingType, self.transform, self.batch_size)
+        train_dataset = Dataset(traindata_paths, self.trainingType, self.batch_size, self.transform)
         trainLoadedData = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False)
         if self.return_train_and_test:
             testdata_paths = self.make_data(testDataCSV)
@@ -124,6 +124,8 @@ class DataloaderSequential():
         dataset = CSVDataset(self.csv_file, self.transform)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         return dataloader
+
+        
 
 # class DataLoaderSequential():
 
