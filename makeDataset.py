@@ -88,29 +88,55 @@
 #         createBinarySegmentationMask()
 
 
+# import os
+# import csv
+
+# # Define the path to the directory containing the subdirectories and files
+# path = "Datasets/VOS/train/images/"
+
+# # Create a list of the subdirectories
+# subdirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+
+# # Create a list to store the file paths
+# file_paths = []
+
+# # Loop through each subdirectory
+# for subdir in subdirs:
+#     # Loop through each file in the subdirectory
+#     for file in os.listdir(subdir):
+#         # Get the full path to the file
+#         file_path = os.path.join(subdir, file)
+#         # Add the file path to the list
+#         file_paths.append(file_path)
+
+# # Write the file paths to a CSV file
+# with open('data_image_train_VOS.csv', 'w', newline='') as csvfile:
+#     writer = csv.writer(csvfile)
+#     for file_path in file_paths:
+#         writer.writerow([file_path])
+
+
 import os
 import csv
 
-# Define the path to the directory containing the subdirectories and files
-path = "Datasets/VOS/train/images/"
+# Specify the path of the "Dataset" folder
+dataset_path = "Datasets/VOS/train/images"
 
-# Create a list of the subdirectories
-subdirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+# Open the CSV file for writing
+with open("filenames.csv", "w") as f:
+    writer = csv.writer(f)
 
-# Create a list to store the file paths
-file_paths = []
+    # Iterate through all the folders in the "Dataset" folder
+    for folder in os.listdir(dataset_path):
+        folder_path = os.path.join(dataset_path, folder)
+        # Ignore if its not a directory
+        if not os.path.isdir(folder_path):
+            continue
+        files = os.listdir(folder_path)
+        files.sort()
+        # Iterate through all the files in the folder
+        for i in range(len(files)):
+            window_files = files[i:i+5]
+            file_paths = [os.path.join(folder_path, x) for x in window_files]
+            writer.writerow(file_paths)
 
-# Loop through each subdirectory
-for subdir in subdirs:
-    # Loop through each file in the subdirectory
-    for file in os.listdir(subdir):
-        # Get the full path to the file
-        file_path = os.path.join(subdir, file)
-        # Add the file path to the list
-        file_paths.append(file_path)
-
-# Write the file paths to a CSV file
-with open('data_image_train_VOS.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-    for file_path in file_paths:
-        writer.writerow([file_path])
