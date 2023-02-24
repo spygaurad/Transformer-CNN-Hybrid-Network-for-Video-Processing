@@ -289,35 +289,13 @@ def train(epochs, lr=1e-6):
             #zero gradding the optimizer
             optimizerTransformer.zero_grad()
 
-            #input the image into the model
             image = torch.stack(image).to(DEVICE)
 
+            #input the image into the model
             imagePred = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
-            if start_training:
-
-                # MS-SSIM loss + MSE Loss for model evaluation
-                loss = nvidia_mix_loss(imageDeck_pred[2], imageDeck[2])
-
-                #getting the loss's number
-                _loss += loss.item()
-
-                optimizerCNNEncoder.zero_grad()
-                optimizerTransformer.zero_grad()
-                optimizerCNNDecoder.zero_grad()
-
-                #backpropogation algorithm
-                loss.backward()
-                optimizerTransformer.step()
-                optimizerCNNEncoder.step()
-                optimizerCNNDecoder.step()
-
-                #saving a sample
-                if  ((epoch%5 == 0) and (i == num)):
-                    __save_sample__(epoch+1, imageDeck[2], imageDeck_pred[2])
-                
-                imageDeck.clear()
+            
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
