@@ -290,7 +290,9 @@ def train(epochs, lr=1e-6):
             optimizerTransformer.zero_grad()
 
             #input the image into the model
-            iamge = torch.stack(image).to(DEVICE)
+            image = torch.stack(image).to(DEVICE)
+
+            imagePred = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
             if start_training:
