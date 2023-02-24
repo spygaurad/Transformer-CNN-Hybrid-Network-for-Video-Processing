@@ -286,11 +286,11 @@ def train(epochs, lr=1e-6):
 
         for i, image in enumerate(tqdm(train_data)):
 
-            #converting the image to cuda device
+            #zero gradding the optimizer
             optimizerTransformer.zero_grad()
 
             #input the image into the model
-            start_training, imageDeck_pred = model(image)
+            iamge = torch.stack(image).to(DEVICE)
             #here, we take our output as the latent which is just on the third frame 
 
             if start_training:
