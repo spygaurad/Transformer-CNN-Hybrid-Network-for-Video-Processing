@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import math
 import torch.optim as optim
-from AE_32K import Autoencoder32K
+from AE_256_32K import Autoencoder32K
 from dataset import DataLoaderSequential
 from TransformerEncoder import TransformerEncoder
 from collections import deque
@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -245,11 +245,11 @@ class VideoSegmentationNetwork(nn.Module):
 
 
 
-def train(epochs, lr=0.001):
+def train(epochs, lr=1e-6):
 
     print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
-    train_data = DataLoaderSequential(BATCH_SIZE).load_data()
+    train_data = DataLoaderSequential(csv_file="data_sequential_VOS.csv", batch_size=BATCH_SIZE, image_size=256).load_data()
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 

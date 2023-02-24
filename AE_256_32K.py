@@ -254,12 +254,12 @@ def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
 
 
 
-def train(epochs, batch_size=8, lr=0.0001):
+def train(epochs, batch_size=16, lr=0.0001):
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print(f"Using {device} device.")
     print("Loading Datasets...")
-    train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", return_train_and_test=False).load_data("data_image_train_VOS.csv", testDataCSV=None)
+    train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", image_size=256, return_train_and_test=False).load_data("data_image_train_VOS.csv", testDataCSV=None)
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 

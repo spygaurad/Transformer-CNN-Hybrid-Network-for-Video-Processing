@@ -46,8 +46,8 @@ class Dataset(torch.utils.data.Dataset):
 
 class DataLoader():
 
-    def __init__(self, batch_size, trainingType, return_train_and_test):
-        self.transform =  transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
+    def __init__(self, batch_size, trainingType, image_size, return_train_and_test):
+        self.transform =  transforms.Compose([transforms.Resize((image_size, image_size)), transforms.ToTensor()])
         self.batch_size = batch_size
         self.trainingType = trainingType
         self.return_train_and_test = return_train_and_test
@@ -115,9 +115,9 @@ class CSVDataset(torch.utils.data.Dataset):
 
 class DataloaderSequential():
     
-    def __init__(self, csv_file, batch_size) -> None:
+    def __init__(self, csv_file, batch_size, imageSize) -> None:
         self.csv_file = csv_file
-        self.transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+        self.transform = transforms.Compose([transforms.Resize((imageSize, imageSize)), transforms.ToTensor()])
         self.batch_size = batch_size
     
     def load_images(self):

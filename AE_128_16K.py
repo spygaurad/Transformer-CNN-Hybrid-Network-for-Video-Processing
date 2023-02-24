@@ -560,7 +560,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
 
     print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
-    train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", return_train_and_test=False).load_data("data_image_train_VOS.csv", testDataCSV=None)
+    train_dataloader = DataLoader(batch_size=batch_size, trainingType="semisupervised", image_size=128, return_train_and_test=False).load_data("data_image_train_VOS.csv", testDataCSV=None)
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 

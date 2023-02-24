@@ -143,7 +143,7 @@ def train(epochs, lr=0.00001):
 
     print(f"Using {DEVICE} device.")
     print("Loading Datasets...")
-    train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=4).load_images()
+    train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=4, imageSize=64).load_images()
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
