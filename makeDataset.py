@@ -152,4 +152,4 @@ with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
         if len(row) >= 5:
             writer.writerow(row)
 
-os.remove(input_file)
+# os.remove(input_file)
