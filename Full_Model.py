@@ -295,7 +295,9 @@ def train(epochs, lr=1e-6):
             imagePred = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
-            
+            loss = nvidia_mix_loss(imagePred, image)
+
+
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
