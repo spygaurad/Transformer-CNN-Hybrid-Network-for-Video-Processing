@@ -127,59 +127,20 @@ class VideoSegmentationNetwork(nn.Module):
         latents = []
         image_preds = []
 
-        #appending our buffer with chunk of latents
-        self.sequence_window.append(chunked_lat.tolist())     
-
-        if len(self.sequence_window) >= SEQUENCE_LENGTH:
-            
-            #chunk is a tensor of shape [BATCH, SEQUENCE_LENGTH, EMBEDDING_DIMENSION]
-            chunks = self.__get_latent__chunks__().to(DEVICE)
-            
-            #getting the middle latent as ground truth
-            middle_chunk = chunks[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
-            middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
-            # middle_chunk = chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
-            # middle_chunk = self.__reshape_unstack_and_merge__(middle_chunk)[-1]
-
-            #adding the mask to the latent exactly in the middle
-            # mask = torch.empty(1, 1, 32768).to(DEVICE)
-            # mask_new = self.__reshape_split_and_stack__(mask)
-            # chunks[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :] = mask_new
-
-            #adding the positional encoding to the tensor just created
-            chunk = chunks + self.positionalTensor
-
-            #sending the encoded latent to the transformer
-            latent_from_transformer = self.transenc(chunk, mask=None)
-
-
-            l0 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, 0: CHUNK_LENGTH, :])
-            l1 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH: CHUNK_LENGTH*2 :])
-            l2 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*2: CHUNK_LENGTH*3, :])
-            l3 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*3: CHUNK_LENGTH*4, :])
-            l4 = self.__reshape_unstack_and_merge__(latent_from_transformer[:, CHUNK_LENGTH*4: CHUNK_LENGTH*5, :])
-
-
-            i0_hat, i1_hat, i2_hat, i3_hat, i4_hat = self.cnndecoder(l0), self.cnndecoder(l1), self.cnndecoder(l2), self.cnndecoder(l3), self.cnndecoder(l4)
-
-            # #taking the latent which is exacty in the middle
-            # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2): (CHUNK_LENGTH)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH), :]
-            # # transformer_predicted_latent = latent_from_transformer[:, (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) : (CHUNK_LENGTH+2)*(SEQUENCE_LENGTH//2) + (CHUNK_LENGTH+2), :]
-
-            # #removing the start of frame token, and end of frame token from the middle-latent and reshaping it back to its original spatial orientation
-            # single_frame_merged_latent = self.__reshape_unstack_and_merge__(transformer_predicted_latent)
-
-            # #decoding the latent to reconstruct the image
-            # decoded_latent = self.cnndecoder(single_frame_merged_latent)
-
-            #emptying the buffer
-            self.sequence_window.clear()
-            assert len(self.sequence_window) == 0, "The buffer is not empty"
-
-            #returns both, Decoded image, and Latent to be decoded
-            return True, [i0_hat, i1_hat, i2_hat, i3_hat, i4_hat]
-        
-        return False, [None, None, None, None, None]
+        # sending the input to the cnn encoder
+        # maskFrameNo = 2
+        maskFrameNo = random.randint(1, SEQUENCE_LENGTH)
+        for i in range(x.shape[0]):
+            if i == maskFrameNo:
+                l = torch.nn.init.xavier_normal_(torch.empty(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH)).to(DEVICE)
+            else:
+                l = self.cnnencoder(x[i])
+            l = self.__split_and_stack__(l)
+            latents.append(l)
+        #before sending to the transformer, this is the pre-processing we need
+        latents = torch.stack(latents).permute(1, 0, 2, 3)
+        latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
+        latents += self.positions
 
     
 
