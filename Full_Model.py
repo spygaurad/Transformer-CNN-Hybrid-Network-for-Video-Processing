@@ -162,7 +162,7 @@ class VideoSegmentationNetwork(nn.Module):
         return latent_sequence
 
 
-    def __reshape_unstack_and_merge__(self, x):
+    def __unstack_and_merge__(self, x):
         # x = x[:, 1:-1]
         chunks = x.split(1, dim=1)
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
