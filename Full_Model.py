@@ -299,7 +299,8 @@ def train(epochs, lr=1e-6):
 
             #getting the loss value
             _loss += loss.item()
-
+            
+            #gradient accumulation
             if i%accumulation_steps==0:
                 loss.backward()
                 optimizerTransformer.step()
@@ -307,8 +308,9 @@ def train(epochs, lr=1e-6):
             else:
                 loss.backward()
             
-            if i%num==0 and epoch%5==0:
-            
+            #saving the sample in each epoch
+            if i%num==0: 
+                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
 
 
 

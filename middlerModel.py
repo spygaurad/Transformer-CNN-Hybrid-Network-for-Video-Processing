@@ -213,7 +213,8 @@ def train(epochs, lr=1e-6):
                 loss.backward()
 
             #saving a sample in each epoch
-            if i%num==0: [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
+            if i%num==0: 
+                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
 
 
 
