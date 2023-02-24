@@ -88,66 +88,68 @@
 #         createBinarySegmentationMask()
 
 
-# import os
-# import csv
+import os
+import csv
 
-# # Define the path to the directory containing the subdirectories and files
-# path = "Datasets/VOS/train/images/"
+# Define the path to the directory containing the subdirectories and files
+path = "Datasets/VOS/train/images/"
 
-# # Create a list of the subdirectories
-# subdirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+# Create a list of the subdirectories
+subdirs = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
 
-# # Create a list to store the file paths
-# file_paths = []
+# Create a list to store the file paths
+file_paths = []
 
-# # Loop through each subdirectory
-# for subdir in subdirs:
-#     # Loop through each file in the subdirectory
-#     for file in os.listdir(subdir):
-#         # Get the full path to the file
-#         file_path = os.path.join(subdir, file)
-#         # Add the file path to the list
-#         file_paths.append(file_path)
+# Loop through each subdirectory
+for subdir in subdirs:
+    # Loop through each file in the subdirectory
+    for file in os.listdir(subdir):
+        # Get the full path to the file
+        file_path = os.path.join(subdir, file)
+        # Add the file path to the list
+        file_paths.append(file_path)
 
-# # Write the file paths to a CSV file
-# with open('data_image_train_VOS.csv', 'w', newline='') as csvfile:
-#     writer = csv.writer(csvfile)
-#     for file_path in file_paths:
-#         writer.writerow([file_path])
-
-
-# import os
-# import csv
-
-# # Specify the path of the "Dataset" folder
-# dataset_path = "Datasets/VOS/train/images"
-
-# # Open the CSV file for writing
-# with open("sequentual_VOS_data.csv", "w") as f:
-#     writer = csv.writer(f)
-
-#     # Iterate through all the folders in the "Dataset" folder
-#     for folder in os.listdir(dataset_path):
-#         folder_path = os.path.join(dataset_path, folder)
-#         # Ignore if its not a directory
-#         if not os.path.isdir(folder_path):
-#             continue
-#         files = os.listdir(folder_path)
-#         files.sort()
-#         # Iterate through all the files in the folder
-#         for i in range(len(files)):
-#             window_files = files[i:i+5]
-#             file_paths = [os.path.join(folder_path, x) for x in window_files]
-#             writer.writerow(file_paths)
+# Write the file paths to a CSV file
+with open('data_image_train_VOS.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    for file_path in file_paths:
+        writer.writerow([file_path])
 
 
+import os
+import csv
 
-# input_file = 'sequential_VOS_data.csv'
-# output_file = 'data_sequential_VOS.csv'
+# Specify the path of the "Dataset" folder
+dataset_path = "Datasets/VOS/train/images"
 
-# with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
-#     reader = csv.reader(f_in)
-#     writer = csv.writer(f_out)
-#     for row in reader:
-#         if len(row) >= 5:
-#             writer.writerow(row)
+# Open the CSV file for writing
+with open("sequentual_VOS_data.csv", "w") as f:
+    writer = csv.writer(f)
+
+    # Iterate through all the folders in the "Dataset" folder
+    for folder in os.listdir(dataset_path):
+        folder_path = os.path.join(dataset_path, folder)
+        # Ignore if its not a directory
+        if not os.path.isdir(folder_path):
+            continue
+        files = os.listdir(folder_path)
+        files.sort()
+        # Iterate through all the files in the folder
+        for i in range(len(files)):
+            window_files = files[i:i+5]
+            file_paths = [os.path.join(folder_path, x) for x in window_files]
+            writer.writerow(file_paths)
+
+
+
+input_file = 'sequential_VOS_data.csv'
+output_file = 'data_sequential_VOS.csv'
+
+with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
+    reader = csv.reader(f_in)
+    writer = csv.writer(f_out)
+    for row in reader:
+        if len(row) >= 5:
+            writer.writerow(row)
+
+os.remove(input_file)
