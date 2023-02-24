@@ -306,6 +306,9 @@ def train(epochs, lr=1e-6):
                 optimizerTransformer.zero_grad()
             else:
                 loss.backward()
+            
+            if i%num==0 and epoch%5==0:
+            
 
 
 
