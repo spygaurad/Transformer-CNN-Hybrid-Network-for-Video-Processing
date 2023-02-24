@@ -79,15 +79,11 @@ class VideoSegmentationNetwork(nn.Module):
         #the pre trained encoder which encodes the input into total number of 32K parameters 
         self.cnnencoder = CNN_Encoder()
 
-        #loading the custom transformer encoder class
-        # self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2)
+        #loading the transformer encoder class
         self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=4, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
-
-        #counts which instance of frame that we are looking at in the sequence window. Signifies the index of the window in which we currently are present.
-        self.sequence_counter = -1
 
         #generate a sinusoidal positional embedding
         self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)

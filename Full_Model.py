@@ -100,25 +100,19 @@ class VideoSegmentationNetwork(nn.Module):
         #the pre trained encoder which encodes the input into total number of 32K parameters 
         self.cnnencoder = CNN_Encoder()
 
-        #loading the custom transformer encoder class
-        # self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2)
+        #loading the transformer encoder class
         self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=4, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
 
+        #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
+        self.positions = self.__positionalencoding__(d_model=EMB, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
+
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
         # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
         # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
 
-        #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
-        self.positionalTensor = self.__get_positional__tensor().to(DEVICE)
-
-        #the buffer object where we store the sequence of sequences of frame's latents for a given frame index
-        self.sequence_window = deque()
-
-        #counts which instance of frame that we are looking at in the sequence window. Signifies the index of the window in which we currently are present.
-        self.sequence_counter = -1
 
 
 
