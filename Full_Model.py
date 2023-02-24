@@ -124,11 +124,8 @@ class VideoSegmentationNetwork(nn.Module):
 
     def forward(self, x):
 
-        #tensor size [batch, 32K]
-        latent_32K = self.cnnencoder(x)
-
-        #tensor size [batch, 18, EMBEDDED_DIMENSION]
-        chunked_lat = self.__reshape_split_and_stack__(latent_32K) 
+        latents = []
+        image_preds = []
 
         #appending our buffer with chunk of latents
         self.sequence_window.append(chunked_lat.tolist())     
@@ -311,8 +308,6 @@ def train(epochs, lr=1e-6):
             #saving the sample in each epoch
             if i%num==0: 
                 [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
-
-
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
