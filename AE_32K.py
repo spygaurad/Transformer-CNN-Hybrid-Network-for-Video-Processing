@@ -336,7 +336,7 @@ def train(epochs, batch_size=8, lr=0.0001):
 
 
 
-# error = train(61, batch_size=4)
+error = train(61, batch_size=8)
 # if error:
 #     torch.cuda.empty_cache()
 #     train(epochs=61, batch_size=4)
