@@ -163,11 +163,9 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __unstack_and_merge__(self, x):
-        # x = x[:, 1:-1]
         chunks = x.split(1, dim=1)
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
         merged_x = torch.cat(chunks, dim=1)
-        # merged_x = merged_x.view(BATCH_SIZE, 8, 64, 64)
         return merged_x
 
 
@@ -189,12 +187,12 @@ class VideoSegmentationNetwork(nn.Module):
             T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
         '''
         PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH*SEQUENCE_LENGTH) 
-        # PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
-        # T = []
-        # for seq in PE_imageSequence:
-        #     t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
-        #     T.append(t)
-        # positional_tensor = torch.cat(T, dim=0)
+        PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
+        T = []
+        for seq in PE_imageSequence:
+            t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
+            T.append(t)
+        positional_tensor = torch.cat(T, dim=0)
         return PE_latentSequence
 
 
