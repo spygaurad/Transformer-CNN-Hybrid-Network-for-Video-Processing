@@ -155,20 +155,6 @@ class VideoSegmentationNetwork(nn.Module):
 
         image_preds = torch.stack(image_preds)
         return image_preds
-    
-
-    def __get_latent__chunks__(self):
-        chunks = torch.Tensor(self.sequence_window)
-        chunks = chunks.permute(1, 0, 2, 3)
-        chunks = chunks.reshape(chunks.shape[0], chunks.shape[1]*chunks.shape[2], chunks.shape[-1]) 
-        return chunks
-
-
-    def __sequence_counter__(self):
-        self.sequence_counter += 1
-        if self.sequence_counter > 4:
-            self.sequence_counter = 0
-        return self.sequence_counter
 
 
     def __split_and_stack__(self, x):
