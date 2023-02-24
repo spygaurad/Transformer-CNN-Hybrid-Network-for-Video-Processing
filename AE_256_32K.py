@@ -232,8 +232,8 @@ def save_sample(epoch=0, x=None, mask_pred=None, mode='train'):
     elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
 
     if mode == 'train':
-        elements[0] = elements[0].save(f"{path}_image.jpg")
-        elements[1] = elements[1].save(f"{path}_image_pred.jpg")
+        elements[0] = elements[0].save(f"{path}/{epoch}_image.jpg")
+        elements[1] = elements[1].save(f"{path}/{epoch}_image_pred.jpg")
 
     '''
         elif mode == 'test':
