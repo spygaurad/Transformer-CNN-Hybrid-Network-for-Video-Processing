@@ -297,6 +297,16 @@ def train(epochs, lr=1e-6):
 
             loss = nvidia_mix_loss(imagePred, image)
 
+            #getting the loss value
+            _loss += loss.item()
+
+            if i%accumulation_steps==0:
+                loss.backward()
+                optimizerTransformer.step()
+                optimizerTransformer.zero_grad()
+            else:
+                loss.backward()
+
 
 
         writer.add_scalar("Training Loss", _loss, i)
