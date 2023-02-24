@@ -117,7 +117,7 @@ class DataloaderSequential():
     
     def __init__(self, csv_file, batch_size) -> None:
         self.csv_file = csv_file
-        self.transform = transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
+        self.transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
         self.batch_size = batch_size
     
     def load_images(self):
