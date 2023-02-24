@@ -86,9 +86,6 @@ class VideoSegmentationNetwork(nn.Module):
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
 
-        #the buffer object where we store the sequence of sequences of frame's latents for a given frame index
-        self.sequence_window = deque()
-
         #counts which instance of frame that we are looking at in the sequence window. Signifies the index of the window in which we currently are present.
         self.sequence_counter = -1
 
