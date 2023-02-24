@@ -266,8 +266,6 @@ def train(epochs, lr=1e-6):
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
-    optimizerCNNDecoder = optim.AdamW(decodermodel.parameters(), lr)
-    optimizerCNNEncoder = optim.AdamW(encodermodel.parameters(), lr)
 
     #loss function
     nvidia_mix_loss = MixedLoss(0.5, 0.5)
