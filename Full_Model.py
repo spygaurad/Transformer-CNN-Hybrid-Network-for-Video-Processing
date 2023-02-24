@@ -137,6 +137,7 @@ class VideoSegmentationNetwork(nn.Module):
                 l = self.cnnencoder(x[i])
             l = self.__split_and_stack__(l)
             latents.append(l)
+
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
@@ -170,10 +171,8 @@ class VideoSegmentationNetwork(nn.Module):
         return self.sequence_counter
 
 
-    def __reshape_split_and_stack__(self, x):
-        # x = x.view(x.shape[0], -1)
+    def __split_and_stack__(self, x):
         latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
-        # sequence = torch.cat((torch.cat((self.sof, latent_sequence), dim=1), self.eof), dim=1)
         return latent_sequence
 
 
