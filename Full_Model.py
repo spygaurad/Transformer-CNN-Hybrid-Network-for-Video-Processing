@@ -142,6 +142,18 @@ class VideoSegmentationNetwork(nn.Module):
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
 
+        # sending the latents predicted to the transformer
+        latents_pred = self.transenc(latents)
+        
+        #decoding all the sequence of the latents
+        # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
+        latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_LENGTH, EMBEDDED_DIMENSION)
+        for i in range(latents_pred.shape[0]):
+            l_hat = self.__unstack_and_merge__(latents_pred[i])
+            image_preds.append(self.cnndecoder(l_hat))
+
+        image_preds = torch.stack(image_preds)
+        return image_preds
     
 
     def __get_latent__chunks__(self):
