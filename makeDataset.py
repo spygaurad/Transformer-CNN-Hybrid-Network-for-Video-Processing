@@ -116,38 +116,38 @@
 #         writer.writerow([file_path])
 
 
-import os
-import csv
+# import os
+# import csv
 
-# Specify the path of the "Dataset" folder
-dataset_path = "Datasets/VOS/train/images"
+# # Specify the path of the "Dataset" folder
+# dataset_path = "Datasets/VOS/train/images"
 
-# Open the CSV file for writing
-with open("sequebtual_VOS_data.csv", "w") as f:
-    writer = csv.writer(f)
+# # Open the CSV file for writing
+# with open("sequentual_VOS_data.csv", "w") as f:
+#     writer = csv.writer(f)
 
-    # Iterate through all the folders in the "Dataset" folder
-    for folder in os.listdir(dataset_path):
-        folder_path = os.path.join(dataset_path, folder)
-        # Ignore if its not a directory
-        if not os.path.isdir(folder_path):
-            continue
-        files = os.listdir(folder_path)
-        files.sort()
-        # Iterate through all the files in the folder
-        for i in range(len(files)):
-            window_files = files[i:i+5]
-            file_paths = [os.path.join(folder_path, x) for x in window_files]
-            writer.writerow(file_paths)
+#     # Iterate through all the folders in the "Dataset" folder
+#     for folder in os.listdir(dataset_path):
+#         folder_path = os.path.join(dataset_path, folder)
+#         # Ignore if its not a directory
+#         if not os.path.isdir(folder_path):
+#             continue
+#         files = os.listdir(folder_path)
+#         files.sort()
+#         # Iterate through all the files in the folder
+#         for i in range(len(files)):
+#             window_files = files[i:i+5]
+#             file_paths = [os.path.join(folder_path, x) for x in window_files]
+#             writer.writerow(file_paths)
 
 
 
-input_file = 'sequential_VOS_data.csv'
-output_file = 'data_sequential_VOS.csv'
+# input_file = 'sequential_VOS_data.csv'
+# output_file = 'data_sequential_VOS.csv'
 
-with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
-    reader = csv.reader(f_in)
-    writer = csv.writer(f_out)
-    for row in reader:
-        if len(row) >= 5:
-            writer.writerow(row)
+# with open(input_file, 'r') as f_in, open(output_file, 'w', newline='') as f_out:
+#     reader = csv.reader(f_in)
+#     writer = csv.writer(f_out)
+#     for row in reader:
+#         if len(row) >= 5:
+#             writer.writerow(row)
