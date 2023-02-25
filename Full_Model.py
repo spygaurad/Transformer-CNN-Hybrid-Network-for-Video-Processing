@@ -47,9 +47,9 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 encoderdecoder = Autoencoder32K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_50.tar')['model_state_dict'])
-# for params in encoderdecoder.parameters():
-#     params.requires_grad = False
+# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_50.tar')['model_state_dict'])
+for params in encoderdecoder.encoder.parameters():
+    params.requires_grad = False
 
 
 
