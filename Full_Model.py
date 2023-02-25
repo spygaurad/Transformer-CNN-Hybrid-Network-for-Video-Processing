@@ -204,11 +204,6 @@ def train(epochs, lr=1e-6):
     model = VideoSegmentationNetwork().to(DEVICE)
     # model.load_state_dict(torch.load('saved_model/transformer_full_model.tar')['model_state_dict'])
 
-    #the CNN's encoder and decoder model
-    decodermodel = model.cnndecoder
-    encodermodel = model.cnnencoder
-
-
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.parameters(), lr)
