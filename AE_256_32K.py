@@ -295,8 +295,8 @@ def train(epochs, batch_size=16, lr=0.0001):
             #input the image into the model and getting the reconstructed image
             if epoch>15:
                 noise_image = image + torch.randn(image.size()).to(DEVICE)*0.05 + 0.0
-            # else:
-                # noise_image = image
+            else:
+                noise_image = image
             output = model()
 
             #Loss functions for evaluation
