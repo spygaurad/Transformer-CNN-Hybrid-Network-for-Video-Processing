@@ -96,10 +96,10 @@ class VideoSegmentationNetwork(nn.Module):
 
         # sending the input to the cnn encoder
         # maskFrameNo = 2
-        maskFrameNo = random.randint(1, SEQUENCE_LENGTH)
+        maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
         for i in range(x.shape[0]):
             if i == maskFrameNo:
-                l = torch.nn.init.xavier_normal_(torch.empty(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH)).to(DEVICE)
+                l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
             l = self.__split_and_stack__(l)
