@@ -239,7 +239,7 @@ def train(epochs, lr=1e-6):
             #here, we take our output as the latent which is just on the third frame 
 
             # loss = nvidia_mix_loss(imagePred, image)
-            loss = mseloss(image_pred, image)
+            loss = mseloss(imagePred, image)
 
             #getting the loss value
             _loss += loss.item()
