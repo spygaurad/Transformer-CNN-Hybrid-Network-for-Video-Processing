@@ -85,7 +85,7 @@ class DataLoader():
 
 class CSVDataset(torch.utils.data.Dataset):
 
-    def __init__(self, csv_file, transforms):
+    def __init__(self, csv_file, batch_size, transforms):
         self.transform = transforms
         self.rows = []
         with open(csv_file, "r") as f:
