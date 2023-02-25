@@ -267,7 +267,7 @@ def train(epochs, batch_size=16, lr=0.0001):
 
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
-    nvidia_mix_loss = MixedLoss(0.5, 0.5)
+    nvidia_mix_loss = MixedLoss(0.3, 0.7)
     loss_train = []
     start = 0
     epochs = epochs
@@ -286,6 +286,7 @@ def train(epochs, batch_size=16, lr=0.0001):
         for i, image in enumerate(tqdm(train_dataloader)):
 
             #converting the image to cuda decice
+            
             image = image.to(device)
 
             #zero grading the optimizer
