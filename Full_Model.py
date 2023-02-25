@@ -210,7 +210,8 @@ def train(epochs, lr=1e-6):
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
 
     #loss function
-    nvidia_mix_loss = MixedLoss(0.5, 0.5)
+    # nvidia_mix_loss = MixedLoss(0.5, 0.5)
+    mseloss = nn.MSELoss()
 
     writer = SummaryWriter(log_dir="logs")     
 
@@ -237,7 +238,8 @@ def train(epochs, lr=1e-6):
             imagePred = model(image)
             #here, we take our output as the latent which is just on the third frame 
 
-            loss = nvidia_mix_loss(imagePred, image)
+            # loss = nvidia_mix_loss(imagePred, image)
+            loss = mseloss(image_pred, image)
 
             #getting the loss value
             _loss += loss.item()
