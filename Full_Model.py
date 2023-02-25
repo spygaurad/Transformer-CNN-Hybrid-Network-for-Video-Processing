@@ -4,7 +4,7 @@ import torch.nn as nn
 import math
 import torch.optim as optim
 from AE_256_32K import Autoencoder32K
-from dataset import DataLoaderSequential
+from dataset import DataloaderSequential
 from TransformerEncoder import TransformerEncoder
 from collections import deque
 from metric import MixedLoss
