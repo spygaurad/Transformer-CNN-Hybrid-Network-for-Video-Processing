@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -254,7 +254,7 @@ def train(epochs, lr=1e-6):
             
             #saving the sample in each epoch
             if i%num==0: 
-                [__save_sample__(epoch+1, image[j], imagePred[j]) for j in range(SEQUENCE_LENGTH)]
+                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
@@ -269,7 +269,7 @@ def train(epochs, lr=1e-6):
 
 
 
-def __save_sample__(epoch, x, img_pred):
+def __save_sample__(epoch, x, img_pred, iter):
     path = f'Training_Sneakpeeks/Transformer_Training/'
     try:
         os.makedirs(path)
@@ -278,7 +278,10 @@ def __save_sample__(epoch, x, img_pred):
     elements = [x, img_pred]
     elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
     for i, element in enumerate(elements):
-        element.save(f"{path}{epoch}_{['image', 'image_trans_pred'][i]}.jpg")
+        try:
+            element.save(f"{path}{epoch}_{iter}_{['image', 'image_trans_pred'][i]}.jpg")
+        except:
+            pass
 
 
 train(epochs=500)
