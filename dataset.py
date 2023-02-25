@@ -122,7 +122,7 @@ class DataloaderSequential():
         self.batch_size = batch_size
     
     def load_images(self):
-        dataset = CSVDataset(self.csv_file, self.transform)
+        dataset = CSVDataset(self.csv_file, self.batch_size, self.transform)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         return dataloader
 
