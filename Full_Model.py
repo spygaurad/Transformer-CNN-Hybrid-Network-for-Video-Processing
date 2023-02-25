@@ -254,7 +254,7 @@ def train(epochs, lr=1e-6):
             
             #saving the sample in each epoch
             if i%num==0: 
-                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
+                [__save_sample__(epoch+1, image[j], imagePred[j]) for j in range(SEQUENCE_LENGTH)]
 
         writer.add_scalar("Training Loss", _loss, i)
         loss_train.append(_loss)
