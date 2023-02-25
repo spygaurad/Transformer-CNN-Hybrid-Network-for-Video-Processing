@@ -116,6 +116,7 @@ class Encoder_32K(nn.Module):
         x = self.relu(self.bn5(self.conv5(x)))
         x = self.dropout(x)
         x = x.view(x.shape[0], -1)
+        x = x.view(x.shape[0], 8, 4096)
 
 
         #to run in a VAE setup, use the following part of code
