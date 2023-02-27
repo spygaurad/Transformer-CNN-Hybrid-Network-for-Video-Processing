@@ -75,7 +75,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=4, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
