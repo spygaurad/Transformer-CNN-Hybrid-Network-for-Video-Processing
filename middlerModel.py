@@ -144,7 +144,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
 
-def train(epochs, lr=1e-6):
+def train(epochs, lr=1e-5):
     
     print(f"Using {DEVICE} device...")
     print("Loading Datasets...")
