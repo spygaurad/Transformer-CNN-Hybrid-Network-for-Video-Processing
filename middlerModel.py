@@ -84,14 +84,15 @@ class VideoSegmentationNetwork(nn.Module):
         self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
 
 
-    def forward(self, x):
+    def forward(self, x, epoch):
 
         latents = []
         image_preds = []
 
         # sending the input to the cnn encoder
         # maskFrameNo = 2
-        maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
+        if epoch > 15:
+            maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
         for i in range(x.shape[0]):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
