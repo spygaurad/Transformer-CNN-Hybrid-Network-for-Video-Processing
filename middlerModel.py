@@ -84,7 +84,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
 
 
-    def forward(self, x, epoch):
+    def forward(self, x, epoch=None):
 
         latents = []
         image_preds = []
@@ -93,6 +93,8 @@ class VideoSegmentationNetwork(nn.Module):
         # maskFrameNo = 2
         if epoch > 15:
             maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
+        else:
+            maskFrameNo = SEQUENCE_LENGTH+1
         for i in range(x.shape[0]):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
