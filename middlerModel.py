@@ -39,7 +39,6 @@ class CNN_Encoder(nn.Module):
         return bottleneck_4K
 
 
-#generate a code
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, num_layers, num_heads, dropout):
         super(Transformer_Encoder, self).__init__()
