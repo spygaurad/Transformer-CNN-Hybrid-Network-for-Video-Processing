@@ -160,7 +160,7 @@ def train(epochs, lr=1e-5):
     # model.load_state_dict(torch.load('saved_model/transformer_full_model_4k_0.tar')['model_state_dict'])
 
     #initializing the optimizer for transformer
-    optimizerTransformer = optim.AdamW(model.parameters(), lr)
+    optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
 
     #loss function
     # nvidia_mix_loss = MixedLoss(0.5, 0.5)
