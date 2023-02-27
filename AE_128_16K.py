@@ -565,7 +565,6 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
     print("Initializing Parameters...")
 
     model = Autoencoder4K("image").to(DEVICE)
-    model.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_30.tar'))
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     mseloss = torch.nn.MSELoss()
