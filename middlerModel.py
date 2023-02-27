@@ -24,8 +24,6 @@ BATCH_SIZE = 8
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-
-
 encoderdecoder = Autoencoder4K(outputType="image")
 encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40.tar')['model_state_dict'])
 
