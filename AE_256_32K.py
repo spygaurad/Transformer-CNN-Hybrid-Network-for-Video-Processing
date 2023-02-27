@@ -265,7 +265,7 @@ def train(epochs, batch_size=16, lr=0.0001):
     print("Initializing Parameters...")
 
     model = Autoencoder32K("image").to(device)
-    model.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_10.tar'))
+    model.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_10.tar')['model_state_dict'])
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     nvidia_mix_loss = MixedLoss(0.3, 0.7)
