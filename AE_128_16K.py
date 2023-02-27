@@ -569,8 +569,8 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
 
     mseloss = torch.nn.MSELoss()
     loss_train = []
-    start = 30
-    epochs += start
+    start = 0
+    epochs = epochs
     print(f"Parameters Initialized...")
     print(f"Starting to train for {epochs} epochs.")
 
