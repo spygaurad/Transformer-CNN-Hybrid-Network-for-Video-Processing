@@ -426,7 +426,7 @@ class Encoder_32K(nn.Module):
     def forward(self, x):
         x = self.relu(self.bn1(self.conv1(x)))
         x = self.layer1(x)
-        # x = self.dropout(x)
+        x = self.dropout(x)
         x = self.layer2(x)
         x = self.relu(self.bn2(self.conv2(x)))
         x = self.relu(self.bn3(self.conv3(x)))
@@ -565,12 +565,13 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
     print("Initializing Parameters...")
 
     model = Autoencoder4K("image").to(DEVICE)
+    model.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_30.tar'))
     optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     mseloss = torch.nn.MSELoss()
     loss_train = []
-    start = 0
-    epochs = epochs
+    start = 30
+    epochs += start
     print(f"Parameters Initialized...")
     print(f"Starting to train for {epochs} epochs.")
 
@@ -629,7 +630,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
 
 
 
-# error = train(31, batch_size=BATCH_SIZE)
+error = train(21, batch_size=BATCH_SIZE)
 # if error:
 #     torch.cuda.empty_cache()
 #     train(epochs=61, batch_size=4)
