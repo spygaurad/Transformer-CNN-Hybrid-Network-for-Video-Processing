@@ -29,16 +29,13 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 encoderdecoder = Autoencoder4K(outputType="image")
 encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40.tar')['model_state_dict'])
 
-
-
-
 class CNN_Encoder(nn.Module):
     def __init__(self):
         super(CNN_Encoder, self).__init__()
         self.encoder = encoderdecoder.encoder
         for params in encoderdecoder.encoder.parameters():
             params.requires_grad = False
-            
+
     def forward(self, x):
         bottleneck_4K = self.encoder(x)
         return bottleneck_4K
