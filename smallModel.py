@@ -148,7 +148,7 @@ def train(epochs, lr=0.00001):
 
     #loading the model
     model = VideoSegmentationNetwork().to(DEVICE)
-
+    model.load_state_dict(torch.load('saved_model/autoencoder_4k_VOS_30.tar')['model_state_dict'])
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
 
