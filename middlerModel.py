@@ -91,7 +91,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         # sending the input to the cnn encoder
         # maskFrameNo = 2
-        if epoch > 21:
+        if epoch > 20:
             maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
         else:
             maskFrameNo = SEQUENCE_LENGTH+1
