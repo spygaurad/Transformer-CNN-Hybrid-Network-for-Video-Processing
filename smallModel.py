@@ -192,7 +192,7 @@ def train(epochs, lr=0.00001):
             #saving a sample
             optimizerTransformer.step()
             
-            if i%50 ==0 and epoch%5==0:
+            if i%50==0 and epoch%5==0:
                 __save_sample__(epoch+1, image[0], imagePred[0], "1")
                 __save_sample__(epoch+1, image[1], imagePred[1], "2")
                 __save_sample__(epoch+1, image[2], imagePred[2], "3")
