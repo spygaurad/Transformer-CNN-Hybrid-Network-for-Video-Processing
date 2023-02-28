@@ -124,6 +124,7 @@ class VideoSegmentationNetwork(nn.Module):
         # sending the input to the cnn encoder
         # maskFrameNo = 2
         maskFrameNo = random.randint(1, SEQUENCE_LENGTH)
+        
         for i in range(x.shape[0]):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
