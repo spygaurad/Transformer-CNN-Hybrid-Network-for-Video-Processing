@@ -197,7 +197,6 @@ def train(epochs, lr=0.00001):
                 __save_sample__(epoch+1, image[1], imagePred[1], "2")
                 __save_sample__(epoch+1, image[2], imagePred[2], "3")
                 __save_sample__(epoch+1, image[3], imagePred[3], "4")
-                __save_sample__(epoch+1, image[4], imagePred[4], "5")
             
   
         writer.add_scalar("Training Loss", _loss, i)
