@@ -193,6 +193,7 @@ def train(epochs, lr=0.00001):
             optimizerTransformer.step()
             
             if i%50==0 and epoch%5==0:
+                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
             
   
         writer.add_scalar("Training Loss", _loss, i)
