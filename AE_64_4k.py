@@ -312,7 +312,7 @@ def train(epochs, batch_size=16, lr=0.001):
 
         #Saving the minimum loss wala model
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
-        if epoch%10 == 0 and loss_train[-1] == min(loss_train):
+        if epoch%10 == 0:
             print('Saving Model...')
             torch.save({
                 'epoch': epoch,
