@@ -104,12 +104,11 @@ class VideoSegmentationNetwork(nn.Module):
         for i in range(x.shape[0]):
             latents.append(self.cnnencoder(x[i]))
         latents = torch.stack(latents).permute(1, 0, 2)
-
+        
         latents = latents + self.positions
 
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
-        
         
         
         # decoding all the sequence of the latents

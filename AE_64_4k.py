@@ -186,7 +186,7 @@ class Decoder_32K(nn.Module):
         self.relu = nn.ReLU()
 
 
-    def forward(self,x):
+    def forward(self, x):
 
         #we now convert a linear vector to a volume of a desired shape
         # '''
