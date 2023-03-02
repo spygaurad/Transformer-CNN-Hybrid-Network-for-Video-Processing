@@ -115,7 +115,7 @@ class VideoSegmentationNetwork(nn.Module):
         for i in range(latents_pred.shape[0]):
             image_preds.append(self.cnndecoder(latents_pred[i]))
 
-        image_preds = torch.stack(image_preds)
+        image_preds = torch.stack(image_preds).permute(0, 1, 2)
         return image_preds
 
     
