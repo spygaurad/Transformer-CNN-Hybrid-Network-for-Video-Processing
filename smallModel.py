@@ -92,7 +92,7 @@ class VideoSegmentationNetwork(nn.Module):
         #counts which instance of frame that we are looking at in the sequence window. Signifies the index of the window in which we currently are present.
         self.sequence_counter = -1
 
-        self.positions = self.__get_positional__tensor()
+        self.positions = self.__get_positional__tensor().to(DEVICE)
 
 
     def forward(self, x):
