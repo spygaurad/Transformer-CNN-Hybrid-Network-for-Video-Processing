@@ -187,7 +187,7 @@ def train(epochs, lr=1e-5):
             image = torch.stack(image).to(DEVICE)
 
             #input the image into the model
-            imagePred = model(image)
+            imagePred = model(image, epoch)
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
