@@ -293,7 +293,7 @@ def __save_sample__(epoch, x, img_pred, iter):
 vsn = VideoSegmentationNetwork()
 
 input_tensor = torch.randn(SEQUENCE_LENGTH, BATCH_SIZE, 3, 256, 256)
-imagePred = vsn(input_tensor)
+imagePred = vsn(input_tensor, 1)
 print(imagePred.shape)
     
 
