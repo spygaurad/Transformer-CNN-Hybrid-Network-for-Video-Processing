@@ -47,7 +47,7 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 encoderdecoder = Autoencoder32K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_50.tar')['model_state_dict'])
+# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_50.tar')['model_state_dict'])
 
 
 
@@ -116,7 +116,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
 
-    def forward(self, x):
+    def forward(self, x, epoch):
 
         latents = []
         image_preds = []
@@ -288,16 +288,13 @@ def __save_sample__(epoch, x, img_pred, iter):
             pass
 
 
-train(epochs=500)
+# train(epochs=500)
 
-# vsn = VideoSegmentationNetwork()
+vsn = VideoSegmentationNetwork()
 
-# for i in range(100):
-#     input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
-#     state, throughput0, throughput1 = vsn(x=input_tensor)
-#     print(f'Iteration: {i+1}')
-#     if state:
-#         print(throughput1.shape)
+input_tensor = torch.randn(SEQUENCE_LENGTH, BATCH_SIZE, 3, 256, 256)
+imagePred = vsn(input_tensor)
+print(imagePred.shape)
     
 
 
