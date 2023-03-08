@@ -82,8 +82,8 @@ if __name__ == "__main__":
         print('Dataset Exists!')
     else:
         print('Preparing dataset...')
-        downloadDataset()
-        extractDataset()
+        # downloadDataset()
+        # extractDataset()
         manageFolderStructure()
         createBinarySegmentationMask()
 
