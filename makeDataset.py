@@ -33,7 +33,7 @@ import csv
 # Now we make our folder's structure, compatible with how our dataloader class does it.
 def manageFolderStructure():
     #For images
-    source_directory = 'Datasets/VOS/train/train/JPEGImages/'
+    source_directory = 'Datasets/VOS/train/JPEGImages/'
     destination_directory = 'Datasets/VOS/train/images/'
     os.makedirs(destination_directory)
     subdirectories = [d for d in os.listdir(source_directory) if os.path.isdir(os.path.join(source_directory, d))]
