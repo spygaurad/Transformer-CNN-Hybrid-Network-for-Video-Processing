@@ -107,8 +107,8 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
-        self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
-
+        # self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
+        self.positions = torch.randn(max_seq_len, emb_dim, requires_grad=True)
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
         # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
         # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
@@ -133,11 +133,11 @@ class VideoSegmentationNetwork(nn.Module):
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
-            l = self.__split_and_stack__(l)
+            l = self.__unstack_and_merge__(l)
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
-        latents = torch.stack(latents).permute(1, 0, 2, 3)
+        latents = torch.stack(latents).permute(1, 0, 2)
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
 
@@ -153,6 +153,18 @@ class VideoSegmentationNetwork(nn.Module):
 
         image_preds = torch.stack(image_preds)
         return image_preds
+
+    def add_positional_embeddings(x, embedding_dim=4096):
+
+
+        # create the positional embedding tensor
+        num_embeddings = SEQUENCE_LENGTH
+        positional_embeddings = nn.Parameter(torch.randn(num_embeddings, 1, embedding_dim))
+
+        # repeat the positional embeddings and reshape for concatenation
+        repeated_embeddings = positional_embeddings.repeat(1, interval, 1).view(num_embeddings*interval, 1, embedding_dim)
+
+        return concatenated_tensor
 
 
     def __split_and_stack__(self, x):
