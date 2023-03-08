@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -170,27 +170,6 @@ class VideoSegmentationNetwork(nn.Module):
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
         merged_x = torch.cat(chunks, dim=1)
         return merged_x
-
-
-    # def __positionalencoding__(self, d_model, length):
-    #     pos_embedding = torch.randn(max_seq_len, emb_dim, requires_grad=True)
-
-
-
-    # def __get_positional__tensor(self):
-    #     ''' 
-    #         A = [A1, A2, A3, A4]
-    #         B = [B1, B2, B3, B4, B5]
-    #         T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
-    #     '''
-    #     PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH*SEQUENCE_LENGTH) 
-    #     PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
-    #     T = []
-    #     for seq in PE_imageSequence:
-    #         t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
-    #         T.append(t)
-    #     positional_tensor = torch.cat(T, dim=0)
-    #     return PE_latentSequence
 
 
 
