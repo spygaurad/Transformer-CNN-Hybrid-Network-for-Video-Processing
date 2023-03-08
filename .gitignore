@@ -8,3 +8,4 @@ env/
 data_image_train_VOS.csv
 data_sequential_VOS.csv
 Training_Sneakpeeks/
+__pycache__/
