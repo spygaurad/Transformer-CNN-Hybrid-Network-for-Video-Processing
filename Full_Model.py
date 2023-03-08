@@ -188,7 +188,7 @@ def train(epochs, lr=1e-6):
 
 
     #initializing the optimizer for transformer
-    optimizerTransformer = optim.AdamW(model.parameters(), lr)
+    optimizerTransformer = optim.Adam(model.parameters(), lr)
     #initializing the optimizer for CNN decoder. It will learn in 10% of the rate that the transformer is learning in
 
     #loss function
