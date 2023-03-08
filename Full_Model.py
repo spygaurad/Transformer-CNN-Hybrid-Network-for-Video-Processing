@@ -108,7 +108,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
         # self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
-        self.positions = torch.randn(max_seq_len, emb_dim, requires_grad=True)
+        self.positions = torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True)
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
         # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
         # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
