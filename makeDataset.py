@@ -33,15 +33,15 @@ import csv
 # Now we make our folder's structure, compatible with how our dataloader class does it.
 def manageFolderStructure():
     #For images
-    source_directory = 'Datasets/VOS/train/JPEGImages/'
-    destination_directory = 'Datasets/VOS/train/images/'
-    os.makedirs(destination_directory)
-    subdirectories = [d for d in os.listdir(source_directory) if os.path.isdir(os.path.join(source_directory, d))]
-    print(f"Moving the files from {source_directory} to {destination_directory}")
-    for subdirectory in tqdm(subdirectories):
-        shutil.move(os.path.join(source_directory, subdirectory), destination_directory)
-    shutil.rmtree(source_directory)
-    print("Images Moved")
+    # source_directory = 'Datasets/VOS/train/JPEGImages/'
+    # destination_directory = 'Datasets/VOS/train/images/'
+    # os.makedirs(destination_directory)
+    # subdirectories = [d for d in os.listdir(source_directory) if os.path.isdir(os.path.join(source_directory, d))]
+    # print(f"Moving the files from {source_directory} to {destination_directory}")
+    # for subdirectory in tqdm(subdirectories):
+    #     shutil.move(os.path.join(source_directory, subdirectory), destination_directory)
+    # shutil.rmtree(source_directory)
+    # print("Images Moved")
 
     #For moving labels
     source_directory = 'Datasets/VOS/train/Annotations/'
