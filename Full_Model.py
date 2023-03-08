@@ -108,7 +108,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
         # self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
-        self.positions = torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True)
+        self.positions = torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION*CHUNK_LENGTH, requires_grad=True)
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
         # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
         # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
@@ -138,8 +138,8 @@ class VideoSegmentationNetwork(nn.Module):
 
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.stack(latents).permute(1, 0, 2)
-        latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
+        latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
 
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
@@ -154,9 +154,8 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = torch.stack(image_preds)
         return image_preds
 
-    def add_positional_embeddings(x, embedding_dim=4096):
 
-
+    def __get_positional__tensor(x, embedding_dim=4096):
         # create the positional embedding tensor
         num_embeddings = SEQUENCE_LENGTH
         positional_embeddings = nn.Parameter(torch.randn(num_embeddings, 1, embedding_dim))
@@ -179,31 +178,25 @@ class VideoSegmentationNetwork(nn.Module):
         return merged_x
 
 
-    def __positionalencoding__(self, d_model, length):
-        if d_model % 2 != 0:
-            raise ValueError("Cannot use sin/cos positional encoding with odd dim (got dim={:d})".format(d_model))
-        pe = torch.zeros(length, d_model)
-        position = torch.arange(0, length).unsqueeze(1)
-        div_term = torch.exp((torch.arange(0, d_model, 2, dtype=torch.float) * -(math.log(10000.0) / d_model)))
-        pe[:, 0::2] = torch.sin(position.float() * div_term)
-        pe[:, 1::2] = torch.cos(position.float() * div_term)
-        return pe
+    # def __positionalencoding__(self, d_model, length):
+    #     pos_embedding = torch.randn(max_seq_len, emb_dim, requires_grad=True)
 
 
-    def __get_positional__tensor(self):
-        ''' 
-            A = [A1, A2, A3, A4]
-            B = [B1, B2, B3, B4, B5]
-            T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
-        '''
-        PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH*SEQUENCE_LENGTH) 
-        PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
-        T = []
-        for seq in PE_imageSequence:
-            t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
-            T.append(t)
-        positional_tensor = torch.cat(T, dim=0)
-        return PE_latentSequence
+
+    # def __get_positional__tensor(self):
+    #     ''' 
+    #         A = [A1, A2, A3, A4]
+    #         B = [B1, B2, B3, B4, B5]
+    #         T = [ B1, A1, A2, A3, A4, B1, B2, A1, A2, A3, A4, B2, B3, A1, A2, A3, A4, B3,.... B5, A1, A2, A3, A4, B5 ]
+    #     '''
+    #     PE_latentSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, CHUNK_LENGTH*SEQUENCE_LENGTH) 
+    #     PE_imageSequence = self.__positionalencoding__(EMBEDDED_DIMENSION, SEQUENCE_LENGTH)
+    #     T = []
+    #     for seq in PE_imageSequence:
+    #         t = torch.cat((seq.unsqueeze(dim=0), PE_latentSequence, seq.unsqueeze(dim=0)))
+    #         T.append(t)
+    #     positional_tensor = torch.cat(T, dim=0)
+    #     return PE_latentSequence
 
 
 
