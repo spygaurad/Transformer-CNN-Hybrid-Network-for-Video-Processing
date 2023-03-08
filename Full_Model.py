@@ -266,7 +266,7 @@ def __save_sample__(epoch, x, img_pred, iter):
             pass
 
 
-# train(epochs=500)
+train(epochs=500)
 
 # vsn = VideoSegmentationNetwork().to(DEVICE)
 
