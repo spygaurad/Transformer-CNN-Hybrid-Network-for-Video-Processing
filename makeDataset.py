@@ -85,7 +85,7 @@ if __name__ == "__main__":
         # downloadDataset()
         # extractDataset()
         # manageFolderStructure()
-        createBinarySegmentationMask()
+        # createBinarySegmentationMask()
 
 
 import os
