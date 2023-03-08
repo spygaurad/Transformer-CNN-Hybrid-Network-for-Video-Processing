@@ -46,7 +46,7 @@ def manageFolderStructure():
     #For moving labels
     source_directory = 'Datasets/VOS/train/Annotations/'
     destination_directory = 'Datasets/VOS/train/labels/'
-    os.makedirs(destination_directory)
+    # os.makedirs(destination_directory)
     print(f"Moving the files from {source_directory} to {destination_directory}")
     subdirectories = [d for d in os.listdir(source_directory) if os.path.isdir(os.path.join(source_directory, d))]
     for subdirectory in tqdm(subdirectories):
