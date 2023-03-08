@@ -44,7 +44,7 @@ def manageFolderStructure():
     print("Images Moved")
 
     #For moving labels
-    source_directory = 'Datasets/VOS/train/train/annotations/'
+    source_directory = 'Datasets/VOS/train/annotations/'
     destination_directory = 'Datasets/VOS/train/labels/'
     os.makedirs(destination_directory)
     print(f"Moving the files from {source_directory} to {destination_directory}")
