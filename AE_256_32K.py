@@ -294,7 +294,7 @@ def train(epochs, batch_size=16, lr=0.0001):
             optimizer.zero_grad()
 
             #input the image into the model and getting the reconstructed image
-            if epoch>15:
+            if epoch>5:
                 noise_image = image + torch.randn(image.size()).to(DEVICE)*0.05 + 0.0
             else:
                 noise_image = image
