@@ -101,7 +101,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -184,6 +184,13 @@ def train(epochs, lr=1e-6):
 
     #loading the model
     model = VideoSegmentationNetwork().to(DEVICE)
+    
+    #checking the size of the model
+    params = list(model.parameters())
+    size_bytes = sum(reduce(mul, p.size()) * p.element_size() for p in params)
+    size_gb = size_bytes / (1024 ** 3)
+    print(f"Allocating: {size_gb:.2f} GB of {DEVICE} runtime Memory for the Model")
+
     # model.load_state_dict(torch.load('saved_model/transformer_full_model.tar')['model_state_dict'])
 
 
