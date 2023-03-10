@@ -41,8 +41,8 @@ SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
 BATCH_SIZE = 8
-# DEVICE =  "cpu"
-DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+DEVICE =  "cpu"
+# DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
