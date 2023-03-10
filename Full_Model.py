@@ -14,7 +14,8 @@ from tqdm import tqdm
 import os
 from torchvision import transforms
 from tensorboardX import SummaryWriter
-
+from functools import reduce
+from operator import mul
 
 '''
     How do we send an image to a transformer? 
