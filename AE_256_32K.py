@@ -201,6 +201,7 @@ class Decoder_32K(nn.Module):
 
 
 
+
 class Autoencoder32K(nn.Module):
     def __init__(self, outputType):
         super(Autoencoder32K, self).__init__()

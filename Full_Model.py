@@ -14,8 +14,7 @@ from tqdm import tqdm
 import os
 from torchvision import transforms
 from tensorboardX import SummaryWriter
-from functools import reduce
-from operator import mul
+from torchsummary import summary
 
 '''
     How do we send an image to a transformer? 
@@ -187,10 +186,7 @@ def train(epochs, lr=1e-6):
     model = VideoSegmentationNetwork().to(DEVICE)
     
     #checking the size of the model
-    params = list(model.parameters())
-    size_bytes = sum(reduce(mul, p.size()) * p.element_size() for p in params)
-    size_gb = size_bytes / (1024 ** 3)
-    print(f"Allocating: {size_gb:.2f} GB of {DEVICE} runtime Memory for the Model")
+    
 
     # model.load_state_dict(torch.load('saved_model/transformer_full_model.tar')['model_state_dict'])
 
