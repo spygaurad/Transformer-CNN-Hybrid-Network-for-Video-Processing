@@ -217,7 +217,7 @@ def train(epochs, lr=1e-6):
             image = torch.stack(image).to(DEVICE)
 
             #input the image into the model
-            imagePred = model(image)
+            imagePred = model(image, epoch)
             #here, we take our output as the latent which is just on the third frame 
 
             # loss = nvidia_mix_loss(imagePred, image)
