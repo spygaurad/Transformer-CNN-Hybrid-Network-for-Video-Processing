@@ -140,10 +140,6 @@ class VideoSegmentationNetwork(nn.Module):
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
 
-        # Verify the shape of latents before sending it to the transformer
-        assert latents.shape == (BATCH_SIZE, SEQUENCE_LENGTH*CHUNK_LENGTH, EMBEDDED_DIMENSION), f"Unexpected shape for latents tensor: {latents.shape}"
-        assert not torch.any(torch.isnan(my_tensor)), "Tensor contains NaN values"
-        
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
         
