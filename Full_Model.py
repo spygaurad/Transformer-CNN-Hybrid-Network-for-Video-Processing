@@ -158,7 +158,7 @@ class VideoSegmentationNetwork(nn.Module):
     #     pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
     #     pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
     #     return pos_tensor
-    def __get_positional__tensor(x, embedding_dim=EMBEDDED_DIMENSION):
+    def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
     # Calculate the positional encoding matrix
         pos_embedding = torch.zeros(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, device=DEVICE)
         for pos in range(SEQUENCE_LENGTH):
@@ -167,9 +167,9 @@ class VideoSegmentationNetwork(nn.Module):
                     pos_embedding[pos, i] = math.sin(pos / (10000 ** (i / embedding_dim)))
                 else:
                     pos_embedding[pos, i] = math.cos(pos / (10000 ** ((i - 1) / embedding_dim)))
-        
+
         # Repeat the positional encoding matrix CHUNK_LENGTH times for each element in the batch
-        pos_tensor = torch.cat([pos_embedding.repeat_interleave(CHUNK_LENGTH, dim=0) for _ in range(x.shape[1])], dim=1)
+        pos_tensor = torch.cat([pos_embedding.repeat_interleave(CHUNK_LENGTH, dim=0) for _ in range(pos_embedding.shape[0])], dim=1)
         return pos_tensor
 
 
