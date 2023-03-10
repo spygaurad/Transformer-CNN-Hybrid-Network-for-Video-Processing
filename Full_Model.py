@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 2
+BATCH_SIZE = 4
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -101,7 +101,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=8, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
