@@ -153,11 +153,20 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = torch.stack(image_preds)
         return image_preds
 
+    def get_positional_encoding(self, seq_len, embedding_dim):
+        pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
+        div = torch.exp(torch.arange(0, embedding_dim, 2).float() * (-math.log(10000.0) / embedding_dim))
+        pos_embedding = torch.zeros(seq_len, embedding_dim)
+        pos_embedding[:, 0::2] = torch.sin(pos * div)
+        pos_embedding[:, 1::2] = torch.cos(pos * div)
+        return pos_embedding
 
-    # def __get_positional__tensor(x, embedding_dim=EMBEDDED_DIMENSION):
-    #     pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
-    #     pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
-    #     return pos_tensor
+    def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
+        pos_embedding = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
+        pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
+        return pos_tensor
+
+    # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
     # def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
     # # Calculate the positional encoding matrix
     #     pos_embedding = torch.zeros(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, device=DEVICE)
