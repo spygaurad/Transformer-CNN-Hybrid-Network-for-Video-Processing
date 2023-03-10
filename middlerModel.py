@@ -81,7 +81,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #generate a sinusoidal positional embedding
-        self.positions = self.__positionalencoding__(d_model=EMBEDDED_DIMENSION, length=SEQUENCE_LENGTH*CHUNK_LENGTH).to(DEVICE)
+        self.positions = self.self.__get_positional__tensor()
 
 
     def forward(self, x, epoch=None):
@@ -95,7 +95,7 @@ class VideoSegmentationNetwork(nn.Module):
             maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
         else:
             maskFrameNo = SEQUENCE_LENGTH+1
-            
+
         for i in range(x.shape[0]):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
@@ -122,15 +122,10 @@ class VideoSegmentationNetwork(nn.Module):
         return image_preds
 
 
-    def __positionalencoding__(self, d_model, length):
-        if d_model % 2 != 0:
-            raise ValueError("Cannot use sin/cos positional encoding with odd dim (got dim={:d})".format(d_model))
-        pe = torch.zeros(length, d_model)
-        position = torch.arange(0, length).unsqueeze(1)
-        div_term = torch.exp((torch.arange(0, d_model, 2, dtype=torch.float) * -(math.log(10000.0) / d_model)))
-        pe[:, 0::2] = torch.sin(position.float() * div_term)
-        pe[:, 1::2] = torch.cos(position.float() * div_term)
-        return pe
+    def __get_positional__tensor(x, embedding_dim=EMBEDDED_DIMENSION):
+        pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
+        pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
+        return pos_tensor
 
 
     def __split_and_stack__(self, x):

@@ -107,7 +107,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #get the tensor of size [sequence_length, embedding dimension] which is encoded like... (see the method implementation)
-        self.positions = self.__get_positional__tensor().to(DEVICE)
+        self.positions = self.__get_positional__tensor()
 
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
         # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
@@ -155,7 +155,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def __get_positional__tensor(x, embedding_dim=EMBEDDED_DIMENSION):
-        pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True))
+        pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
         return pos_tensor
 
