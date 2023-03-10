@@ -40,7 +40,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 8
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -139,6 +139,9 @@ class VideoSegmentationNetwork(nn.Module):
         latents = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
+
+        # Verify the shape of latents before sending it to the transformer
+        assert latents.shape == (BATCH_SIZE, SEQUENCE_LENGTH*CHUNK_LENGTH, EMBEDDED_DIMENSION), f"Unexpected shape for latents tensor: {latents.shape}"
 
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
