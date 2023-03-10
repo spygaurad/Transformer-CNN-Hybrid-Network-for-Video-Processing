@@ -154,7 +154,7 @@ class VideoSegmentationNetwork(nn.Module):
         return image_preds
 
     def get_positional_encoding(self, seq_len, embedding_dim):
-        pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
+        pos = torch.arange(0, seq_len, device=DEVICE, dtype=torch.float32).unsqueeze(1)
         div = torch.exp(torch.arange(0, embedding_dim, 2).float() * (-math.log(10000.0) / embedding_dim))
         pos_embedding = torch.zeros(seq_len, embedding_dim)
         pos_embedding[:, 0::2] = torch.sin(pos * div)
