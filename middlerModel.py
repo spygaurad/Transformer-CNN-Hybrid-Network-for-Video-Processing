@@ -81,7 +81,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnndecoder = CNN_Decoder()
 
         #generate a sinusoidal positional embedding
-        self.positions = self.__get_positional__tensor()
+        self.positions = self.__get_positional__tensor().to(DEVICE)
 
 
     def forward(self, x, epoch=None):
