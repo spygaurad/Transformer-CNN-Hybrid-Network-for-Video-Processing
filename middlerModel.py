@@ -122,7 +122,7 @@ class VideoSegmentationNetwork(nn.Module):
         return image_preds
 
 
-    def __get_positional__tensor(x, embedding_dim=EMBEDDED_DIMENSION):
+    def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
         pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
         return pos_tensor
