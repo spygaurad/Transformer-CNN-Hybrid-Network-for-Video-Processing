@@ -121,7 +121,7 @@ class Encoder_32K(nn.Module):
         x = x.view(x.shape[0], -1)
 
         #breaking the latents into 4 chunks, linearly
-        x = x.view(s.shape[0], 4, 4096)
+        x = x.view(x.shape[0], 4, 4096)
 
         #to run in a VAE setup, use the following part of code
         '''
