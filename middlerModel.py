@@ -135,7 +135,7 @@ class VideoSegmentationNetwork(nn.Module):
         pos_embedding = self.get_positional_encoding(CHUNK_LENGTH, EMBEDDED_DIMENSION)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         # pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
-        return pos_tensor
+        return pos_embedding
 
 
     def __split_and_stack__(self, x):
