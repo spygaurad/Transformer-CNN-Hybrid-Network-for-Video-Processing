@@ -212,7 +212,7 @@ def train(epochs, lr=1e-5):
             #saving a sample in each epoch
             if epoch%5==0 and i==num: 
                 # [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
-                __save_sample__(epoch+1, image[0], imagePred, 1)
+                __save_sample__(epoch+1, image[0], imagePred[0], 1)
 
         writer.add_scalar("Training Loss", _loss, epoch)
         loss_train.append(_loss)
