@@ -266,6 +266,10 @@ def train(epochs, lr=1e-6):
                 [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
 
         writer.add_scalar("Training Loss", _loss, i)
+
+        with open('numbers.txt', 'w') as f:
+            f.write(str(_loss) + '\n')
+            
         loss_train.append(_loss)
 
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
