@@ -106,7 +106,7 @@ class VideoSegmentationNetwork(nn.Module):
             break
         #before sending to the transformer, this is the pre-processing we need
         latent = torch.stack(latents).permute(1, 0, 2, 3)
-        latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
+        latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
 
         # sending the latents predicted to the transformer
