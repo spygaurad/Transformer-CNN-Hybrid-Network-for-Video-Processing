@@ -110,8 +110,8 @@ class VideoSegmentationNetwork(nn.Module):
         self.positions = self.__get_positional__tensor().to(DEVICE)
 
         #the two learnable tokens which separates one frame's latent sequence with another frame's sequence of latents
-        # self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
-        # self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        self.sof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
+        self.eof = nn.Parameter(torch.randn(EMBEDDED_DIMENSION)).expand(BATCH_SIZE, 1, -1).to(DEVICE)
 
 
 
