@@ -133,6 +133,7 @@ class VideoSegmentationNetwork(nn.Module):
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
+            l = torch.cat((torch.cat((self.sof, l), dim=1), self.eof), dim=1)
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
@@ -142,7 +143,6 @@ class VideoSegmentationNetwork(nn.Module):
 
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
-        
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
         latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_LENGTH, EMBEDDED_DIMENSION)
