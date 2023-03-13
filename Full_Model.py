@@ -168,7 +168,7 @@ class VideoSegmentationNetwork(nn.Module):
             temp = pos_embedding_chunk
             temp = torch.cat((pos_embedding_frame[i:i+1], temp), dim=0)
             temp = torch.cat((temp, pos_embedding_frame[i:i+1]), dim=0)
-            T3.append(temp)
+            pos_tensor.append(temp)
 
         pos_tensor = torch.cat(pos_tensor, dim=0)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
