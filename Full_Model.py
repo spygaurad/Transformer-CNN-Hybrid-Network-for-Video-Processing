@@ -265,7 +265,7 @@ def train(epochs, lr=1e-6):
             if i%num==0 and epoch%5==0: 
                 [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(SEQUENCE_LENGTH)]
 
-        writer.add_scalar("Training Loss", _loss, i)
+        writer.add_scalar("Training Loss", _loss, epoch)
 
         with open(f'trainLogs/Training_Full_Model.txt', 'w') as f:
             f.write(str(_loss) + '\n')
