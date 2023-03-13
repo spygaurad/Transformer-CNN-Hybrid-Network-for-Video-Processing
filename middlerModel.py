@@ -234,7 +234,7 @@ def __save_sample__(epoch, x, img_pred, iter):
     except:
         pass
     elements = [x, img_pred]
-    elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
+    elements = [transforms.ToPILImage()(torch.squeeze(element[0, :, :, :])) for element in elements]
     for i, element in enumerate(elements):
         try:
             element.save(f"{path}{epoch}_{iter}_{['image', 'image_trans_pred'][i]}.jpg")
