@@ -267,7 +267,7 @@ def train(epochs, lr=1e-6):
 
         writer.add_scalar("Training Loss", _loss, i)
 
-        with open(f'Training_Full_Model_{1}.txt', 'w') as f:
+        with open(f'trainLogs/Training_Full_Model.txt', 'w') as f:
             f.write(str(_loss) + '\n')
 
         loss_train.append(_loss)
