@@ -105,7 +105,7 @@ class VideoSegmentationNetwork(nn.Module):
             latents.append(l)
             break
         #before sending to the transformer, this is the pre-processing we need
-        latents = torch.stack(latents).permute(1, 0, 2, 3)
+        latent = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
         latents += self.positions
 
@@ -114,7 +114,7 @@ class VideoSegmentationNetwork(nn.Module):
         
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
-        latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_LENGTH, EMBEDDED_DIMENSION)
+        latents_pred = latents_pred.reshape(latent.shape[1], latent.shape[0], latent.shape[2], latent.shape[3])
         for i in range(latents_pred.shape[0]):
             l_hat = self.__unstack_and_merge__(latents_pred[i])
             image_preds.append(self.cnndecoder(l_hat))
