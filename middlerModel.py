@@ -197,7 +197,7 @@ def train(epochs, lr=1e-5):
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
-            loss = mseloss(imagePred, image[0:1])
+            loss = mseloss(imagePred, image[0:2])
 
             #getting the loss's number
             _loss += loss.item()
