@@ -103,7 +103,7 @@ class VideoSegmentationNetwork(nn.Module):
                 l = self.cnnencoder(x[i])
             l = self.__split_and_stack__(l)
             latents.append(l)
-            
+
         #before sending to the transformer, this is the pre-processing we need
         latent = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
@@ -132,7 +132,7 @@ class VideoSegmentationNetwork(nn.Module):
         return pos_embedding
 
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-        pos_embedding = self.get_positional_encoding(CHUNK_LENGTH, EMBEDDED_DIMENSION)
+        pos_embedding = self.get_positional_encoding(seq_len=2, embedding_dim=EMBEDDED_DIMENSION)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         # pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
         return pos_embedding
