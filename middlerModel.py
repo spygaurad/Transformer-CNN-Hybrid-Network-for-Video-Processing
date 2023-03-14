@@ -96,14 +96,14 @@ class VideoSegmentationNetwork(nn.Module):
         else:
             maskFrameNo = SEQUENCE_LENGTH+1
 
-        for i in range(x.shape[0]):
+        for i in range(x.shape[0], 2, 1):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
             l = self.__split_and_stack__(l)
             latents.append(l)
-            break
+            
         #before sending to the transformer, this is the pre-processing we need
         latent = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
