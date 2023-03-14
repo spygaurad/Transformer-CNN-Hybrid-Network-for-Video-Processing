@@ -96,7 +96,7 @@ class VideoSegmentationNetwork(nn.Module):
         else:
             maskFrameNo = SEQUENCE_LENGTH+1
 
-        for i in range(x.shape[0], 2, 1):
+        for i in range(x.shape[0]-3):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
