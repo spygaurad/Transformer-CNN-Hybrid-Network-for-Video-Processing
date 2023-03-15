@@ -153,6 +153,7 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = torch.stack(image_preds)
         return image_preds
 
+
     def get_positional_encoding(self, seq_len, embedding_dim, learnable=False):
         if not learnable:
             pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
@@ -165,9 +166,6 @@ class VideoSegmentationNetwork(nn.Module):
         return pos_embedding
 
         
-
-
-
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
         pos_embedding_chunk = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
         pos_embedding_frame = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
