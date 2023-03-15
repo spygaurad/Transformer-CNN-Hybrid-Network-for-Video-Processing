@@ -167,8 +167,8 @@ class VideoSegmentationNetwork(nn.Module):
 
         
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-        pos_embedding_chunk = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
-        pos_embedding_frame = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
+        pos_embedding_chunk = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, learnable=False)
+        pos_embedding_frame = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, learnable=True)
         pos_tensor = []
         for i in range(pos_embedding_frame.shape[0]):
             temp = pos_embedding_chunk
