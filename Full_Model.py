@@ -40,7 +40,7 @@ from torchsummary import summary
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_UNITS = 8
-BATCH_SIZE = 4
+BATCH_SIZE = 2
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
