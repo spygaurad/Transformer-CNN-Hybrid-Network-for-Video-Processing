@@ -39,7 +39,7 @@ from torchsummary import summary
 
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
-CHUNK_LENGTH = 8
+CHUNK_UNITS = 8
 BATCH_SIZE = 4
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -130,7 +130,7 @@ class VideoSegmentationNetwork(nn.Module):
         
         for i in range(x.shape[0]):
             if i == maskFrameNo:
-                l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
+                l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_UNITS).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
             l = torch.cat((torch.cat((self.sof, l), dim=1), self.eof), dim=1)
@@ -145,7 +145,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents_pred = self.transenc(latents)
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
-        latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_LENGTH, EMBEDDED_DIMENSION)
+        latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_UNITS, EMBEDDED_DIMENSION)
         for i in range(latents_pred.shape[0]):
             l_hat = self.__unstack_and_merge__(latents_pred[i])
             image_preds.append(self.cnndecoder(l_hat))
@@ -167,7 +167,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-        pos_embedding_chunk = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, learnable=False)
+        pos_embedding_chunk = self.get_positional_encoding(CHUNK_UNITS, EMBEDDED_DIMENSION, learnable=False)
         pos_embedding_frame = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, learnable=True)
         pos_tensor = []
         for i in range(pos_embedding_frame.shape[0]):
@@ -175,33 +175,11 @@ class VideoSegmentationNetwork(nn.Module):
             temp = torch.cat((pos_embedding_frame[i:i+1], temp), dim=0)
             temp = torch.cat((temp, pos_embedding_frame[i:i+1]), dim=0)
             pos_tensor.append(temp)
-
         pos_tensor = torch.cat(pos_tensor, dim=0)
-        # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
-        # pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
         return pos_tensor
-        # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True))
-        # pos_tensor = torch.cat([pos_embedding[i].repeat(CHUNK_LENGTH, 1) for i in range(pos_embedding.shape[0])], dim=0)
-        # return pos_tensor
-
-    # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
-    # def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-    # # Calculate the positional encoding matrix
-    #     pos_embedding = torch.zeros(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, device=DEVICE)
-    #     for pos in range(SEQUENCE_LENGTH):
-    #         for i in range(embedding_dim):
-    #             if i % 2 == 0:
-    #                 pos_embedding[pos, i] = math.sin(pos / (10000 ** (i / embedding_dim)))
-    #             else:
-    #                 pos_embedding[pos, i] = math.cos(pos / (10000 ** ((i - 1) / embedding_dim)))
-
-    #     # Repeat the positional encoding matrix CHUNK_LENGTH times for each element in the batch
-    #     pos_tensor = torch.cat([pos_embedding.repeat_interleave(CHUNK_LENGTH, dim=0) for _ in range(pos_embedding.shape[0])], dim=1)
-    #     return pos_tensor
-
 
     def __split_and_stack__(self, x):
-        latent_sequence = x.view(BATCH_SIZE, CHUNK_LENGTH, -1)
+        latent_sequence = x.view(BATCH_SIZE, CHUNK_UNITS, -1)
         return latent_sequence
 
 
@@ -210,6 +188,19 @@ class VideoSegmentationNetwork(nn.Module):
         chunks = [chunk.squeeze(dim=1) for chunk in chunks]
         merged_x = torch.cat(chunks, dim=1)
         return merged_x
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
