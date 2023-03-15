@@ -160,6 +160,7 @@ class VideoSegmentationNetwork(nn.Module):
         pos_embedding[:, 0::2] = torch.sin(pos * div)
         pos_embedding[:, 1::2] = torch.cos(pos * div)
         return pos_embedding
+        
 
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
         pos_embedding_chunk = self.get_positional_encoding(SEQUENCE_LENGTH, EMBEDDED_DIMENSION)
