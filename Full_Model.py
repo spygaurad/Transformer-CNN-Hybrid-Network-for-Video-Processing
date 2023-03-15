@@ -145,7 +145,8 @@ class VideoSegmentationNetwork(nn.Module):
         latents_pred = self.transenc(latents)
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
-        
+        latents_pred = torch.cat((latents_pred[:, 1:], latents_pred[:, -1:]), dim=1)
+        latents_pred = torch.cat((latents_pred[:, :8], latents_pred[:, 10::2]), dim=1)
         latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_UNITS, EMBEDDED_DIMENSION)
         for i in range(latents_pred.shape[0]):
             l_hat = self.__unstack_and_merge__(latents_pred[i])
