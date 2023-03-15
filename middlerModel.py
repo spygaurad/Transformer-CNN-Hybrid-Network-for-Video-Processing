@@ -96,7 +96,7 @@ class VideoSegmentationNetwork(nn.Module):
         else:
             maskFrameNo = SEQUENCE_LENGTH+1
 
-        for i in range(x.shape[0]-3):
+        for i in range(x.shape[0]-4):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
@@ -108,6 +108,9 @@ class VideoSegmentationNetwork(nn.Module):
         latent = torch.stack(latents).permute(1, 0, 2, 3)
         latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
+
+        maskChunk = random.randint(0, CHUNK_LENGTH)
+        latents[:, maskChunk, :] = 0
 
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
@@ -197,7 +200,7 @@ def train(epochs, lr=1e-6):
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
-            loss = mseloss(imagePred, image[0:2])
+            loss = mseloss(imagePred, image[0:1])
 
             #getting the loss's number
             _loss += loss.item()
