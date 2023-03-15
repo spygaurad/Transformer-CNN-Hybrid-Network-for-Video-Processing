@@ -144,8 +144,7 @@ class VideoSegmentationNetwork(nn.Module):
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
         
-        indices = [i for i in range(50) if i == 0 or i % 10 == 9 or i % 10 == 0]
-        latents_pred = torch.index_select(latents_pred, 1, torch.tensor([i for i in range(latents_pred.shape[1]) if i not in indices]))
+        latents_pred = torch.cat([x[:, 1:-1, :] for x in torch.split(latents_pred, CHUNK_UNITS+2, dim=1)], dim=1)
         latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_UNITS, EMBEDDED_DIMENSION)
         for i in range(latents_pred.shape[0]):
             l_hat = self.__unstack_and_merge__(latents_pred[i])
