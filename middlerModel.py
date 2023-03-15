@@ -109,7 +109,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
 
-        maskChunk = random.randint(0, CHUNK_LENGTH)
+        maskChunk = random.randint(0, CHUNK_LENGTH-1)
         latents[:, maskChunk, :] = 0
 
         # sending the latents predicted to the transformer
