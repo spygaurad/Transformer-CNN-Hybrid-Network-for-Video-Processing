@@ -153,7 +153,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
 
-def train(epochs, lr=1e-5):
+def train(epochs, lr=1e-6):
     
     print(f"Using {DEVICE} device...")
     print("Loading Datasets...")
@@ -210,8 +210,8 @@ def train(epochs, lr=1e-5):
                 loss.backward()
 
             #saving a sample in each epoch
-            # if epoch%5==0 and i==num: 
-            [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(len(imagePred))]
+            if epoch%5==0 and i==num: 
+                [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(len(imagePred))]
                 # __save_sample__(epoch+1, image, imagePred, 1)
 
         writer.add_scalar("Training Loss", _loss, epoch)
