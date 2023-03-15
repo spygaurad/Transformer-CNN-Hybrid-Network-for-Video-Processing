@@ -216,8 +216,9 @@ def train(epochs, lr=1e-6):
             if i%20==0: 
                 [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(len(imagePred))]
                 # __save_sample__(epoch+1, image, imagePred, 1)
+                
+            writer.add_scalar("Training Loss", loss.item(), i)
 
-        writer.add_scalar("Training Loss", _loss, epoch)
         loss_train.append(_loss)
 
         print(f"Epoch: {epoch+1}, Training loss: {_loss}")
