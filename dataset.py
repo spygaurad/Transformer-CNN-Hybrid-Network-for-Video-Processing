@@ -9,7 +9,7 @@ import pandas as pd
 import makeDataset
 
 
-DATA_SIZE = 128
+DATA_SIZE = 32
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, data, trainingType, batch_size, transforms=None):
