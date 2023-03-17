@@ -20,12 +20,12 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_LENGTH = 4
-BATCH_SIZE = 4
+BATCH_SIZE = 1
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 encoderdecoder = Autoencoder4K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40.tar')['model_state_dict'])
+# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40.tar')['model_state_dict'])
 
 class CNN_Encoder(nn.Module):
     def __init__(self):
@@ -75,7 +75,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=4, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=2, num_heads=2, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -100,13 +100,15 @@ class VideoSegmentationNetwork(nn.Module):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
             else:
-                l = self.cnnencoder(x[i])
-            l = self.__split_and_stack__(l)
+                l = self.cnnencoder(x[i]) #[batch, 16, 1024]
+                l = l.permute(0, 2, 1)
+            # l = self.__split_and_stack__(l)
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
-        latent = torch.stack(latents).permute(1, 0, 2, 3)
-        latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
+        latents = torch.concat(latents, axi=1)
+
+        # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
 
         # maskChunk = random.randint(0, CHUNK_LENGTH-1)
@@ -247,16 +249,16 @@ def __save_sample__(epoch, x, img_pred, iter):
             pass
 
 
-train(epochs=500)
+# train(epochs=500)
 
-# vsn = VideoSegmentationNetwork()
+vsn = VideoSegmentationNetwork()
 
-# for i in range(100):
-#     input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
-#     state, throughput0, throughput1 = vsn(x=input_tensor)
-#     print(f'Iteration: {i+1}')
-#     if state:
-#         print(throughput1.shape)
+for i in range(100):
+    input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
+    state, throughput0, throughput1 = vsn(x=input_tensor)
+    print(f'Iteration: {i+1}')
+    if state:
+        print(throughput1.shape)
     
 
 

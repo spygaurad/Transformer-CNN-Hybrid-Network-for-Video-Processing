@@ -118,10 +118,11 @@ class Encoder_32K(nn.Module):
         x = self.relu(self.bn4(self.conv4(x)))
         x = self.relu(self.bn5(self.conv5(x)))
         x = self.dropout(x)
-        x = x.view(x.shape[0], -1)
+        x = x.reshape(x.shape[0], 16, 32*32)
+        # x = x.view(x.shape[0], -1)
 
         #breaking the latents into 4 chunks, linearly
-        x = x.view(x.shape[0], 4, 4096)
+        # x = x.view(x.shape[0], 4, 4096)
 
         #to run in a VAE setup, use the following part of code
         '''
@@ -196,10 +197,12 @@ class Decoder_32K(nn.Module):
     def forward(self,x):
 
         #we now convert a broken linear vector to a volume of a desired shape
+        # # '''
+        # x = x.view(x.shape[0], 4, 4096)
+        # x = x.view(x.shape[0], 16, 32, 32)
+
         # '''
-        x = x.view(x.shape[0], 4, 4096)
-        x = x.view(x.shape[0], 16, 32, 32)
-        # '''
+        x = x.reshape( x.shape[0], 16, 32, 32)
         x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
         return x
 
