@@ -191,8 +191,8 @@ def train(epochs, lr=1e-6):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        # num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
-        num = random.randint(0, 20 - 1)
+        num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
+        # num = random.randint(0, )
         accumulation_steps = 4
 
         for i, image in enumerate(tqdm(train_data)):
@@ -219,7 +219,7 @@ def train(epochs, lr=1e-6):
                 loss.backward()
 
             #saving a sample in each epoch
-            if i%num==0: 
+            if epoch%5==0 and i==num: 
                 [__save_sample__(epoch+1, image[j], imagePred[j], str(j+1)) for j in range(len(imagePred))]
                 # __save_sample__(epoch+1, image, imagePred, 1)
 
