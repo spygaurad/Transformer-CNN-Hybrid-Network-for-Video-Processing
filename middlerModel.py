@@ -91,17 +91,17 @@ class VideoSegmentationNetwork(nn.Module):
 
         # sending the input to the cnn encoder
         # maskFrameNo = 2
-        if epoch > 20:
-            maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
-        else:
-            maskFrameNo = SEQUENCE_LENGTH+1
+        # if epoch > 20:
+        #     maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
+        # else:
+        #     maskFrameNo = SEQUENCE_LENGTH+1
 
         for i in range(x.shape[0]-3):
-            if i == maskFrameNo:
-                l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
-            else:
-                l = self.cnnencoder(x[i]) #[batch, 16, 1024]
-                l = l.permute(0, 2, 1)
+            # if i == maskFrameNo:
+            #     l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
+            # else:
+            l = self.cnnencoder(x[i]) #[batch, 16, 1024]
+            l = l.permute(0, 2, 1)
             # l = self.__split_and_stack__(l)
             latents.append(l)
 
