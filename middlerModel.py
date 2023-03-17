@@ -106,7 +106,7 @@ class VideoSegmentationNetwork(nn.Module):
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
-        latents = torch.concat(latents, axi=1)
+        latents = torch.concat(latents, axis=1)
 
         # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
@@ -249,16 +249,16 @@ def __save_sample__(epoch, x, img_pred, iter):
             pass
 
 
-# train(epochs=500)
+train(epochs=500)
 
-vsn = VideoSegmentationNetwork()
+# vsn = VideoSegmentationNetwork()
 
-for i in range(100):
-    input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
-    state, throughput0, throughput1 = vsn(x=input_tensor)
-    print(f'Iteration: {i+1}')
-    if state:
-        print(throughput1.shape)
+# for i in range(100):
+#     input_tensor = torch.randn(BATCH_SIZE, 3, 256, 256)
+#     state, throughput0, throughput1 = vsn(x=input_tensor)
+#     print(f'Iteration: {i+1}')
+#     if state:
+#         print(throughput1.shape)
     
 
 
