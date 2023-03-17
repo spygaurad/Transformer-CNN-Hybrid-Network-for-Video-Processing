@@ -119,10 +119,10 @@ class VideoSegmentationNetwork(nn.Module):
         
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
-        latents_pred = latents_pred.reshape(latent.shape[1], latent.shape[0], latent.shape[2], latent.shape[3])
-        for i in range(latents_pred.shape[0]):
-            l_hat = self.__unstack_and_merge__(latents_pred[i])
-            image_preds.append(self.cnndecoder(l_hat))
+        chunks = torch.chunk(latents_pred, num_chunks, dim=1)
+        for chunk in chunks:
+            # l_hat = self.__unstack_and_merge__(chunk)
+            image_preds.append(self.cnndecoder(chunk))
 
         image_preds = torch.stack(image_preds)
         return image_preds
