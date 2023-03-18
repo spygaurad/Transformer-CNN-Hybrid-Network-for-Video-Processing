@@ -78,11 +78,11 @@ class Encoder_32K(nn.Module):
         self.conv3 = nn.Conv2d(128, 64, 3, 1, 1)
         self.bn3 = nn.BatchNorm2d(64)
 
-        self.conv4 = nn.Conv2d(64, 32, 3, 1, 1)
-        self.bn4 = nn.BatchNorm2d(32)
+        self.conv4 = nn.Conv2d(64, 256, 3, 2, 1)
+        self.bn4 = nn.BatchNorm2d(256)
 
-        self.conv5 = nn.Conv2d(32, 16, 3, 1, 1)
-        self.bn5 = nn.BatchNorm2d(16)
+        self.conv5 = nn.Conv2d(256, 512, 3, 2, 1)
+        self.bn5 = nn.BatchNorm2d(512)
 
         #initializing the vector for mean and standard deviation 
         '''
@@ -118,7 +118,7 @@ class Encoder_32K(nn.Module):
         x = self.relu(self.bn4(self.conv4(x)))
         x = self.relu(self.bn5(self.conv5(x)))
         x = self.dropout(x)
-        x = x.reshape(x.shape[0], 16, 32*32)
+        x = x.reshape(x.shape[0], 512, 8*8)
         # x = x.view(x.shape[0], -1)
 
         #breaking the latents into 4 chunks, linearly
@@ -156,10 +156,10 @@ class Decoder_32K(nn.Module):
 
         self.outputDeterminer = outputDeterminer
             
-        self.conv1= nn.Conv2d(16, 32, 3, 1, 1)
-        self.bn1 = nn.BatchNorm2d(32)
+        self.conv1= nn.Conv2d(512, 256, 3, 1, 1)
+        self.bn1 = nn.BatchNorm2d(256)
 
-        self.conv2 = nn.Conv2d(32, 64, 3, 1, 1)
+        self.conv2 = nn.Conv2d(256, 64, 3, 1, 1)
         self.bn2 = nn.BatchNorm2d(64)
 
         self.conv3 = nn.Conv2d(64, 128, 3, 1, 1)
@@ -202,7 +202,7 @@ class Decoder_32K(nn.Module):
         # x = x.view(x.shape[0], 16, 32, 32)
 
         # '''
-        x = x.reshape( x.shape[0], 16, 32, 32)
+        x = x.reshape( x.shape[0], 512, 8, 8)
         x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
         return x
 
