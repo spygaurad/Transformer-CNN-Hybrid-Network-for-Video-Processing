@@ -238,7 +238,7 @@ def train(epochs, lr=1e-6):
 
 
 def __save_sample__(epoch, x, img_pred, iter):
-    path = f'Training_Sneakpeeks/Transformer_Training_16K_double_image_cool_setting/'
+    path = f'Training_Sneakpeeks/Transformer_Training_16K_double_image_512D/'
     try:
         os.makedirs(path)
     except:
