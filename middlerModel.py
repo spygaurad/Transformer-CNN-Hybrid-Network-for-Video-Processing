@@ -141,7 +141,7 @@ class VideoSegmentationNetwork(nn.Module):
         pos_tensor1 = self.get_positional_encoding(seq_len=64, embedding_dim=512)
         pos_tensor2 = self.get_positional_encoding(seq_len=2, embedding_dim=512)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
-        pos_tensor1 = torch.cat([pos_tensor1 for i in range(2)], dim=1)
+        pos_tensor1 = torch.cat([pos_tensor1 for i in range(2)], dim=0)
         pos_tensor2 = torch.cat([pos_tensor2[:, i].repeat_interleave(64).unsqueeze(1) for i in range(pos_tensor2.shape[1])], dim=1)
         return pos_tensor1 + pos_tensor2
 
