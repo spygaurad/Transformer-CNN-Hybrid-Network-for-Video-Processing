@@ -160,7 +160,7 @@ class Decoder_32K(nn.Module):
         self.bn1 = nn.BatchNorm2d(256)
 
         self.conv2 = nn.Conv2d(256, 128, 3, 1, 1)
-        self.bn2 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(128)
 
         self.conv3 = nn.ConvTranspose2d(128, 384, 2, 2, padding = 0)
         self.bn3 = nn.BatchNorm2d(384)
@@ -179,9 +179,6 @@ class Decoder_32K(nn.Module):
 
         self.conv8 = nn.ConvTranspose2d(384, 128, 2, 2, padding = 0)
         self.bn8 = nn.BatchNorm2d(128)
-
-        # self.transConv3= nn.ConvTranspose2d(192, 128, 2, 2, padding = 0)
-        # self.dbn4 = nn.BatchNorm2d(128)
 
         self.conv9 = nn.Conv2d(128, 64, 3, padding=1)
         self.bn9 = nn.BatchNorm2d(64)
