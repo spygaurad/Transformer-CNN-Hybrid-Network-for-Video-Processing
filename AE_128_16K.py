@@ -316,7 +316,7 @@ def train(epochs, batch_size=BATCH_SIZE, lr=0.0001):
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss_train
-            }, f'saved_model/autoencoder_16k_VOS_{epoch}.tar')
+            }, f'saved_model/autoencoder_16k_VOS_{epoch}_512D.tar')
         print('\nProceeding to the next epoch...')
 
     return False
