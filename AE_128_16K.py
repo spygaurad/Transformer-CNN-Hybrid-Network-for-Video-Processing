@@ -159,29 +159,35 @@ class Decoder_32K(nn.Module):
         self.conv1= nn.Conv2d(512, 256, 3, 1, 1)
         self.bn1 = nn.BatchNorm2d(256)
 
-        self.conv2 = nn.Conv2d(256, 64, 3, 1, 1)
+        self.conv2 = nn.Conv2d(256, 128, 3, 1, 1)
         self.bn2 = nn.BatchNorm2d(64)
 
-        self.conv3 = nn.Conv2d(64, 128, 3, 1, 1)
-        self.bn3 = nn.BatchNorm2d(128)
+        self.conv3 = nn.ConvTranspose2d(128, 384, 2, 2, padding = 0)
+        self.bn3 = nn.BatchNorm2d(384)
 
-        self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
-        self.bn4 = nn.BatchNorm2d(256)
+        self.conv4 = nn.ConvTranspose2d(384, 64, 2, 2, padding = 0)
+        self.bn4 = nn.BatchNorm2d(64)
 
-        self.transConv1 = nn.ConvTranspose2d(256, 384, 2, 2, padding = 0)
-        self.dbn2 = nn.BatchNorm2d(384)
+        self.conv5 = nn.Conv2d(64, 128, 3, 1, 1)
+        self.bn5 = nn.BatchNorm2d(128)
 
-        self.transConv2 = nn.ConvTranspose2d(384, 128, 2, 2, padding = 0)
-        self.dbn3 = nn.BatchNorm2d(128)
+        self.conv6 = nn.Conv2d(128, 256, 3, 1, 1)
+        self.bn6 = nn.BatchNorm2d(256)
+
+        self.conv7 = nn.ConvTranspose2d(256, 384, 2, 2, padding = 0)
+        self.bn7 = nn.BatchNorm2d(384)
+
+        self.conv8 = nn.ConvTranspose2d(384, 128, 2, 2, padding = 0)
+        self.bn8 = nn.BatchNorm2d(128)
 
         # self.transConv3= nn.ConvTranspose2d(192, 128, 2, 2, padding = 0)
         # self.dbn4 = nn.BatchNorm2d(128)
 
-        self.conv5 = nn.Conv2d(128, 64, 3, padding=1)
-        self.bn5 = nn.BatchNorm2d(64)
+        self.conv9 = nn.Conv2d(128, 64, 3, padding=1)
+        self.bn9 = nn.BatchNorm2d(64)
 
-        self.conv6 = nn.Conv2d(64, 8, 3, padding=1)
-        self.bn6 = nn.BatchNorm2d(8)
+        self.conv10 = nn.Conv2d(64, 8, 3, padding=1)
+        self.bn10 = nn.BatchNorm2d(8)
 
         if self.outputDeterminer.lower() == "image":
             self.outputDeterminerConv = nn.Conv2d(8, 3, 3, padding=1)
@@ -196,14 +202,19 @@ class Decoder_32K(nn.Module):
 
     def forward(self,x):
 
-        #we now convert a broken linear vector to a volume of a desired shape
-        # # '''
-        # x = x.view(x.shape[0], 4, 4096)
-        # x = x.view(x.shape[0], 16, 32, 32)
-
-        # '''
         x = x.reshape( x.shape[0], 512, 8, 8)
-        x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.relu(self.bn2(self.conv2(x)))
+        x = self.relu(self.bn3(self.conv3(x)))
+        x = self.relu(self.bn4(self.conv4(x)))
+        x = self.relu(self.bn5(self.conv5(x)))
+        x = self.relu(self.bn6(self.conv6(x)))
+        x = self.relu(self.bn7(self.conv7(x)))
+        x = self.relu(self.bn8(self.conv8(x)))
+        x = self.relu(self.bn9(self.conv9(x)))
+        x = self.relu(self.bn10(self.conv10(x)))
+        x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(x)))
+        # x = self.finalactivation(self.outputDeterminerNorm(self.outputDeterminerConv(self.relu(self.bn6(self.conv6(self.relu(self.bn5(self.conv5(self.relu(self.dbn3(self.transConv2(self.relu(self.dbn2(self.transConv1(self.relu(self.bn4(self.conv4(self.relu(self.bn3(self.conv3(self.relu(self.bn2(self.conv2(self.relu(self.bn1(self.conv1(x)))))))))))))))))))))))))))
         return x
 
 
