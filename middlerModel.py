@@ -119,7 +119,7 @@ class VideoSegmentationNetwork(nn.Module):
         
         #decoding all the sequence of the latents
         # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
-        chunks = torch.chunk(latents_pred, 2, dim=1)
+        chunks = torch.chunk(latents_pred, 5, dim=1)
         for chunk in chunks:
             chunk = chunk.permute(0, 2, 1)
             # l_hat = self.__unstack_and_merge__(chunk)
@@ -206,7 +206,7 @@ def train(epochs, lr=1e-6):
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
-            loss = mseloss(imagePred, image[0:2])
+            loss = mseloss(imagePred, image)
 
             #getting the loss's number
             _loss += loss.item()
