@@ -97,10 +97,10 @@ class VideoSegmentationNetwork(nn.Module):
             maskFrameNo = SEQUENCE_LENGTH+1
 
         for i in range(x.shape[0]):
-            # if i == maskFrameNo:
-            #     l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_LENGTH).to(DEVICE)
-            # else:
-            l = self.cnnencoder(x[i]) #[batch, 16, 1024]
+            if i == maskFrameNo:
+                l = torch.zeros(BATCH_SIZE, 512, 64).to(DEVICE)
+            else:
+                l = self.cnnencoder(x[i]) #[batch, 16, 1024]
             l = l.permute(0, 2, 1)
             # l = self.__split_and_stack__(l)
             latents.append(l)
