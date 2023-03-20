@@ -134,12 +134,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def maskTheLatents(self, latents):
-        num_cols = latents.shape[1]
-        num_cols_to_mask = int(0.4 * num_cols)
-        mask = torch.ones(num_cols)  
-        mask[:num_cols_to_mask] = 0  
-        mask = mask.repeat(BATCH_SIZE, 1, 1).to(torch.bool) 
-        return torch.masked_fill(latents, mask, 0)
+        indices = random
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
@@ -252,7 +247,7 @@ def train(epochs, lr=1e-6):
 
 
 def __save_sample__(epoch, x, img_pred, iter):
-    path = f'Training_Sneakpeeks/Transformer_Training_16K_5seq_512D/'
+    path = f'Training_Sneakpeeks/Transformer_Training_16K_5seq_512D_noise/'
     try:
         os.makedirs(path)
     except:
