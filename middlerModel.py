@@ -91,10 +91,10 @@ class VideoSegmentationNetwork(nn.Module):
 
         # sending the input to the cnn encoder
         # maskFrameNo = 2
-        # if epoch > 20:
-        #     maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
-        # else:
-        #     maskFrameNo = SEQUENCE_LENGTH+1
+        if epoch > 6:
+            maskFrameNo = random.randint(0, 64)
+        else:
+            maskFrameNo = SEQUENCE_LENGTH+1
 
         for i in range(x.shape[0]):
             # if i == maskFrameNo:
@@ -133,8 +133,9 @@ class VideoSegmentationNetwork(nn.Module):
         return image_preds
 
 
-    def maskTheLatents(self, latents):
-        indices = random
+    # def maskTheLatents(self, latents):
+    #     indices = random.sample((0, 320), 320//4)
+
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
