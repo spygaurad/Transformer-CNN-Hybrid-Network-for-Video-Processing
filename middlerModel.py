@@ -108,6 +108,10 @@ class VideoSegmentationNetwork(nn.Module):
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.concat(latents, axis=1)
 
+         
+        latents =   self.maskTheLatents(latents)
+
+
         # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
 
@@ -128,6 +132,14 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = torch.stack(image_preds)
         return image_preds
 
+
+    def maskTheLatents(self, latents):
+        num_cols = latents.shape[1]
+        num_cols_to_mask = int(0.4 * num_cols)
+        mask = torch.ones(num_cols)  
+        mask[:num_cols_to_mask] = 0  
+        mask = mask.repeat(BATCH_SIZE, 1, 1).to(torch.bool) 
+        return torch.masked_fill(latents, mask, 0)
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
