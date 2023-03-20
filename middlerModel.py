@@ -216,7 +216,7 @@ def train(epochs, lr=1e-6):
             noise_image = image + torch.randn(image.size()).to(DEVICE)*0.05 + 0.01
             
             #input the image into the model
-            imagePred = model(image, epoch)
+            imagePred = model(noise_image, epoch)
 
             # MS-SSIM loss + MSE Loss for model evaluation
 
