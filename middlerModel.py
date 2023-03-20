@@ -108,9 +108,6 @@ class VideoSegmentationNetwork(nn.Module):
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.concat(latents, axis=1)
 
-         
-        latents =   self.maskTheLatents(latents)
-
 
         # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         latents += self.positions
