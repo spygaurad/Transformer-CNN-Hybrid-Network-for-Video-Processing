@@ -108,7 +108,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents = torch.concat(latents, axis=1)
 
         #mask random k% of the items in the sequence 
-        num_zeros = int(0.4 * latents.shape[1])
+        num_zeros = int(0.15 * latents.shape[1])
         zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
         latents[:, zero_indices, :] = 0
 
