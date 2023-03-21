@@ -107,7 +107,13 @@ class VideoSegmentationNetwork(nn.Module):
         #before sending to the transformer, this is the pre-processing we need
         latents = torch.concat(latents, axis=1)
 
+        #mask random k% of the items in the sequence 
+        num_zeros = int(0.4 * latents.shape[1])
+        zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
+        latents[:, zero_indices, :] = 0
+
         # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
+        #add the positional embedding
         latents += self.positions
 
         # maskChunk = random.randint(0, CHUNK_LENGTH-1)
