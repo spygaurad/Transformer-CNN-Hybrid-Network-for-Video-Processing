@@ -52,7 +52,6 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-
 class CNN_Decoder(nn.Module):
     def __init__(self):
         super(CNN_Decoder, self).__init__()
