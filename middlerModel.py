@@ -248,17 +248,17 @@ def train(epochs, lr=1e-6):
 
 
 
-def __save_sample__(epoch, x, img_pred, iter):
-    path = f'Training_Sneakpeeks/Transformer_Training_16K_5seq_512D_noise/'
+def __save_sample__(epoch, x, _x, img_pred, iter):
+    path = f'Training_Sneakpeeks/Transformer_Training_16K_5seq_512D_noise_bertmask/'
     try:
         os.makedirs(path)
     except:
         pass
-    elements = [x, img_pred]
+    elements = [x, _x, img_pred]
     elements = [transforms.ToPILImage()(torch.squeeze(element[0, :, :, :])) for element in elements]
     for i, element in enumerate(elements):
         try:
-            element.save(f"{path}{epoch}_{iter}_{['image', 'image_trans_pred'][i]}.jpg")
+            element.save(f"{path}{epoch}_{iter}_{['image', 'input', 'image_trans_pred'][i]}.jpg")
         except:
             pass
 
