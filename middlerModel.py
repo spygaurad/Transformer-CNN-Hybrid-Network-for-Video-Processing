@@ -92,6 +92,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents = []
         image_preds = []
 
+        #sending the inputs the CNN encoder
         for i in range(x.shape[0]):
             l = self.cnnencoder(x[i])
             l = l.permute(0, 2, 1)
@@ -105,7 +106,6 @@ class VideoSegmentationNetwork(nn.Module):
         zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
         latents[:, zero_indices, :] = 0
 
-        # latents = latent.reshape(latent.shape[0], latent.shape[1]*latent.shape[2], latent.shape[3])
         #add the positional embedding
         latents += self.positions
 
