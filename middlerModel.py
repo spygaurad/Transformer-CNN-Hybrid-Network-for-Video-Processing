@@ -93,9 +93,8 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = []
 
         for i in range(x.shape[0]):
-            l = self.cnnencoder(x[i]) #[batch, 16, 1024]
+            l = self.cnnencoder(x[i])
             l = l.permute(0, 2, 1)
-            # l = self.__split_and_stack__(l)
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
