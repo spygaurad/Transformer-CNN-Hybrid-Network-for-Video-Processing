@@ -113,7 +113,6 @@ class VideoSegmentationNetwork(nn.Module):
         latents_pred = self.transenc(latents)
         
         #decoding all the sequence of the latents
-        # latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, ,EMBEDDED_DIMENSION)
         chunks = torch.chunk(latents_pred, 5, dim=1)
         for chunk in chunks:
             chunk = chunk.permute(0, 2, 1)
