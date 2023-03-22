@@ -68,7 +68,6 @@ class CNN_Decoder(nn.Module):
 
 
 
-
 class VideoSegmentationNetwork(nn.Module):
 
     def __init__(self):
