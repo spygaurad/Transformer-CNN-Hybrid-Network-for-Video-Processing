@@ -16,7 +16,7 @@ from torchvision import transforms
 from tensorboardX import SummaryWriter
 
 
-
+#Defining the gobal variables
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 512
 CHUNK_LENGTH = 64
@@ -26,6 +26,7 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 encoderdecoder = Autoencoder4K(outputType="image")
 encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
+
 
 class CNN_Encoder(nn.Module):
     def __init__(self):
