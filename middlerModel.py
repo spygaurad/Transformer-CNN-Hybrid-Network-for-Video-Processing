@@ -122,9 +122,6 @@ class VideoSegmentationNetwork(nn.Module):
         return image_preds
 
 
-    # def maskTheLatents(self, latents):
-    #     indices = random.sample((0, 320), 320//4)
-
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
