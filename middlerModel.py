@@ -18,7 +18,7 @@ from tensorboardX import SummaryWriter
 
 
 SEQUENCE_LENGTH = 5
-EMBEDDED_DIMENSION = 4096
+EMBEDDED_DIMENSION = 512
 CHUNK_LENGTH = 4
 BATCH_SIZE = 8
 # DEVICE =  "cpu"
