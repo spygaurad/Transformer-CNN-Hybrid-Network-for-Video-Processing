@@ -29,6 +29,7 @@ encoderdecoder = Autoencoder4K(outputType="image")
 encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
 
 
+#We freeze the parameters in the CNN Encoder
 class CNN_Encoder(nn.Module):
     def __init__(self):
         super(CNN_Encoder, self).__init__()
