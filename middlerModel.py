@@ -116,7 +116,6 @@ class VideoSegmentationNetwork(nn.Module):
         chunks = torch.chunk(latents_pred, 5, dim=1)
         for chunk in chunks:
             chunk = chunk.permute(0, 2, 1)
-            # l_hat = self.__unstack_and_merge__(chunk)
             image_preds.append(self.cnndecoder(chunk))
 
         image_preds = torch.stack(image_preds)
