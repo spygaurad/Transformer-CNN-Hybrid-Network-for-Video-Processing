@@ -109,9 +109,6 @@ class VideoSegmentationNetwork(nn.Module):
         #add the positional embedding
         latents += self.positions
 
-        # maskChunk = random.randint(0, CHUNK_LENGTH-1)
-        # latents[:, maskChunk, :] = 0
-
         # sending the latents predicted to the transformer
         latents_pred = self.transenc(latents)
         
