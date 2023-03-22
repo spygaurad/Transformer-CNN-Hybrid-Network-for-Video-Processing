@@ -92,13 +92,6 @@ class VideoSegmentationNetwork(nn.Module):
         latents = []
         image_preds = []
 
-        # sending the input to the cnn encoder
-        # maskFrameNo = 2
-        # if epoch > 6:
-        #     maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
-        # else:
-        #     maskFrameNo = SEQUENCE_LENGTH+1
-
         for i in range(x.shape[0]):
             # if i == maskFrameNo:
             #     l = torch.zeros(BATCH_SIZE, 512, 64).to(DEVICE)
