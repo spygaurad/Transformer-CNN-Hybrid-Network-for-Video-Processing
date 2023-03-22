@@ -56,6 +56,7 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
+#The CNN Decoder layer, which decodes the latent from the transformer
 class CNN_Decoder(nn.Module):
     def __init__(self):
         super(CNN_Decoder, self).__init__()
