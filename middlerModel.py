@@ -21,6 +21,7 @@ SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 512
 CHUNK_LENGTH = 64
 BATCH_SIZE = 8
+MODEL_NAME = "Transformer_Training_16K_5seq_512D_noise_bertmask"
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -165,7 +166,7 @@ def train(epochs, lr=1e-6):
 
     #loading the model
     model = VideoSegmentationNetwork().to(DEVICE)
-    # model.load_state_dict(torch.load('saved_model/transformer_full_model_4k_0.tar')['model_state_dict'])
+    model.load_state_dict(torch.load('saved_model/transformer_full_model_4k_0.tar')['model_state_dict'])
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
