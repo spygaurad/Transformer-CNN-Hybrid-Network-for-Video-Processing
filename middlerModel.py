@@ -79,7 +79,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=512, num_layers=4, num_heads=8, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -133,8 +133,8 @@ class VideoSegmentationNetwork(nn.Module):
         return pos_embedding
 
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-        pos_tensor1 = self.get_positional_encoding(seq_len=64, embedding_dim=512)
-        pos_tensor2 = self.get_positional_encoding(seq_len=5, embedding_dim=512)
+        pos_tensor1 = self.get_positional_encoding(seq_len=64, embedding_dim=EMBEDDED_DIMENSION)
+        pos_tensor2 = self.get_positional_encoding(seq_len=5, embedding_dim=EMBEDDED_DIMENSION)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         pos_tensor1 = torch.cat([pos_tensor1 for i in range(5)], dim=0)
         pos_tensor2 = torch.cat([pos_tensor2[:, i].repeat_interleave(64).unsqueeze(1) for i in range(pos_tensor2.shape[1])], dim=1)
