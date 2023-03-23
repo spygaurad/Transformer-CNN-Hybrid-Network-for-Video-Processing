@@ -35,8 +35,8 @@ class CNN_Encoder(nn.Module):
     def __init__(self):
         super(CNN_Encoder, self).__init__()
         self.encoder = encoderdecoder.encoder
-        for params in self.encoder.parameters():
-            params.requires_grad = False
+        # for params in self.encoder.parameters():
+        #     params.requires_grad = False
 
     def forward(self, x):
         bottleneck_4K = self.encoder(x)
