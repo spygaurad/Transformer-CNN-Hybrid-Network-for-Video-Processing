@@ -174,6 +174,7 @@ def train(epochs, lr=1e-6):
     #loss function
     # nvidia_mix_loss = MixedLoss(0.5, 0.5)
     mseloss = torch.nn.MSELoss()
+    temporal_loss = nn.smooth_l1_loss()
 
     writer = SummaryWriter(log_dir="logs")     
 
