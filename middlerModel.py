@@ -228,14 +228,14 @@ def train(epochs, lr=1e-6):
 
         if epoch%10==0:
             print('Saving Model...')
-            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/transformer_full_model_16K_{epoch}.tar')
+            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/{MODEL_NAME}_{epoch}.tar')
             # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
 
 
 
 def __save_sample__(epoch, x, _x, img_pred, iter):
-    path = f'Training_Sneakpeeks/Transformer_Training_16K_5seq_512D_noise_bertmask/'
+    path = f'Training_Sneakpeeks/{MODEL_NAME}/'
     try:
         os.makedirs(path)
     except:
