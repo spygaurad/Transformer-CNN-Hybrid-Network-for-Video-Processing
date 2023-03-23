@@ -174,7 +174,6 @@ def train(epochs, lr=1e-6):
     #loss function
     # nvidia_mix_loss = MixedLoss(0.5, 0.5)
     mseloss = nn.MSELoss()
-    smoothl1loss = nn.smooth_l1_loss()
 
     writer = SummaryWriter(log_dir="logs")     
 
@@ -204,7 +203,7 @@ def train(epochs, lr=1e-6):
 
             # We add a temporal loss for the model too, for the model to learn temporal dependencies in the inputs
             frameloss = mseloss(imagePred, image)
-            temporalloss = smoothl1loss(output_seq[:-1], output_seq[1:])
+            temporalloss = nn.functional.smooth_l1_loss(imagePred[:-1], imagePred[1:])
             loss = frameloss + 0.4*temporalloss
 
             #getting the loss's number
