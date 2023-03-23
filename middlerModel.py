@@ -133,7 +133,7 @@ class VideoSegmentationNetwork(nn.Module):
         return pos_embedding
 
     def __get_positional__tensor(self, embedding_dim=EMBEDDED_DIMENSION):
-        pos_tensor1 = self.get_positional_encoding(seq_len=64, embedding_dim=EMBEDDED_DIMENSION)
+        pos_tensor1 = self.get_positional_encoding(seq_len=CHUNK_LENGTH, embedding_dim=EMBEDDED_DIMENSION)
         pos_tensor2 = self.get_positional_encoding(seq_len=5, embedding_dim=EMBEDDED_DIMENSION)
         # pos_embedding = nn.Parameter(torch.randn(SEQUENCE_LENGTH, EMBEDDED_DIMENSION, requires_grad=True, device=DEVICE))
         pos_tensor1 = torch.cat([pos_tensor1 for i in range(5)], dim=0)
