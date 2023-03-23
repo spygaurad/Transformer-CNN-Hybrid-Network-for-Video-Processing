@@ -202,10 +202,10 @@ def train(epochs, lr=1e-6):
             #input the image into the model
             imagePred = model(noise_image, epoch)
 
-            # MS-SSIM loss + MSE Loss for model evaluation
-
+            #
             frameloss = mseloss(imagePred, image)
-            temporalloss = temporal_loss(output_seq[:-1], output_seq[1:])
+            temporalloss = smoothl1loss(output_seq[:-1], output_seq[1:])
+            loss = frameloss + 0.4*temporalloss
 
             #getting the loss's number
             _loss += loss.item()
