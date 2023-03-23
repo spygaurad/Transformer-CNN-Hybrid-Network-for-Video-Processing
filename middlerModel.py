@@ -21,7 +21,7 @@ SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 512
 CHUNK_LENGTH = 64
 BATCH_SIZE = 8
-MODEL_NAME = "Transformer_Training_16K_5seq_512D_noise_bertmask"
+MODEL_NAME = "Transformer_Training_16K_5seq_512D_noise_bertmask_end2end"
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
