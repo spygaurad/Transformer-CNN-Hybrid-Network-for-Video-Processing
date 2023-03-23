@@ -27,7 +27,7 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 #Loading the previously trained encoder decoder model
 encoderdecoder = Autoencoder4K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
+# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
 
 
 #We freeze the parameters in the CNN Encoder
