@@ -173,8 +173,8 @@ def train(epochs, lr=1e-6):
 
     #loss function
     # nvidia_mix_loss = MixedLoss(0.5, 0.5)
-    mseloss = torch.nn.MSELoss()
-    temporal_loss = nn.smooth_l1_loss()
+    mseloss = nn.MSELoss()
+    smoothl1loss = nn.smooth_l1_loss()
 
     writer = SummaryWriter(log_dir="logs")     
 
@@ -205,7 +205,7 @@ def train(epochs, lr=1e-6):
             # MS-SSIM loss + MSE Loss for model evaluation
 
             frameloss = mseloss(imagePred, image)
-            (output_seq[:-1], output_seq[1:])
+            temporalloss = temporal_loss(output_seq[:-1], output_seq[1:])
 
             #getting the loss's number
             _loss += loss.item()
