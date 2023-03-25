@@ -57,6 +57,11 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
+class Transformer_Decoder(nn.Module):
+    def __init__(self):
+        super(Transformer_Decoder, self).__init__()
+        self.decoder = nn.Trans
+
 #The CNN Decoder layer, which decodes the latent from the transformer
 class CNN_Decoder(nn.Module):
     def __init__(self):
@@ -232,7 +237,6 @@ def train(epochs, lr=1e-6):
             torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizerTransformer.state_dict(), 'loss': loss_train} , f'saved_model/{MODEL_NAME}_{epoch}.tar')
             # torch.save({'epoch': epoch, 'model_state_dict': decoderModel.state_dict(), 'optimizer_state_dict': optimizerCNNDecoder.state_dict(), 'loss': loss_train} , f'saved_model/CNN_decoder_model{epoch}.tar')
         print('\nProceeding to the next epoch...')
-
 
 
 def __save_sample__(epoch, x, _x, img_pred, iter):
