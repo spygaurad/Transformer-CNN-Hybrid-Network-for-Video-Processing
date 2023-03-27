@@ -98,6 +98,7 @@ class VideoSegmentationNetwork(nn.Module):
         #loading the transformer encoder class
         self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
+        
         self.transdec = Transformer_Decoder(output_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
@@ -133,7 +134,10 @@ class VideoSegmentationNetwork(nn.Module):
         # latents_pred = self.transenc(latents)
 
         #splitting the latents to source and target for the transformer decoder
-        
+        src = latent[:, :256, :]
+        tgt = latent[:, 256:320, :]
+
+
 
         #decoding all the sequence of the latents
         chunks = torch.chunk(latents_pred, SEQUENCE_LENGTH, dim=1)
