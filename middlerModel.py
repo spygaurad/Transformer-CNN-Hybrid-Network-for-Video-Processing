@@ -58,19 +58,29 @@ class Transformer_Encoder(nn.Module):
 
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, vocab_size, d_model, nhead, num_layers):
+    def __init__(self, output_dim, hidden_dim, num_layers, num_heads, dropout):
         super().__init__()
+        self.embedding = nn.Embedding(output_dim, hidden_dim)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim, dropout=dropout)
+        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
+        self.fc_out = nn.Linear(hidden_dim, output_dim)
+        self.dropout = nn.Dropout(dropout)
 
-        self.decoder_layer = nn.TransformerDecoderLayer(d_model, nhead)
-        self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers)
-        self.fc = nn.Linear(d_model, vocab_size)
+    def forward(self, target, memory):
+        output = self.transformer_decoder(tgt=embedded, memory=enc_src, tgt_mask=trg_mask, memory_mask=src_mask)
+        output = self.fc_out(output)
+        return output
 
-    def forward(self, tgt, memory, tgt_mask):
-        tgt = tgt.transpose(0, 1)  # [batch, 256, 512] -> [256, batch, 512]
-        memory = memory.transpose(0, 1)  # [batch, 320, 512] -> [320, batch, 512]
-        tgt = self.transformer_decoder(tgt, memory, tgt_mask)
-        tgt = self.fc(tgt)
-        return tgt.transpose(0, 1) 
+    def _add_positional_encoding(self, embedded):
+        max_length = embedded.size(0)
+        hidden_dim = embedded.size(2)
+        pe = torch.zeros(max_length, hidden_dim).to(embedded.device)
+        for i in range(hidden_dim):
+            if i % 2 == 0:
+                pe[:, i] = torch.sin(torch.arange(0, max_length, step=1) / (10000 ** (i / hidden_dim)))
+            else:
+                pe[:, i] = torch.cos(torch.arange(0, max_length, step=1) / (10000 ** ((i - 1) / hidden_dim)))
+        return pe.unsqueeze(1)
 
 
 
