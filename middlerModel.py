@@ -274,8 +274,8 @@ def train(epochs, lr=1e-6):
                 loss.backward()
 
             #saving a sample in each epoch
-            # if epoch%5==0 and i==num: 
-            __save_sample__(epoch+1, image[-1], noise_image[-1], imagePred, 5)
+            if epoch%5==0 and i==num: 
+                __save_sample__(epoch+1, image[-1], noise_image[-1], imagePred, 5)
                 # __save_sample__(epoch+1, image, imagePred, 1)
 
         _loss = _loss/len(train_data//BATCH_SIZE)
