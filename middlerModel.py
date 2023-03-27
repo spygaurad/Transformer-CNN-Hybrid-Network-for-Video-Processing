@@ -57,10 +57,24 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-class Transformer_Decoder(nn.Module):
-    def __init__(self):
-        super(Transformer_Decoder, self).__init__()
-        self.decoder = nn.Trans
+class AutoregressiveTransformer_Decoder(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers, num_heads, dropout):
+        super().__init__()
+        self.embedding = nn.Linear(input_dim, hidden_dim)
+        self.transformer_layers = nn.ModuleList([
+            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dropout=dropout)
+            for _ in range(num_layers)
+        ])
+        self.transformer = nn.TransformerEncoder(self.transformer_layers)
+        self.output = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        # x has shape [batch_size, input_dim, sequence_length]
+        x = x.permute(2, 0, 1)  # reshape to [sequence_length, batch_size, input_dim]
+        x = self.embedding(x)  # shape [sequence_length, batch_size, hidden_dim]
+        x = self.transformer(x)  # shape [sequence_length, batch_size, hidden_dim]
+        x = self.output(x[-1])  # take output from last time step, shape [batch_size, output_dim]
+        return x
 
 #The CNN Decoder layer, which decodes the latent from the transformer
 class CNN_Decoder(nn.Module):
