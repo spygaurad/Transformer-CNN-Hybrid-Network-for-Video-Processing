@@ -134,8 +134,8 @@ class VideoSegmentationNetwork(nn.Module):
         # latents_pred = self.transenc(latents)
 
         #splitting the latents to source and target for the transformer decoder
-        src = latent[:, :256, :]
-        tgt = latent[:, 256:320, :]
+        src = latents[:, :256, :]
+        tgt = latents[:, 256:320, :]
 
         outputFrame = self.transdec(tgt, src)
         # src = []
