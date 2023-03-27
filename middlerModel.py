@@ -62,7 +62,7 @@ class Transformer_Encoder(nn.Module):
 class Transformer_Decoder(nn.Module):
     def __init__(self, output_dim, hidden_dim, num_layers, num_heads, dropout):
         super().__init__()
-        decoder_layer = nn.TransformerDecoderLayer(d_model=output_dim, nhead=num_heads, dim_feedforward=hidden_dim, dropout=dropout)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=output_dim*num_heads, nhead=num_heads, dim_feedforward=hidden_dim, dropout=dropout)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
         # self.fc_out = nn.Linear(hidden_dim, output_dim)
         # self.dropout = nn.Dropout(dropout)
@@ -70,7 +70,7 @@ class Transformer_Decoder(nn.Module):
     def forward(self, target, memory):
         output = self.transformer_decoder(target, memory)
         # output = self.dropout(self.fc_out(output))
-        return output
+        return output.permute(1, 0, 2)
 
 
 
@@ -141,7 +141,7 @@ class VideoSegmentationNetwork(nn.Module):
         # tgt = torch.cat((torch.zeros((BATCH_SIZE, CHUNK_LENGTH*(SEQUENCE_LENGTH-1), EMBEDDED_DIMENSION), device=DEVICE), latents[:, 192:256, :]), dim=1)
         # tgt = latents[:, 256:320, :]
 
-        latents_pred = self.transdec(tgt.permute(1, 0, 2), mem)
+        latents_pred = self.transdec(tgt.permute(1, 0, 2), mem.permute(1, 0, 2))
         # src = []
         # tgt = []
         # chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
