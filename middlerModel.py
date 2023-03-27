@@ -278,7 +278,8 @@ def train(epochs, lr=1e-6):
             [__save_sample__(epoch+1, image[j], noise_image[j], imagePred[j], str(j+1)) for j in range(len(imagePred))]
                 # __save_sample__(epoch+1, image, imagePred, 1)
 
-            writer.add_scalar("Training Loss", loss.item(), i)
+        _loss = _loss/len(train_data//BATCH_SIZE)
+        writer.add_scalar("Training Loss", _loss, epoch)
 
         loss_train.append(_loss)
 
