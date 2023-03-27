@@ -134,17 +134,19 @@ class VideoSegmentationNetwork(nn.Module):
         # latents_pred = self.transenc(latents)
 
         #splitting the latents to source and target for the transformer decoder
-        # src = latent[:, :256, :]
-        # tgt = latent[:, 256:320, :]
-        src = []
-        tgt = []
-        chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
-        for i, chunk in enumerate(chunks):
-            masks = torch.zeros((batch, n, 512))
-            if i<SEQUENCE_LENGTH:
-                src.append(chunk)
-            else:
-                tgt.append(chunk)
+        src = latent[:, :256, :]
+        tgt = latent[:, 256:320, :]
+
+        outputFrame = self.transdec(src, tgt)
+        # src = []
+        # tgt = []
+        # chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
+        # for i, chunk in enumerate(chunks):
+        #     masks = torch.zeros((batch, n, 512))
+        #     if i<SEQUENCE_LENGTH:
+        #         src.append(chunk)
+        #     else:
+        #         tgt.append(chunk)
 
 
 
