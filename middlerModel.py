@@ -137,7 +137,7 @@ class VideoSegmentationNetwork(nn.Module):
         src = latent[:, :256, :]
         tgt = latent[:, 256:320, :]
 
-        outputFrame = self.transdec(src, tgt)
+        outputFrame = self.transdec(tgt, src)
         # src = []
         # tgt = []
         # chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
