@@ -57,23 +57,20 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-class AutoregressiveTransformerDecoder(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, num_layers, num_heads, dropout):
+class TransformerDecoder(nn.Module):
+    def __init__(self, vocab_size, d_model, nhead, num_layers):
         super().__init__()
-        self.embedding = nn.Linear(input_dim, hidden_dim)
-        self.transformer_layers = nn.ModuleList([
-            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dropout=dropout)
-            for _ in range(num_layers)
-        ])
-        self.transformer = nn.TransformerEncoder(self.transformer_layers)
-        self.output = nn.Linear(hidden_dim, output_dim)
 
-    def forward(self, x):
-        # x has shape [batch_size, input_dim, sequence_length]
-        x = x.permute(2, 0, 1)  # reshape to [sequence_length, batch_size, input_dim]
-        x = self.transformer(x)  # shape [sequence_length, batch_size, hidden_dim]
-        x = self.output(x[-1])  # take output from last time step, shape [batch_size, output_dim]
-        return x
+        self.decoder_layer = nn.TransformerDecoderLayer(d_model, nhead)
+        self.transformer_decoder = nn.TransformerDecoder(self.decoder_layer, num_layers)
+        self.fc = nn.Linear(d_model, vocab_size)
+
+    def forward(self, tgt, memory, tgt_mask):
+        tgt = tgt.transpose(0, 1)  # [batch, 256, 512] -> [256, batch, 512]
+        memory = memory.transpose(0, 1)  # [batch, 320, 512] -> [320, batch, 512]
+        tgt = self.transformer_decoder(tgt, memory, tgt_mask)
+        tgt = self.fc(tgt)
+        return tgt.transpose(0, 1) 
 
 
 
