@@ -171,7 +171,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #add the positional embedding
         latents += self.positions
-        
+
         mem = latents[:, :256, :]
         tgt = latents[:, 256:320, :]
         latents_pred = self.transdec(tgt.permute(1, 0, 2), mem.permute(1, 0, 2))
@@ -262,8 +262,7 @@ def train(epochs, lr=1e-6):
 
             # We add a temporal loss for the model too, for the model to learn temporal dependencies in the inputs
             frameloss = mseloss(imagePred, image)
-            temporalloss = nn.functional.smooth_l1_loss(imagePred[:-1], imagePred[1:])
-            loss = frameloss + 0.4*temporalloss
+            loss = frameloss
 
             #getting the loss's number
             _loss += loss.item()
