@@ -57,24 +57,73 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-class AutoregressiveTransformer_Decoder(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, num_layers, num_heads, dropout):
+class AutoregressiveTransformerDecoder(nn.Module):
+    def __init__(self, num_layers, num_heads, d_model, dim_feedforward):
         super().__init__()
-        self.embedding = nn.Linear(input_dim, hidden_dim)
-        self.transformer_layers = nn.ModuleList([
-            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dropout=dropout)
+        self.num_layers = num_layers
+        self.num_heads = num_heads
+        self.d_model = d_model
+        self.dim_feedforward = dim_feedforward
+        
+        # Set up layers
+        self.layers = nn.ModuleList([
+            nn.TransformerDecoderLayer(d_model, num_heads, dim_feedforward)
             for _ in range(num_layers)
         ])
-        self.transformer = nn.TransformerEncoder(self.transformer_layers)
-        self.output = nn.Linear(hidden_dim, output_dim)
+        
+        self.fc = nn.Linear(d_model, 3 * 128 * 128)  # Output size of the decoder
+        self.register_buffer('mask', None)  # Will be set dynamically during inference
+        
+    def forward(self, x, memory):
+        # x shape: [batch_size, seq_len, d_model]
+        # memory shape: [batch_size, encoder_seq_len, d_model]
+        
+        # Inference mode
+        if self.training == False:
+            # Create mask if it doesn't exist
+            if self.mask is None or self.mask.size(0) != x.size(1):
+                self.mask = self.generate_mask(x.size(1)).to(x.device)
 
-    def forward(self, x):
-        # x has shape [batch_size, input_dim, sequence_length]
-        x = x.permute(2, 0, 1)  # reshape to [sequence_length, batch_size, input_dim]
-        x = self.embedding(x)  # shape [sequence_length, batch_size, hidden_dim]
-        x = self.transformer(x)  # shape [sequence_length, batch_size, hidden_dim]
-        x = self.output(x[-1])  # take output from last time step, shape [batch_size, output_dim]
-        return x
+            # Generate autoregressive mask
+            ar_mask = torch.triu(torch.ones(x.size(1), x.size(1)), diagonal=1).bool().to(x.device)
+            x = x.masked_fill(ar_mask, 0.0)
+            
+            # Apply padding mask
+            x = x.masked_fill(self.mask == 0, float('-inf'))
+            
+            # Pass through decoder layers
+            for layer in self.layers:
+                x = layer(x, memory)
+                
+            # Decode sequence
+            x = self.fc(x)
+            x = x.view(-1, 3, 128, 128)
+            
+            return x
+        
+        # Training mode
+        else:
+            # Generate autoregressive mask
+            ar_mask = torch.triu(torch.ones(x.size(1), x.size(1)), diagonal=1).bool().to(x.device)
+            x = x.masked_fill(ar_mask, 0.0)
+            
+            # Pass through decoder layers
+            for layer in self.layers:
+                x = layer(x, memory)
+                
+            # Decode sequence
+            x = self.fc(x)
+            x = x.view(-1, 3, 128, 128)
+            
+            return x
+    
+    def generate_mask(self, seq_len):
+        # Create mask
+        mask = torch.zeros(seq_len, seq_len)
+        mask[:256, :256] = 1  # Allow full access to first 256 elements
+        mask[256:, :256] = 1  # Allow full access to first 256 elements of subsequent timesteps
+        mask[256:, 256:] = 0  # Mask the rest
+        return mask
 
 #The CNN Decoder layer, which decodes the latent from the transformer
 class CNN_Decoder(nn.Module):
