@@ -141,7 +141,7 @@ class VideoSegmentationNetwork(nn.Module):
         # tgt = torch.cat((torch.zeros((BATCH_SIZE, CHUNK_LENGTH*(SEQUENCE_LENGTH-1), EMBEDDED_DIMENSION), device=DEVICE), latents[:, 192:256, :]), dim=1)
         # tgt = latents[:, 256:320, :]
 
-        latents_pred = self.transdec(tgt, mem)
+        latents_pred = self.transdec(tgt.permute(1, 0, 2), mem)
         # src = []
         # tgt = []
         # chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
