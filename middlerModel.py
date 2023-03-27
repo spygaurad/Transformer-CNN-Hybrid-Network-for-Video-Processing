@@ -57,16 +57,18 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-class TransformerDecoder(nn.Module):
+
+class Transformer_Decoder(nn.Module):
     def __init__(self, output_dim, hidden_dim, num_layers, num_heads, dropout):
         super().__init__()
         decoder_layer = nn.TransformerDecoderLayer(d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim, dropout=dropout)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
         self.fc_out = nn.Linear(hidden_dim, output_dim)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, target, memory):
         output = self.transformer_decoder(tgt=embedded, memory=enc_src, tgt_mask=trg_mask, memory_mask=src_mask)
-        output = self.fc_out(output)
+        output = self.dropout(self.fc_out(output))
         return output
 
 
@@ -94,6 +96,8 @@ class VideoSegmentationNetwork(nn.Module):
 
         #loading the transformer encoder class
         self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
+
+        self.transdec = Transformer_Decoder(output_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
