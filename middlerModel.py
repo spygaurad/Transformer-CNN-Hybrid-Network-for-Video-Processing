@@ -178,7 +178,6 @@ class VideoSegmentationNetwork(nn.Module):
 
         imgPred = self.cnndecoder(latents_pred)
 
-        imgpred = torch.stack(image_preds)
         return imgPred
 
 
