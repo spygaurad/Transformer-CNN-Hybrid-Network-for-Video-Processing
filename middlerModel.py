@@ -57,6 +57,7 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
+
 #The transformer Decoder layer, to autoregressively predict the posterior frames
 class Transformer_Decoder(nn.Module):
     def __init__(self, output_dim, hidden_dim, num_layers, num_heads, dropout):
