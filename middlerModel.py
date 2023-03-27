@@ -57,13 +57,9 @@ class Transformer_Encoder(nn.Module):
         return transformer_latent
 
 
-class AutoregressiveTransformerDecoder(nn.Module):
+class Transformer_Decoder(nn.Module):
     def __init__(self, num_layers, num_heads, d_model, dim_feedforward):
         super().__init__()
-        self.num_layers = num_layers
-        self.num_heads = num_heads
-        self.d_model = d_model
-        self.dim_feedforward = dim_feedforward
         
         # Set up layers
         self.layers = nn.ModuleList([
@@ -71,14 +67,9 @@ class AutoregressiveTransformerDecoder(nn.Module):
             for _ in range(num_layers)
         ])
         
-        self.fc = nn.Linear(d_model, 3 * 128 * 128)  # Output size of the decoder
         self.register_buffer('mask', None)  # Will be set dynamically during inference
         
     def forward(self, x, memory):
-        # x shape: [batch_size, seq_len, d_model]
-        # memory shape: [batch_size, encoder_seq_len, d_model]
-        
-        # Inference mode
         if self.training == False:
             # Create mask if it doesn't exist
             if self.mask is None or self.mask.size(0) != x.size(1):
@@ -94,10 +85,6 @@ class AutoregressiveTransformerDecoder(nn.Module):
             # Pass through decoder layers
             for layer in self.layers:
                 x = layer(x, memory)
-                
-            # Decode sequence
-            x = self.fc(x)
-            x = x.view(-1, 3, 128, 128)
             
             return x
         
@@ -111,12 +98,12 @@ class AutoregressiveTransformerDecoder(nn.Module):
             for layer in self.layers:
                 x = layer(x, memory)
                 
-            # Decode sequence
             x = self.fc(x)
             x = x.view(-1, 3, 128, 128)
             
             return x
     
+
     def generate_mask(self, seq_len):
         # Create mask
         mask = torch.zeros(seq_len, seq_len)
@@ -124,6 +111,8 @@ class AutoregressiveTransformerDecoder(nn.Module):
         mask[256:, :256] = 1  # Allow full access to first 256 elements of subsequent timesteps
         mask[256:, 256:] = 0  # Mask the rest
         return mask
+
+
 
 #The CNN Decoder layer, which decodes the latent from the transformer
 class CNN_Decoder(nn.Module):
