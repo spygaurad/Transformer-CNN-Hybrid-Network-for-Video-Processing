@@ -109,7 +109,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def forward(self, x, epoch=None):
-
+        '''
         latents = []
         image_preds = []
 
@@ -137,21 +137,8 @@ class VideoSegmentationNetwork(nn.Module):
         # src = latents[:, :256, :]
         mem = latents[:, :256, :]
         tgt = latents[:, 256:320, :]
-        # src = torch.cat((latents[:, :256, :], torch.zeros((BATCH_SIZE, CHUNK_LENGTH, EMBEDDED_DIMENSION), device=DEVICE)), dim=1)
-        # tgt = torch.cat((torch.zeros((BATCH_SIZE, CHUNK_LENGTH*(SEQUENCE_LENGTH-1), EMBEDDED_DIMENSION), device=DEVICE), latents[:, 192:256, :]), dim=1)
-        # tgt = latents[:, 256:320, :]
 
         latents_pred = self.transdec(tgt.permute(1, 0, 2), mem.permute(1, 0, 2))
-        # src = []
-        # tgt = []
-        # chunks = torch.chunk(latents, SEQUENCE_LENGTH, dim=1)
-        # for i, chunk in enumerate(chunks):
-        #     masks = torch.zeros((batch, n, 512))
-        #     if i<SEQUENCE_LENGTH:
-        #         src.append(chunk)
-        #     else:
-        #         tgt.append(chunk)
-
 
 
 
@@ -163,6 +150,36 @@ class VideoSegmentationNetwork(nn.Module):
 
         image_preds = torch.stack(image_preds)
         return image_preds
+        '''
+
+        latents = []
+        image_preds = []
+
+        #sending the inputs the CNN encoder
+        for i in range(x.shape[0]):
+            l = self.cnnencoder(x[i])
+            l = l.permute(0, 2, 1)
+            latents.append(l)
+
+        #before sending to the transformer, this is the pre-processing we need
+        latents = torch.concat(latents, axis=1)
+
+        #mask random k% of the items in the sequence 
+        num_zeros = int(0.15 * latents.shape[1])
+        zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
+        latents[:, zero_indices, :] = 0
+
+        #add the positional embedding
+        latents += self.positions
+        
+        mem = latents[:, :256, :]
+        tgt = latents[:, 256:320, :]
+        latents_pred = self.transdec(tgt.permute(1, 0, 2), mem.permute(1, 0, 2))
+
+        imgPred = self.cnndecoder(latents_pred)
+
+        imgpred = torch.stack(image_preds)
+        return imgPred
 
 
 
