@@ -68,7 +68,7 @@ class Transformer_Decoder(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, target, memory):
-        output = self.transformer_decoder(tgt=embedded, memory=enc_src, tgt_mask=trg_mask, memory_mask=src_mask)
+        output = self.transformer_decoder(tgt, memory)
         output = self.dropout(self.fc_out(output))
         return output
 
