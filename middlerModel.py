@@ -71,7 +71,6 @@ class Transformer_Decoder(nn.Module):
         
     def forward(self, x, memory):
         if self.training == False:
-            # Create mask if it doesn't exist
             if self.mask is None or self.mask.size(0) != x.size(1):
                 self.mask = self.generate_mask(x.size(1)).to(x.device)
 
