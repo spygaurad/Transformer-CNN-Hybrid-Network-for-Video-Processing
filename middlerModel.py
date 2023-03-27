@@ -130,8 +130,11 @@ class VideoSegmentationNetwork(nn.Module):
         latents += self.positions
 
         # sending the latents predicted to the transformer
-        latents_pred = self.transenc(latents)
+        # latents_pred = self.transenc(latents)
+
+        #splitting the latents to source and target for the transformer decoder
         
+
         #decoding all the sequence of the latents
         chunks = torch.chunk(latents_pred, SEQUENCE_LENGTH, dim=1)
         for chunk in chunks:
