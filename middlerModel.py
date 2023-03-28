@@ -219,7 +219,7 @@ def train(epochs, lr=1e-6):
     print(f"Using {DEVICE} device...")
     print("Loading Datasets...")
     train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=BATCH_SIZE, imageSize=128).load_images()
-    data_len = 
+    data_len = len(train_data//BATCH_SIZE)
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
@@ -245,7 +245,7 @@ def train(epochs, lr=1e-6):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        num = random.randint(0, (len(train_data)//BATCH_SIZE) - 1)
+        num = random.randint(0, data_len - 1)
         # num = random.randint(0, )
         accumulation_steps = 4
 
