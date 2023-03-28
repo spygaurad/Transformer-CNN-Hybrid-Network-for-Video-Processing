@@ -245,7 +245,7 @@ def train(epochs, lr=1e-6):
 
         print(f"Epoch no: {epoch+1}")
         _loss = 0
-        num = random.randint(0, data_len - 1)
+        num = random.randint(0, data_size - 1)
         # num = random.randint(0, )
         accumulation_steps = 4
 
