@@ -219,7 +219,7 @@ def train(epochs, lr=1e-6):
     print(f"Using {DEVICE} device...")
     print("Loading Datasets...")
     train_data = DataloaderSequential(csv_file="data_sequential_VOS.csv", batch_size=BATCH_SIZE, imageSize=128).load_images()
-    data_len = len(train_data//BATCH_SIZE)
+    data_size = len(train_data//BATCH_SIZE)
     print("Dataset Loaded.")
     print("Initializing Parameters...")
 
@@ -279,7 +279,7 @@ def train(epochs, lr=1e-6):
                 __save_sample__(epoch+1, image[-1], noise_image[-1], imagePred, 5)
                 # __save_sample__(epoch+1, image, imagePred, 1)
 
-        _loss = _loss/(len(train_data)//BATCH_SIZE)
+        _loss = _loss/data
         writer.add_scalar("Training Loss", _loss, epoch)
 
         loss_train.append(_loss)
