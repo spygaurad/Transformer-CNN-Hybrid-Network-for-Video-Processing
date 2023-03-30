@@ -25,4 +25,29 @@ for i in range(num_heads):
 
 # transpose the attention weights tensor to match the expected input of the Transformer
 attn_weights = attn_weights.transpose(1, 2)
-print(attn_weights)
+print(attn_weights)import torch
+
+batch_size = 8
+sequence_length = 320
+hidden_size = 512
+
+# Create a mask tensor of shape (batch_size, sequence_length)
+mask = torch.ones((batch_size, sequence_length), dtype=torch.bool)
+
+# Set the last 64 elements of each sequence to False to mask them
+mask[:, -64:] = False
+
+# Create a causal mask tensor for the last 64 elements
+causal_mask = torch.tril(torch.ones((64, 64), dtype=torch.bool))
+
+# Repeat the causal mask tensor for each batch
+causal_mask = causal_mask.repeat(batch_size, 1, 1)
+
+# Concatenate the two mask tensors along the sequence length dimension
+mask = torch.cat((mask.unsqueeze(-1), causal_mask.unsqueeze(-1)), dim=-1)
+
+# Expand the mask tensor to shape (batch_size, 1, sequence_length, sequence_length+64)
+mask = mask.unsqueeze(1).expand(batch_size, 1, sequence_length, sequence_length+64)
+
+# Convert the mask tensor to a float tensor and negate it to create the attention mask
+attention_mask = (~mask).type(torch.float)
