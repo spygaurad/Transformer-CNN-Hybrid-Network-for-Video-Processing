@@ -179,6 +179,7 @@ class VideoSegmentationNetwork(nn.Module):
         imgPred = self.cnndecoder(latents_pred)
 
         return imgPred
+        '''
 
 
 
