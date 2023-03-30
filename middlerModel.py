@@ -130,12 +130,19 @@ class VideoSegmentationNetwork(nn.Module):
         #add the positional embedding
         latents += self.positions
 
-        # sending the latents predicted to the transformer
-        # latents_pred = self.transenc(latents)
+        mask = torch.ones(batch_size, seq_length, seq_length)
 
-        #splitting the latents to source and target for the transformer decoder
+        # Set the attention mask for the last 64 elements of each sequence to 0,
+        # so they will be ignored by the Transformer encoder
+        mask[:, 256:, :] = 0
 
-        latents_pred = self.transenc(latents)
+        # Create a triangular mask for the attention weights for the last 64 elements of each sequence
+        triangular_mask = torch.tril(torch.ones(seq_length, seq_length), diagonal=-256)
+        triangular_mask = triangular_mask.unsqueeze(0).repeat(batch_size, 1, 1)
+
+        attention_mask = mask.unsqueeze(1) * triangular_mask.unsqueeze(-1)
+
+        latents_pred = self.transenc(latents, mask=attention_mask)
 
 
 
