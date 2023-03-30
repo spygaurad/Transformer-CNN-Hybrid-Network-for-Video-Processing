@@ -25,3 +25,4 @@ for i in range(num_heads):
 
 # transpose the attention weights tensor to match the expected input of the Transformer
 attn_weights = attn_weights.transpose(1, 2)
+print(attn_weights)
