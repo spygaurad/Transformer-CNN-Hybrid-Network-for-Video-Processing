@@ -137,7 +137,7 @@ class VideoSegmentationNetwork(nn.Module):
         mask[:, 256:, :] = 0
 
         # Create a triangular mask for the attention weights for the last 64 elements of each sequence
-        triangular_mask = torch.tril(torch.ones(seq_length, seq_length), diagonal=-256)
+        triangular_mask = torch.tril(torch.ones(latents.shape[1], latents.shape[1]), diagonal=-256)
         triangular_mask = triangular_mask.unsqueeze(0).repeat(batch_size, 1, 1)
 
         attention_mask = mask.unsqueeze(1) * triangular_mask.unsqueeze(-1)
