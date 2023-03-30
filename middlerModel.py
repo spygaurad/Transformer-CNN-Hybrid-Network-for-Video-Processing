@@ -134,7 +134,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         # Set the attention mask for the last 64 elements of each sequence to 0,
         # so they will be ignored by the Transformer encoder
-        mask[:, 256:, :] = 0
+        mask[:, 3:, :] = 0
 
         # Create a triangular mask for the attention weights for the last 64 elements of each sequence
         triangular_mask = torch.tril(torch.ones(5, 5), diagonal=-3)
