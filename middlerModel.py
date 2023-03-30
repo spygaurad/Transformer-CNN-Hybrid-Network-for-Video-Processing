@@ -109,7 +109,7 @@ class VideoSegmentationNetwork(nn.Module):
 
 
     def forward(self, x, epoch=None):
-        '''
+        # '''
         latents = []
         image_preds = []
 
