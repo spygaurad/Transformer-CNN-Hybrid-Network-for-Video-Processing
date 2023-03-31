@@ -152,13 +152,13 @@ class VideoSegmentationNetwork(nn.Module):
         causal_mask = torch.tril(torch.ones((64, 64), dtype=torch.bool))
 
         # Repeat the causal mask tensor for each batch
-        causal_mask = causal_mask.repeat(batch_size, 1, 1)
+        causal_mask = causal_mask.repeat(latents.shape[0], 1, 1)
 
         # Concatenate the two mask tensors along the sequence length dimension
         mask = torch.cat((mask.unsqueeze(-1), causal_mask.unsqueeze(-1)), dim=-1)
 
-        # Expand the mask tensor to shape (batch_size, 1, sequence_length, sequence_length+64)
-        mask = mask.unsqueeze(1).expand(batch_size, 1, latents.shape[1], latents.shape[1]+64)
+        # Expand the mask tensor to shape (latents.shape[0], 1, sequence_length, sequence_length+64)
+        mask = mask.unsqueeze(1).expand(latents.shape[0], 1, latents.shape[1], latents.shape[1]+64)
 
         # Convert the mask tensor to a float tensor and negate it to create the attention mask
         attention_mask = (~mask).type(torch.float)
