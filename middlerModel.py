@@ -155,7 +155,7 @@ class VideoSegmentationNetwork(nn.Module):
         causal_mask = causal_mask.repeat(latents.shape[0], 1, 1)
 
         # Concatenate the two mask tensors along the sequence length dimension
-        mask = torch.cat((mask.unsqueeze(-1), causal_mask.unsqueeze(-1)), dim=1)
+        mask = torch.cat((mask.unsqueeze(-1), causal_mask), dim=-1)
 
         # Expand the mask tensor to shape (latents.shape[0], 1, sequence_length, sequence_length+64)
         mask = mask.unsqueeze(1).expand(latents.shape[0], 1, latents.shape[1], latents.shape[1]+64)
