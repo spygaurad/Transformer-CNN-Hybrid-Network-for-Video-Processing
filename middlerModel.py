@@ -59,18 +59,33 @@ class Transformer_Encoder(nn.Module):
 
 
 #The transformer Decoder layer, to autoregressively predict the posterior frames
-class Transformer_Decoder(nn.Module):
-    def __init__(self, output_dim, hidden_dim, num_layers, num_heads, dropout):
+class AutoregressiveTransformerDecoder(nn.Module):
+    def __init__(self, d_model, nhead, dim_feedforward, num_layers, dropout):
         super().__init__()
-        decoder_layer = nn.TransformerDecoderLayer(d_model=output_dim, nhead=num_heads, dim_feedforward=hidden_dim, dropout=dropout)
+        self.pos_encoder = PositionalEncoding(d_model, dropout)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
-        # self.fc_out = nn.Linear(hidden_dim, output_dim)
-        # self.dropout = nn.Dropout(dropout)
+        self.d_model = d_model
+        self.target_mask = None
 
-    def forward(self, target, memory):
-        output = self.transformer_decoder(target, memory)
-        # output = self.dropout(self.fc_out(output))
-        return output.permute(1, 0, 2)
+    def forward(self, tgt, memory):
+        # Apply positional encoding to the target sequence
+        tgt = self.pos_encoder(tgt)
+        
+        # Apply the autoregressive mask to the target sequence
+        tgt_mask = self._generate_autoregressive_mask(tgt.size(0)).to(device=tgt.device)
+        if self.target_mask is None or self.target_mask.size(0) != tgt.size(1):
+            self.target_mask = tgt_mask
+        else:
+            self.target_mask = tgt_mask[:tgt.size(1), :tgt.size(1)]
+            
+        # Apply the decoder to the target sequence and memory
+        output = self.transformer_decoder(tgt, memory, tgt_mask=self.target_mask)
+        return output
+    
+    def _generate_autoregressive_mask(self, size):
+        mask = torch.triu(torch.ones(size, size), diagonal=1)
+        return mask.masked_fill(mask == 1, float('-inf'))
 
 
 
