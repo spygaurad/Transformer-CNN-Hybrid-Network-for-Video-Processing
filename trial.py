@@ -24,3 +24,4 @@ mask = mask.unsqueeze(1).expand(batch_size, 1, sequence_length, sequence_length 
 
 # Convert the mask tensor to a float tensor and negate it to create the attention mask
 attention_mask = (~mask).type(torch.float)
+print(attention_mask.shape)
