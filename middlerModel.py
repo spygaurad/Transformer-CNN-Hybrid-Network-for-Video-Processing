@@ -143,7 +143,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents[:, zero_indices, :] = 0
 
         # Create a mask tensor of shape (batch_size, sequence_length)
-        mask = torch.ones((batch_size, sequence_length), dtype=torch.bool)
+        mask = torch.ones((latents.shape[0], latents.shape[1]), dtype=torch.bool)
 
         # Set the last 64 elements of each sequence to False to mask them
         mask[:, -64:] = False
@@ -158,7 +158,7 @@ class VideoSegmentationNetwork(nn.Module):
         mask = torch.cat((mask.unsqueeze(-1), causal_mask.unsqueeze(-1)), dim=-1)
 
         # Expand the mask tensor to shape (batch_size, 1, sequence_length, sequence_length+64)
-        mask = mask.unsqueeze(1).expand(batch_size, 1, sequence_length, sequence_length+64)
+        mask = mask.unsqueeze(1).expand(batch_size, 1, latents.shape[1], latents.shape[1]+64)
 
         # Convert the mask tensor to a float tensor and negate it to create the attention mask
         attention_mask = (~mask).type(torch.float)
