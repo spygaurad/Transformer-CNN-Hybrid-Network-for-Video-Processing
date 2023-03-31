@@ -11,7 +11,7 @@ mask = torch.ones((batch_size, sequence_length))
 mask[:, -3:] = 0
 
 # Create a causal mask tensor for the last 64 elements
-causal_mask = torch.tril(torch.ones((64, 64)))
+causal_mask = torch.tril(torch.ones((5, 5)))
 
 # Repeat the causal mask tensor for each batch
 causal_mask = causal_mask.repeat(batch_size, 1, 1)
@@ -20,7 +20,7 @@ causal_mask = causal_mask.repeat(batch_size, 1, 1)
 mask = torch.cat((mask.unsqueeze(-1), causal_mask.unsqueeze(-1)), dim=-1)
 
 # Expand the mask tensor to shape (batch_size, 1, sequence_length, sequence_length+64)
-mask = mask.unsqueeze(1).expand(batch_size, 1, sequence_length, sequence_length + 64)
+mask = mask.unsqueeze(1).expand(batch_size, 1, sequence_length, sequence_length + 3)
 
 # Convert the mask tensor to a float tensor and negate it to create the attention mask
 attention_mask = (~mask).type(torch.float)
