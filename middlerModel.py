@@ -160,6 +160,7 @@ class VideoSegmentationNetwork(nn.Module):
         # Expand the mask tensor to shape (latents.shape[0], 1, sequence_length, sequence_length+64)
         mask = mask.unsqueeze(1).expand(latents.shape[0], 1, latents.shape[1], latents.shape[1]+64)
 
+
         # Convert the mask tensor to a float tensor and negate it to create the attention mask
         attention_mask = (~mask).type(torch.float)
         latents_pred = self.transenc(latents, mask=attention_mask)
