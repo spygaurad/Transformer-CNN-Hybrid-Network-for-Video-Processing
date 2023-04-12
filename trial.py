@@ -8,7 +8,7 @@ n_elements_to_mask = 3
 mask = torch.ones((batch_size, sequence_length))
 
 # Set the last 3 elements of each sequence to False to mask them
-mask[:, -:] = 0
+mask[:, -n_elements_to_mask:] = 0
 
 # Create a causal mask tensor for the last 64 elements
 causal_mask = torch.tril(torch.ones((5, 5)))
