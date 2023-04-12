@@ -1,13 +1,12 @@
 import torch
 
 batch_size = 1
-sequence_length =5
-hidden_size = 3
+sequence_length = 8
 
 # Create a mask tensor of shape (batch_size, sequence_length)
 mask = torch.ones((batch_size, sequence_length))
 
-# Set the last 64 elements of each sequence to False to mask them
+# Set the last 3 elements of each sequence to False to mask them
 mask[:, -3:] = 0
 
 # Create a causal mask tensor for the last 64 elements
