@@ -18,6 +18,8 @@ causal_mask = causal_mask.unsqueeze(0).expand(batch_size, -1, -1)
 # Concatenate the two mask tensors along the sequence length dimension
 mask = torch.cat((mask.unsqueeze(-1), causal_mask), dim=-1)
 
+attention_mask = mask.to(torch.bool)
+
 # Convert the mask tensor to a float tensor and negate it to create the attention mask
 attention_mask = (~mask).type(torch.float)
 
