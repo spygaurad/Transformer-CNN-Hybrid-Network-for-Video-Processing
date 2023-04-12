@@ -11,7 +11,7 @@ mask = torch.ones((batch_size, sequence_length))
 mask[:, -n_elements_to_mask:] = 0
 
 # Create a causal mask tensor for the last 64 elements
-causal_mask = torch.tril(torch.ones((5, 5)))
+causal_mask = torch.tril(torch.ones((n_elements_to_mask, n_elements_to_mask)))
 
 # Repeat the causal mask tensor for each batch
 causal_mask = causal_mask.repeat(batch_size, 1, 1)
