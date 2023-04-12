@@ -1,27 +1,24 @@
 import torch
 
 # Create a mask tensor of shape (batch_size, sequence_length)
-batch_size = 2
-sequence_length = 9
-n_elements_to_mask = 3
+batch_size = 4
+sequence_length = 320
+n_elements_to_mask = 64
 mask = torch.ones((batch_size, sequence_length))
 
-# Set the last 64 elements of each sequence to False to mask them
+# Set the last 64 elements of each sequence to 0 to mask them
 mask[:, -n_elements_to_mask:] = 0
 
-# Create a causal mask tensor for the last 64 elements
-causal_mask = torch.tril(torch.ones((sequence_length, sequence_length)))
+# Create a mask of shape (batch_size, sequence_length, sequence_length) with diagonal elements set to 1
+# This mask will attend to everything before the element, but not to itself and anything after it
+attention_mask = torch.tril(torch.ones((sequence_length, sequence_length)))
 
-# Expand the causal mask tensor to shape (batch_size, n_elements_to_mask, n_elements_to_mask)
-causal_mask = causal_mask.unsqueeze(0).expand(batch_size, -1, -1)
+# Repeat the mask tensor for each batch and multiply it with the original mask tensor
+# This will create the final attention mask that attends to everything before the element, but not to itself and anything after it
+attention_mask = mask.unsqueeze(-1) * attention_mask.unsqueeze(0)
 
-# Concatenate the two mask tensors along the sequence length dimension
-mask = torch.cat((mask.unsqueeze(-1), causal_mask), dim=-1)
-
-attention_mask = mask.to(torch.bool)
-
-# Convert the mask tensor to a float tensor and negate it to create the attention mask
-attention_mask = (~mask).type(torch.float)
+# Convert the attention mask to a float tensor
+attention_mask = attention_mask.type(torch.float)
 
 # Apply the attention mask to the latent tensor
 latent = torch.randn((batch_size, sequence_length, 512))  # Example latent tensor
