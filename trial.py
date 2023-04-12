@@ -1,7 +1,7 @@
 import torch
 
 # Create a mask tensor of shape (batch_size, sequence_length)
-batch_size = 4
+batch_size = 2
 sequence_length = 320
 n_elements_to_mask = 64
 mask = torch.ones((batch_size, sequence_length))
