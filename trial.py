@@ -2,8 +2,8 @@ import torch
 
 # Create a mask tensor of shape (batch_size, sequence_length)
 batch_size = 2
-sequence_length = 9
-n_elements_to_mask = 3
+sequence_length = 320
+n_elements_to_mask = 64
 mask = torch.ones((batch_size, sequence_length))
 
 # Set the last 64 elements of each sequence to 0 to mask them
