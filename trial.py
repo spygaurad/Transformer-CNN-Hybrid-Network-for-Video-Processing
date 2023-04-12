@@ -1,7 +1,7 @@
 import torch
 
 batch_size = 1
-sequence_length = 5
+sequence_length =5
 hidden_size = 3
 
 # Create a mask tensor of shape (batch_size, sequence_length)
