@@ -207,6 +207,31 @@ class VideoSegmentationNetwork(nn.Module):
         '''
 
 
+    def get_mask_seq_cat(first_seq_len=130, second_seq_len=128):
+
+        def add_additional_top_mask(mat_mask, mp):
+            for seq in range(mat_mask.shape[0]):
+                position = [random.randint(1,first_seq_len-2) for _ in range(mp)]
+                for pos in position:
+                    mat_mask[seq][pos] = float('-inf')
+            return mat_mask
+        
+        def add_additional_bottom_mask(mat_mask, mp):
+            for seq in range(mat_mask.shape[0]):
+                position = [random.randint(1, first_seq_len-2) for _ in range(mp)]
+                position += [random.randint(first_seq_len+1, first_seq_len+second_seq_len-2) for _ in range(mp)]          
+                for pos in position:
+                    mat_mask[seq][pos] = float('-inf')       
+            return mat_mask
+
+        second_mask = torch.triu(torch.full((second_seq_len, second_seq_len), float('-inf')), diagonal=1)
+        first_mask = torch.zeros(second_seq_len, first_seq_len)
+        bottom_mask = torch.cat([first_mask, second_mask], axis=-1)
+
+        top_mask = bottom_mask[0].unsqueeze(0).repeat(first_seq_len,1)
+        mask_ua = torch.cat([top_mask, bottom_mask], axis=0)
+        return mask_ua
+        
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
