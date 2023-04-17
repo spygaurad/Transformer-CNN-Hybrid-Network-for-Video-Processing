@@ -141,6 +141,7 @@ class VideoSegmentationNetwork(nn.Module):
         num_zeros = int(0.15 * latents.shape[1])
         zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
         latents[:, zero_indices, :] = 0
+        latents = latents.permute(1, 0, 2)
 
         #creating an attention mask
         attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(DEVICE)
