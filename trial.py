@@ -79,3 +79,4 @@ def get_mask_seq_cat(first_seq_len=130, second_seq_len=128):
         # return mask_ua
 
 mask = get_mask_seq_cat(256, 64)
+print(mask)
