@@ -9,8 +9,8 @@ batch_size, sequence_length, _ = latent.size()
 # Create a mask tensor of shape (sequence_length, sequence_length) initialized with ones
 mask = torch.ones((sequence_length, sequence_length))
 
-# Set the upper triangle elements (including the diagonal) to False to prevent attending to itself and elements after it
-mask = mask.triu_(1).type(torch.bool)
+# Set the upper triangle elements (including the diagonal) to False for the last 3 elements of the sequence
+mask[-3:, :] = 0
 
 # Expand the mask tensor to shape (batch_size, sequence_length, sequence_length)
 mask = mask.unsqueeze(0).expand(batch_size, sequence_length, sequence_length)
