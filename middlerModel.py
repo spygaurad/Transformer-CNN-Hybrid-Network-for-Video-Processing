@@ -143,6 +143,7 @@ class VideoSegmentationNetwork(nn.Module):
         latents[:, zero_indices, :] = 0
 
         attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(self.device)
+        key_pad_mask = torch
         latents_pred = self.transenc(latents, mask=attention_mask, src_key_padding_mask= )
 
 
@@ -187,7 +188,7 @@ class VideoSegmentationNetwork(nn.Module):
         '''
 
 
-    def get_last_seq_pad_mask(second_seq_len=512, third_seq_len=512, bs=1):
+    def get_last_seq_pad_mask(self, second_seq_len=512, third_seq_len=512, bs=1):
         last_sequence_pad_mask = torch.zeros(second_seq_len+third_seq_len, dtype=torch.bool)
         last_sequence_pad_mask = last_sequence_pad_mask.repeat(bs, 1)
         return last_sequence_pad_mask
