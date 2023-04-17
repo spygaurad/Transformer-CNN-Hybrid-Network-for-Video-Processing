@@ -22,6 +22,6 @@ attention_mask = attention_mask.type(torch.float)
 
 # Apply the attention mask to the latent tensor
 latent = torch.randn((batch_size, sequence_length, 512))  # Example latent tensor
-masked_latent = latent.T * attention_mask
+masked_latent = latent.permute(0, 2, 1) * attention_mask
 
 # Now you can pass the masked_latent tensor along with the attention_mask tensor to the transformer encoder
