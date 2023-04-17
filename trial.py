@@ -2,8 +2,8 @@ import torch
 
 # Create a mask tensor of shape (batch_size, sequence_length)
 batch_size = 2
-sequence_length = 320
-n_elements_to_mask = 64
+sequence_length = 9
+n_elements_to_mask = 3
 mask = torch.ones((batch_size, sequence_length))
 
 # Set the last 64 elements of each sequence to 0 to mask them
@@ -21,7 +21,6 @@ attention_mask = mask.unsqueeze(-1) * attention_mask.unsqueeze(0)
 attention_mask = attention_mask.type(torch.float)
 
 # Apply the attention mask to the latent tensor
-latent = torch.randn((batch_size, sequence_length, 512))  # Example latent tensor
-masked_latent = latent.permute(0, 2, 1) * attention_mask
+latent = torch.randn((batch_size, sequence_length, 4))  # Example latent tensor
 
 # Now you can pass the masked_latent tensor along with the attention_mask tensor to the transformer encoder
