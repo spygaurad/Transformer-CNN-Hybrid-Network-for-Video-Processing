@@ -51,7 +51,7 @@ class Transformer_Encoder(nn.Module):
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads)
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
 
-    def forward(self, x, mask=None):
+    def forward(self, x, mask):
         # transformer_latent = self.transformerencoder(x, mask=None)
         transformer_latent = self.transformer_encoder(x, mask=mask)
         return transformer_latent
