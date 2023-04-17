@@ -1,4 +1,4 @@
-# import torch
+import torch
 
 # # Create a latent tensor of shape (batch_size, sequence_length, embedding_dimension)
 # latent = torch.randn((2, 9, 4))
