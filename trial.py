@@ -15,7 +15,7 @@ attention_mask = torch.tril(torch.ones((sequence_length, sequence_length)))
 
 # Repeat the mask tensor for each batch and multiply it with the original mask tensor
 # This will create the final attention mask that attends to everything before the element, but not to itself and anything after it
-attention_mask = mask.unsqueeze(-1) * attention_mask.unsqueeze(0)
+attention_mask = mask * attention_mask
 
 # Convert the attention mask to a float tensor
 attention_mask = attention_mask.type(torch.float)
