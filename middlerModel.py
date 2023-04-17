@@ -142,27 +142,7 @@ class VideoSegmentationNetwork(nn.Module):
         zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
         latents[:, zero_indices, :] = 0
 
-        # Create a mask tensor of shape (batch_size, sequence_length)
-        mask = torch.ones((latents.shape[0], latents.shape[1]), dtype=torch.bool)
-
-        # Set the last 64 elements of each sequence to False to mask them
-        mask[:, -64:] = False
-
-        # Create a causal mask tensor for the last 64 elements
-        causal_mask = torch.tril(torch.ones((64, 64), dtype=torch.bool))
-
-        # Repeat the causal mask tensor for each batch
-        causal_mask = causal_mask.repeat(latents.shape[0], 1, 1)
-
-        # Concatenate the two mask tensors along the sequence length dimension
-        mask = torch.cat((mask.unsqueeze(-1), causal_mask), dim=-1)
-
-        # Expand the mask tensor to shape (latents.shape[0], 1, sequence_length, sequence_length+64)
-        mask = mask.unsqueeze(1).expand(latents.shape[0], 1, latents.shape[1], latents.shape[1]+64)
-
-
-        # Convert the mask tensor to a float tensor and negate it to create the attention mask
-        attention_mask = (~mask).type(torch.float)
+        
         latents_pred = self.transenc(latents, mask=attention_mask)
 
 
@@ -231,7 +211,7 @@ class VideoSegmentationNetwork(nn.Module):
         top_mask = bottom_mask[0].unsqueeze(0).repeat(first_seq_len,1)
         mask_ua = torch.cat([top_mask, bottom_mask], axis=0)
         return mask_ua
-        
+
 
     def get_positional_encoding(self, seq_len, embedding_dim):
         pos = torch.arange(0, seq_len, dtype=torch.float32).unsqueeze(1)
