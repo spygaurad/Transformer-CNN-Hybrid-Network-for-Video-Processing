@@ -20,7 +20,7 @@ from tensorboardX import SummaryWriter
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 512
 CHUNK_LENGTH = 64
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 MODEL_NAME = "Transformer_Training_16K_UnifiedModel"
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
