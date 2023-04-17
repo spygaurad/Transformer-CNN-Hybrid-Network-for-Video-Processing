@@ -13,7 +13,7 @@ mask = torch.ones((sequence_length, sequence_length))
 mask[-3:, :] = 0
 
 # Expand the mask tensor to shape (batch_size, sequence_length, sequence_length)
-mask = mask.unsqueeze(0).expand(batch_size, sequence_length, sequence_length)
+mask = mask.unsqueeze(0).expand(batch_size, sequence_length, sequence_length).type(bool)
 
 # Convert the mask tensor to a float tensor and negate it to create the attention mask
 attention_mask = (~mask).type(torch.float)
