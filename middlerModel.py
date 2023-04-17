@@ -144,8 +144,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #creating an attention mask
         attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(DEVICE)
-        attention_mask = attention_mask.view(BATCH_SIZE, 1, SEQUENCE_LENGTH*CHUNK_LENGTH, SEQUENCE_LENGTH*CHUNK_LENGTH)  # Shape: [8, 1, 320, 320]
-        attention_mask = attention_mask.expand(BATCH_SIZE, 8, SEQUENCE_LENGTH*CHUNK_LENGTH, SEQUENCE_LENGTH*CHUNK_LENGTH)  # Shape: [8, 8, 320, 320]
+        attention_mask = attention_mask.view(BATCH_SIZE, 1, SEQUENCE_LENGTH*CHUNK_LENGTH, SEQUENCE_LENGTH*CHUNK_LENGTH).repeat(1, 8, 1, 1)
         
         
         #predicting the next frame
