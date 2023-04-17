@@ -142,7 +142,7 @@ class VideoSegmentationNetwork(nn.Module):
         zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
         latents[:, zero_indices, :] = 0
 
-        attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(DEVICE)
+        attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).expand(BATCH_SIZE, -1, -1).to(DEVICE)
         latents_pred = self.transenc(latents, mask=attention_mask)
 
 
