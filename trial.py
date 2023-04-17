@@ -79,5 +79,5 @@ def get_mask_seq_cat(first_seq_len=130, second_seq_len=128):
         #     return mask_a
         # return mask_ua
 
-mask = get_mask_seq_cat(12, 3)
+mask = get_mask_seq_cat(12, 6)
 print(mask)
