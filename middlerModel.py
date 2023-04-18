@@ -111,7 +111,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=4, dropout=0.1)
 
         #loading the transformer decoder class
         # self.transdec = Transformer_Decoder(output_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION*4, num_layers=4, num_heads=8, dropout=0.1)
@@ -145,7 +145,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #creating an attention mask
         attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(DEVICE)
-        attention_mask = attention_mask.view(1, SEQUENCE_LENGTH*CHUNK_LENGTH, SEQUENCE_LENGTH*CHUNK_LENGTH).repeat(BATCH_SIZE*8, 1, 1)
+        attention_mask = attention_mask.view(1, SEQUENCE_LENGTH*CHUNK_LENGTH, SEQUENCE_LENGTH*CHUNK_LENGTH).repeat(BATCH_SIZE, 1, 1)
         # attention_mask = attention_mask.unsqueeze(1).repeat(1, 8, 1, 1)
         
         #predicting the next frame
