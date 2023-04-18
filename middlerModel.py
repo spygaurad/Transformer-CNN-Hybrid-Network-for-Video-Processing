@@ -263,7 +263,7 @@ def train(epochs, lr=1e-6):
 
     #loading the model
     model = VideoSegmentationNetwork().to(DEVICE)
-    # model.load_state_dict(torch.load('saved_model/transformer_full_model_16K_10.tar')['model_state_dict'])
+    model.load_state_dict(torch.load('saved_model/Transformer_Training_16K_5seq_512D_noise_bertmask_100.tar')['model_state_dict'])
 
     #initializing the optimizer for transformer
     optimizerTransformer = optim.AdamW(model.transenc.parameters(), lr)
