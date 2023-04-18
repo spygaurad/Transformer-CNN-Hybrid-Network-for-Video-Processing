@@ -297,7 +297,6 @@ def train(epochs, lr=1e-6):
             #input the image into the model
             imagePred = model(noise_image, epoch)
 
-            # We add a temporal loss for the model too, for the model to learn temporal dependencies in the inputs
             frameloss = mseloss(imagePred, image[-1, :, :, :, :])
             loss = frameloss
 
