@@ -27,7 +27,7 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 #Loading the previously trained encoder decoder model
 encoderdecoder = Autoencoder4K(outputType="image")
-# encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
+encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_16k_VOS_40_512D.tar')['model_state_dict'])
 
 
 #We freeze the parameters in the CNN Encoder
@@ -112,6 +112,7 @@ class VideoSegmentationNetwork(nn.Module):
 
         #loading the transformer encoder class
         self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
+
 
         #loading the transformer decoder class
         # self.transdec = Transformer_Decoder(output_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION*4, num_layers=4, num_heads=8, dropout=0.1)
