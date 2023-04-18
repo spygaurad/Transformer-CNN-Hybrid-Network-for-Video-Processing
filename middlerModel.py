@@ -297,7 +297,7 @@ def train(epochs, lr=1e-6):
             #input the image into the model
             imagePred = model(noise_image, epoch)
 
-            frameloss = mseloss(imagePred, image[-1, :, :, :, :])
+            frameloss = mseloss(imagePred[-1, :, :, :, :], image[-1, :, :, :, :])
             loss = frameloss
 
             #getting the loss's number
