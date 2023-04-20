@@ -263,6 +263,8 @@ def train(epochs, lr=1e-6):
 
     #loading the model
     model = VideoSegmentationNetwork().to(DEVICE)
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"Number of parameters in this model is: {total_params}")
     model.load_state_dict(torch.load('saved_model/Transformer_Training_16K_5seq_512D_noise_bertmask_100.tar')['model_state_dict'])
 
     #initializing the optimizer for transformer
