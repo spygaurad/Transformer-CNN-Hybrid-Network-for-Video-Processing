@@ -42,7 +42,6 @@ class CNN_Encoder(nn.Module):
         bottleneck_4K = self.encoder(x)
         return bottleneck_4K
 
-
 #The transformer Encoder layer, to learn the sequential information in between frames
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, num_layers, num_heads, dropout):
