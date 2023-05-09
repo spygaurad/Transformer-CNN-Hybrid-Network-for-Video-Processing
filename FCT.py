@@ -225,7 +225,7 @@ class FCTEncoder(nn.Module):
         self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads, dpr[3])
         self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads, dpr[4])
 
-    def forward(self,x):
+    def forward(self, x):
         scale_img_2 = self.scale_img(x)
         scale_img_3 = self.scale_img(scale_img_2)
         scale_img_4 = self.scale_img(scale_img_3)  
@@ -272,8 +272,10 @@ class FCT(nn.Module):
         self.encoder = FCTEncoder()
         self.decoder = FCTDecoder()
     
-    def forward(self, x):
+    def forward(self, x, skip=True):
         x1, x2, x3, x4, bottleneck_latent = self.encoder(x)
+        if not skip:
+            x1, x2, x3, x4 = x1*0, x2*0, x3*4, x4*0    
         output = self.decoder(x1, x2, x3, x4, bottleneck_latent)
         return output
 
