@@ -281,6 +281,6 @@ class FCT(nn.Module):
 
 model = FCT().to('cuda')
 image = torch.rand(4, 3, 256, 256).to('cuda')
-output = model(image)
+output = model(image, skip=False)
 print(output.shape)
 
