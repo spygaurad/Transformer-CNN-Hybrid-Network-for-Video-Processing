@@ -12,7 +12,6 @@ import torch.optim as optim
 from torchvision import transforms
 from tqdm import tqdm
 
-from dataset import DataLoader
 from metric import DiceLoss, JaccardScore
 
 from PIL import Image
@@ -207,12 +206,12 @@ class DS_out(nn.Module):
 
 
 
-class FCT(nn.Module):
+class FCTEncoder(nn.Module):
     def __init__(self):
         super().__init__()
 
-        att_heads = 2
-        filters = [8, 16, 32, 64, 128, 64, 32, 16, 8] 
+        att_heads = 4
+        filters = [8, 16, 32, 64, 128] 
         blocks = len(filters)
         stochastic_depth_rate = 0.0
         dpr = [x for x in np.linspace(0, stochastic_depth_rate, blocks)]
@@ -225,188 +224,62 @@ class FCT(nn.Module):
         self.block_3 = Block_encoder_bottleneck("third", filters[1], filters[2], att_heads, dpr[2])
         self.block_4 = Block_encoder_bottleneck("fourth", filters[2], filters[3], att_heads, dpr[3])
         self.block_5 = Block_encoder_bottleneck("bottleneck", filters[3], filters[4], att_heads, dpr[4])
-        self.block_6 = Block_decoder(filters[4], filters[5], att_heads, dpr[5])
-        self.block_7 = Block_decoder(filters[5], filters[6], att_heads, dpr[6])
-        self.block_8 = Block_decoder(filters[6], filters[7], att_heads, dpr[7])
-        self.block_9 = Block_decoder(filters[7], filters[8], att_heads, dpr[8])
 
-        self.ds = DS_out(filters[8], 1)
-        
     def forward(self,x):
-
-        # Multi-scale input
         scale_img_2 = self.scale_img(x)
         scale_img_3 = self.scale_img(scale_img_2)
         scale_img_4 = self.scale_img(scale_img_3)  
-
         x1 = self.block_1(x)
         x2 = self.block_2(x1, scale_img_2)
         x3 = self.block_3(x2, scale_img_3)
         x4 = self.block_4(x3, scale_img_4)
         x = self.block_5(x4)
+        return x1, x2, x3, x4, x
+
+
+
+
+class FCTDecoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        att_heads = 4
+        filters = [128, 64, 32, 16, 8] 
+        blocks = len(filters)
+        stochastic_depth_rate = 0.0
+        dpr = [x for x in np.linspace(0, stochastic_depth_rate, blocks)]
+        self.drp_out = 0.3 
+
+        self.block_6 = Block_decoder(filters[0], filters[1], att_heads, dpr[1])
+        self.block_7 = Block_decoder(filters[1], filters[2], att_heads, dpr[2])
+        self.block_8 = Block_decoder(filters[2], filters[3], att_heads, dpr[3])
+        self.block_9 = Block_decoder(filters[3], filters[4], att_heads, dpr[4])
+        self.ds = DS_out(filters[4], 1)
+
+    def forward(self, x1, x2, x3, x4, x): 
         x = self.block_6(x, x4)
         x = self.block_7(x, x3)
         x = self.block_8(x, x2)
         x = self.block_9(x, x1)
-
         out9 = self.ds(x)
-
         return out9
 
 
 
-# data = (torch.rand(size=(1, 3, 256, 256)))
-# focusnet = FCT()
-# out = focusnet(data)
-# print(out.shape)
-# summary(focusnet, (3, 256, 256))
 
-
-
-
-
-
-
-
-
-
-class FCT_FLOW():
-
-    def __init__(self) -> None:
-        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        # self.device =   "cpu"
+class FCT(nn.Module):
+    def __init__(self):
+        super(FCT, self).__init__()
+        self.encoder = FCTEncoder()
+        self.decoder = FCTDecoder()
     
+    def forward(self, x):
+        x1, x2, x3, x4, bottleneck_latent = self.encoder(x)
+        output = self.decoder(x1, x2, x3, x4, bottleneck_latent)
+        return output
 
-    def save_sample(self, epoch, x, y, y_pred):
-        path = f'Training_Sneakpeeks/FCT'
-        try:
-            os.makedirs(path)
-        except:
-            pass
-        elements = [x, y, y_pred]
-        elements = [transforms.ToPILImage()(torch.squeeze(element[0:1, :, :, :])) for element in elements]
-        for i, element in enumerate(elements):
-            element.save(f"{path}/{epoch}_{['input','actual','predicted'][i]}.jpg")
+model = FCT()
 
+image = torch.rand(4, 3, 256, 256)
+output = model(image)
+print(output.shape)
 
-
-    def train(self, batch_size, epochs, lr=0.001):
-        
-        
-        print("Loading Datasets...")
-        dl = DataLoader(batch_size=batch_size, trainingType="supervised", return_train_and_test=True)
-        train_data, test_data = dl.load_data("car_train_data.csv", "car_test_data.csv")
-        print("Dataset Loaded... initializing parameters...")
-        
-        
-        model = FCT()
-        model.to(self.device)
-
-        optimizer = optim.AdamW(model.parameters(), lr)
-        dsc_loss = DiceLoss() 
-        # iou = JaccardScore()
-
-        writer = SummaryWriter(log_dir="logs")        
-        
-        loss_train, loss_test, measur = [], [], []
-        start = 1
-        epochs = epochs+1
-        
-        print(f"Starting to train for {epochs} epochs.")
-
-        for epoch in range(start, epochs):
-
-            _loss_train, _loss_test, _measure = 0, 0, 0
-            print(f"Training... at Epoch no: {epoch}")
-
-            num = random.randint(0, (len(train_data)//batch_size) - 1)
-
-            for i, (x, y) in enumerate(tqdm(train_data)):
-
-                x, y = x.to(self.device), y.to(self.device)
-
-                optimizer.zero_grad()
-
-                y_pred = model(x)
-
-                #taking the loss 
-                loss = dsc_loss(y_pred, y)
-                _loss_train += loss.item()
-
-                #backprop algorithm
-                loss.backward()
-                optimizer.step()
-                if i == num:
-                    self.save_sample(epoch, x, y, y_pred)
-
-            
-            # if epoch%5 == 0:
-            #     num = random.randint(0, (len(train_data)//batch_size) - 1)
-            #     print(f'Evaluating the performace of {epoch} epoch.')
-            #     for i, (x, y) in enumerate(tqdm(test_data)):
-            #         x, y = x.to(self.device), y.to(self.device)
-            #         y_pred = model(x)
-            #         loss = dsc_loss(y_pred, y)
-            #         measure = iou(y_pred, y)
-            #         _measure += measure.item()
-            #         _loss_test += loss.item()
-
-
-            # writer.add_scalar("Testing Loss", _loss_test, epoch)
-            writer.add_scalar("Training Loss", _loss_train, epoch)
-            # writer.add_scalar("Evaluation Metric", _measure, epoch)
-            
-            loss_train.append(_loss_train)
-            # loss_test.append(_loss_test)
-            # measur.append(_measure)
-
-            # print(f"Epoch: {epoch+1}, Training loss: {_loss_train}, Testing Loss: {_loss_test} || Jaccard Score : {_measure}")
-            print(f"Epoch: {epoch+1}, Training loss: {_loss_train}")
- 
-            if loss_train[-1] == min(loss_train):
-                print('Saving Model...')
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': loss_train
-                }, f'saved_model/FCT_for_cars.tar')
-            print('\nProceeding to the next epoch...')
-
-
-
-    def infer(self):
-
-        model = self.network
-        model.load_state_dict(torch.load("saved_model/FCT_for_cars.tar")['model_state_dict'])
-        model = model.to(self.device)
-
-        path_for_image_inference = 'Datasets/Driving_Dataset/inference'
-        path_for_saving_inference_samples = "Inference_For_Cars/generated_images"
-
-        try:
-            os.makedirs(path_for_saving_inference_samples)
-        except:
-            pass
-
-        file_paths = [ f'{path_for_image_inference}/{x}' for x in os.listdir(path_for_image_inference)]
-        print(file_paths)
-        for i, image in tqdm(enumerate(file_paths)):
-            img = Image.open(image)
-            out = model(img)
-            out = np.array(out)
-            sobel_x = sobel(out, axis=0)
-            sobel_y = sobel(out, axis=1)
-            sobel_img = np.sqrt(np.square(sobel_x) + np.square(sobel_y))
-            sobel_img = (sobel_img / np.max(sobel_img)) * 255
-            sobel_img = sobel_img.astype(np.uint8)
-            out = Image.fromarray(sobel_img)
-            img, out = img.convert("RGB"), out.convert("RGB")
-            result = Image.concatenate(img, out, axis=1)
-            result.save(f"{path_for_saving_inference_samples}/image_{i}")
-
-    
-
-seg = FCT_FLOW()
-seg.train(batch_size=1, epochs=70) 
-seg.infer()
