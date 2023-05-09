@@ -277,9 +277,8 @@ class FCT(nn.Module):
         output = self.decoder(x1, x2, x3, x4, bottleneck_latent)
         return output
 
-model = FCT()
-
-image = torch.rand(4, 3, 256, 256)
+model = FCT().to('cuda')
+image = torch.rand(4, 3, 256, 256).to('cuda')
 output = model(image)
 print(output.shape)
 
