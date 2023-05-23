@@ -1,8 +1,5 @@
-Datasets/Driving_Dataset/
-Datasets/Tomato Leaf Dataset/
-Datasets/VOS/
-__pycache__/AE_128_16K.cpython-38.pyc
-__pycache__/makeDataset.cpython-38.pyc
+Datasets/
+__pycache__/
 saved_model/
 env/
 data_image_train_VOS.csv
