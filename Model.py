@@ -15,7 +15,7 @@ from Metrics import JaccardScore, DiceLoss, MixedLoss
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # DEVICE = "cpu"
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 MODEL_NAME = "IMAGE2IMAGE"
 
 
