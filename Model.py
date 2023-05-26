@@ -129,7 +129,7 @@ class Model():
         print("Initializing Parameters...")
         self.model = self.model.to(DEVICE)
         total_params = sum(p.numel() for p in self.model.parameters())
-        print("Total parameters of the model is: {:.2f}{}".format(number / 10**(len(str(number)) - 1), ["", "K", "M", "B"][len(str(number)) - 1]))
+        print("Total parameters of the model is: {:.2f}{}".format(total_params / 10**(len(str(total_params)) - 1), ["", "K", "M", "B"][len(str(total_params)) - 1]))
 
         print(f"Initializing the Optimizer")
         optimizer = optim.AdamW(self.model.parameters(), lr)
