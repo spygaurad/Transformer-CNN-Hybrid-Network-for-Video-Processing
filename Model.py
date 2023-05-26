@@ -1,8 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.optim as optim
 import random
-import numpy as np
 import os
 from PIL import Image
 from tqdm import tqdm
@@ -136,7 +134,7 @@ class Model():
         optimizer = optim.AdamW(self.model.parameters(), lr)
         print(f"Beginning to train...")
 
-        diceloss = DiceLoss()
+        mixedloss = MixedLoss()
 
         val_psnr_epochs = []
         writer = SummaryWriter(f'runs/{MODEL_NAME}/')
@@ -148,7 +146,7 @@ class Model():
 
             print(f"Epoch No: {epoch}")
 
-            train_loss, train_psnr = self.train(dataset=train_data, loss_func=diceloss, optimizer=optimizer)
+            train_loss, train_psnr = self.train(dataset=train_data, loss_func=mixedloss, optimizer=optimizer)
 
             val_psnr = self.validate(dataset=val_data)
             val_psnr_epochs.append(val_psnr)
