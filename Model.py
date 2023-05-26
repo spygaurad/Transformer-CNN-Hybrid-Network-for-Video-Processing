@@ -134,7 +134,7 @@ class Model():
         optimizer = optim.AdamW(self.model.parameters(), lr)
         print(f"Beginning to train...")
 
-        mixedloss = MixedLoss()
+        mixedloss = MixedLoss(0.5, 0.5)
 
         val_psnr_epochs = []
         writer = SummaryWriter(f'runs/{MODEL_NAME}/')
