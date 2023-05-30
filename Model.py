@@ -40,7 +40,7 @@ class Model():
             image= img.to(DEVICE)
 
             noise_image = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
-            
+            optimizer.zero_grad()
             output = self.model(noise_image)
             loss = loss_func(output[1], image)
             running_loss += loss.item()
