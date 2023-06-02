@@ -38,7 +38,7 @@ class Model():
         for i, img in tqdm(enumerate(dataset), total=len(dataset)):
             counter += 1
             image = img.to(DEVICE)
-            
+
             augment_factor = random.randint(0, 1)
             if augment_factor == 1:
 
@@ -54,10 +54,11 @@ class Model():
                 aug_image = aug_image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
 
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
-                for _ in range(random.randint(0, 2)):
-                    x = random.randint(0, image.size(2) - 16)
-                    y = random.randint(0, image.size(3) - 16)
-                    aug_image[:, :, x:x + 16, y:y + 16] = 0.0
+                if random.random() > 0.3:
+                    for _ in range(random.randint(0, 3)):
+                        x = random.randint(0, image.size(2) - 16)
+                        y = random.randint(0, image.size(3) - 16)
+                        aug_image[:, :, x:x + 16, y:y + 16] = 0.0
 
             optimizer.zero_grad()
             output = self.model(aug_image)
