@@ -121,15 +121,18 @@ class Model():
                         os.makedirs(f"saved_samples/{MODEL_NAME}", exist_ok=True)
                     except:
                         pass
-                    image = img[0, :, :, :].cpu().numpy().transpose((1, 2, 0))
-                    pred = pred[0, :, :, :].cpu().numpy().transpose((1, 2, 0))
+                    image = img[0].cpu().numpy().transpose((1, 2, 0))
+                    pred = pred[0].cpu().numpy().transpose((1, 2, 0))
                     image = (image * 255).astype('uint8')
                     pred = (pred * 255).astype('uint8')
-                    image_pil = Image.fromarray(image)  
-                    pred_pil = Image.fromarray(pred)  
+                    image_pil = Image.fromarray(image)
+                    pred_pil = Image.fromarray(pred)
                     stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
+
                     stacked_image.paste(image_pil, (0, 0))
                     stacked_image.paste(pred_pil, (image_pil.width, 0))
+
+                    stacked_image.save("stacked_image.jpg")
 
                     stacked_image.save(f"saved_samples/{MODEL_NAME}/{epoch}.jpg")
 

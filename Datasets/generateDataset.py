@@ -1,39 +1,25 @@
-import cv2
 import os
-from tqdm import tqdm
+import csv
 
-try:
-    os.makedirs("Datasets/Driving_Dataset/train_images")
-    os.makedirs("Datasets/Driving_Dataset/test_images")
-except :
-    pass
+root_directory = '/home/optimus/Downloads/Dataset/BDD 100K/images/100k/'
+csv_directory = '/home/optimus/wiseyak/Transformer-CNN-Hybrid-Network-for-Video-Processing'
 
-finally:
-    path = 'Datasets/'
-    files = os.listdir(path)
-    files = [x for x in files if x[-1]=="4"]
-    print(files)
-    save_path = "Datasets/Driving_Dataset/train_images/image"
-    save_path2 = "Datasets/Driving_Dataset/test_images/image"
+# Create a list to store the file paths
+file_paths = []
 
-    i = 0
-    j = 0
+# Iterate over the folders (train, test, val)
+for folder in ['train', 'test', 'val']:
+    folder_path = os.path.join(root_directory, folder)
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        file_paths.append(file_path)
 
-    for file in files:
-        video = cv2.VideoCapture(f'{path}{file}')
-        total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-        pbar = tqdm(total=total_frames)
-        frame_counter = 0
-        while frame_counter < total_frames:
-            _, frame = video.read()
-            frame_counter += 1
-            frame = cv2.resize(frame, (1280, 720))
-            if frame_counter%10 == 0:
-                cv2.imwrite(f'{save_path2}_{j}.png', frame)
-                j+=1
-            else:
-                cv2.imwrite(f'{save_path}_{i}.png', frame)
-                i += 1
-            pbar.update(1)
-        pbar.close()
-    
+# Create and save the CSV files
+for folder, csv_file_name in [('train', 'train.csv'), ('test', 'test.csv'), ('val', 'valid.csv')]:
+    csv_file_path = os.path.join(csv_directory, csv_file_name)
+    with open(csv_file_path, 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(['path'])
+        for file_path in file_paths:
+            if folder in file_path:
+                writer.writerow([file_path])
