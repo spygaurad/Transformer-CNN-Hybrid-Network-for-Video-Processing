@@ -134,8 +134,8 @@ class Model():
                     pred = (pred * 255).astype('uint8')
                     image_pil = Image.fromarray(image)
                     pred_pil = Image.fromarray(pred)
-                    image.save(f"saved_samples/{MODEL_NAME}/image_{epoch}.jpg")
-                    pred.save(f"saved_samples/{MODEL_NAME}/pred_{epoch}.jpg")
+                    image_pil.save(f"saved_samples/{MODEL_NAME}/image_{epoch}.jpg")
+                    pred_pil.save(f"saved_samples/{MODEL_NAME}/pred_{epoch}.jpg")
                     # stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
 
                     # stacked_image.paste(image_pil, (0, 0))
@@ -223,4 +223,4 @@ class Model():
 
 
 model = Model()
-model.fit(250, 5e-5)
+model.fit(250, 1e-3)
