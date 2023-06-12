@@ -132,10 +132,10 @@ class Model():
                     pred = pred[0].cpu().numpy().transpose((1, 2, 0))
                     image = (image * 255).astype('uint8')
                     pred = (pred * 255).astype('uint8')
+                    image_pil = Image.fromarray(image)
+                    pred_pil = Image.fromarray(pred)
                     image.save(f"saved_samples/{MODEL_NAME}/image_{epoch}.jpg")
                     pred.save(f"saved_samples/{MODEL_NAME}/pred_{epoch}.jpg")
-                    # image_pil = Image.fromarray(image)
-                    # pred_pil = Image.fromarray(pred)
                     # stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
 
                     # stacked_image.paste(image_pil, (0, 0))
