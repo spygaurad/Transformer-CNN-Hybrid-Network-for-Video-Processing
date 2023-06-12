@@ -1,7 +1,7 @@
 import os
 import csv
 
-root_directory = '/home/optimus/Downloads/Dataset/BDD 100K/images/100k/'
+root_directory = '/home/optimus/Downloads/Dataset/Berkely_Deep_Dive/100K/images/'
 csv_directory = '/home/optimus/wiseyak/Transformer-CNN-Hybrid-Network-for-Video-Processing/Datasets/image2image'
 
 # Create a list to store the file paths
