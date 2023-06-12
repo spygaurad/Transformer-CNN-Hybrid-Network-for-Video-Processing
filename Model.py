@@ -40,7 +40,7 @@ class Model():
             counter += 1
             image = img.to(DEVICE)
 
-            aug_image = aug_image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
+            aug_image = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
             if random.random() > 0.5:
                 #zoom in an image
                 if random.random() > 0.8:
