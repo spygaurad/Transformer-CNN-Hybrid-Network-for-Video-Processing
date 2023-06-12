@@ -45,6 +45,7 @@ class Model():
                 if random.random() > 0.8:
                     print("Before Interpolation: ", aug_image.shape)
                     aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
+                    aug_image = trF.resize(256, 256)
                     print("After Interpolation: ", aug_image.shape)
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
