@@ -114,7 +114,6 @@ class Model():
                 counter += 1
                 image = img.to(DEVICE)
                 img = image
-                img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
                 for _ in range(random.randint(0, 3)):
                     x = random.randint(0, image.size(2) - 32)
                     y = random.randint(0, image.size(3) - 32)
