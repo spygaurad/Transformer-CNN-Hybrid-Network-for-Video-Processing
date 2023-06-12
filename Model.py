@@ -115,9 +115,9 @@ class Model():
                 image = img.to(DEVICE)
                 img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
                 for _ in range(random.randint(0, 3)):
-                    x = random.randint(0, image.size(2) - 16)
-                    y = random.randint(0, image.size(3) - 16)
-                    img[:, :, x:x + 16, y:y + 16] = 0.0
+                    x = random.randint(0, image.size(2) - 32)
+                    y = random.randint(0, image.size(3) - 32)
+                    img[:, :, x:x + 32, y:y + 32] = 0.0
                 output = self.model(img)
                 pred = output[1]
                 psnr = self.psnr(output[1], image)  
