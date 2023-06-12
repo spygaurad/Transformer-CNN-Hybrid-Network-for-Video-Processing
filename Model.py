@@ -68,7 +68,6 @@ class Model():
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-            print(running_loss)
 
             # Calculate the Jaccard score here
             psnr = self.psnr(output[1], image)
