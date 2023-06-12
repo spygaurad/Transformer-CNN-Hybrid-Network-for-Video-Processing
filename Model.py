@@ -39,22 +39,21 @@ class Model():
         for i, img in tqdm(enumerate(dataset), total=len(dataset)):
             counter += 1
             image = img.to(DEVICE)
-            aug_image = image
+
+            aug_image = aug_image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
             if random.random() > 0.5:
                 #zoom in an image
                 if random.random() > 0.8:
-                    print("Before Interpolation: ", aug_image.shape)
+                    # print("Before Interpolation: ", aug_image.shape)
                     aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
                     aug_image = trF.resize(aug_image, (256, 256))
-                    print("After Interpolation: ", aug_image.shape)
+                    # print("After Interpolation: ", aug_image.shape)
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
-                    print("Before Flipping: ", aug_image.shape)
+                    # print("Before Flipping: ", aug_image.shape)
                     aug_image = trF.hflip(aug_image)
-                    print("After Flipping: ", aug_image.shape)
-                # Apply noise to the image, 100% of the time
+                    # print("After Flipping: ", aug_image.shape)
             
-                aug_image = aug_image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
                 if random.random() > 0.5:
                     for _ in range(random.randint(0, 3)):
