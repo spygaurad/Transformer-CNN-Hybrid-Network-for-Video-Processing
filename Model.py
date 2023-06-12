@@ -38,23 +38,18 @@ class Model():
         for i, img in tqdm(enumerate(dataset), total=len(dataset)):
             counter += 1
             image = img.to(DEVICE)
-
-            augment_factor = random.randint(0, 1)
-            if augment_factor == 1:
-
+            aug_image = image
+            if random.random() > 0.5:
                 #zoom in an image
                 if random.random() > 0.8:
                     aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
-
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
                     aug_image = F.flip(aug_image, dims=(1,))
-
                 # Apply noise to the image, 100% of the time
                 aug_image = aug_image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
-
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
-                if random.random() > 0.2:
+                if random.random() > 0.5:
                     for _ in range(random.randint(0, 3)):
                         x = random.randint(0, image.size(2) - 16)
                         y = random.randint(0, image.size(3) - 16)
