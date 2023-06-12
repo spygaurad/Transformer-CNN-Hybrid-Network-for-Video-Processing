@@ -12,7 +12,7 @@ from torchvision import transforms
 
 
 from metric import MixedLoss
-from Autoencoder import Autoencoder
+from AutoEncoder import AutoEncoder
 from dataset import DataloaderSequential
 from TransformerEncoder import TransformerEncoder
 '''
@@ -38,7 +38,7 @@ from TransformerEncoder import TransformerEncoder
 
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
-CHUNK_UNITS = 8
+CHUNK_UNITS = 64
 BATCH_SIZE = 16
 MODEL_NAME = "CNNTRANSFORMER_UNIFIED_V1"
 # DEVICE =  "cpu"
@@ -46,7 +46,7 @@ DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
-encoderdecoder = Autoencoder32K(outputType="image")
+encoderdecoder = AutoEncoder()
 encoderdecoder.load_state_dict(torch.load('')['model_state_dict'])
 
 
@@ -59,13 +59,13 @@ class CNN_Encoder(nn.Module):
             params.requires_grad = False
         
     def forward(self, x):
-        bottleneck_32K = self.encoder(x)
-        return bottleneck_32K
+        cnn_latent = self.encoder(x)
+        return cnn_latent
     
 
 
 class Transformer_Encoder(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, num_heads, dropout):
+    def __init__(self, input_dim, num_layers, num_heads, dropout):
         super(Transformer_Encoder, self).__init__()
         # self.transformerencoder = TransformerEncoder(input_dim=input_dim, hidden_dim=input_dim, num_layers=num_layers, num_heads=num_heads, dropout=0.1)
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads)
@@ -73,7 +73,7 @@ class Transformer_Encoder(nn.Module):
 
     def forward(self, x, mask=None):
         # transformer_latent = self.transformerencoder(x, mask=None)
-        transformer_latent = self.transformer_encoder(x, mask=None)
+        transformer_latent = self.transformer_encoder(x, mask=mask)
         return transformer_latent
 
 
@@ -83,8 +83,8 @@ class CNN_Decoder(nn.Module):
         super(CNN_Decoder, self).__init__()
         self.decoder = encoderdecoder.decoder 
 
-    def forward(self, x):
-        out = self.decoder(x)
+    def forward(self, latent):
+        out = self.decoder(latent)
         return out
 
 
@@ -100,7 +100,7 @@ class VideoSegmentationNetwork(nn.Module):
         self.cnnencoder = CNN_Encoder()
 
         #loading the transformer encoder class
-        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, hidden_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
+        self.transenc = Transformer_Encoder(input_dim=EMBEDDED_DIMENSION, num_layers=4, num_heads=8, dropout=0.1)
 
         #the CNN decoder which is slightly pre-trained but is fine tuned to decode the transformer's output
         self.cnndecoder = CNN_Decoder()
@@ -121,27 +121,26 @@ class VideoSegmentationNetwork(nn.Module):
         image_preds = []
 
         # sending the input to the cnn encoder
-        # maskFrameNo = 2
-        if epoch > 30:
-            maskFrameNo = random.randint(0, SEQUENCE_LENGTH)
-        else:
-            maskFrameNo = SEQUENCE_LENGTH + 1
-        
+        maskFrameNo = 4
         for i in range(x.shape[0]):
             if i == maskFrameNo:
                 l = torch.zeros(BATCH_SIZE, EMBEDDED_DIMENSION*CHUNK_UNITS).to(DEVICE)
             else:
                 l = self.cnnencoder(x[i])
-            l = torch.cat((torch.cat((self.sof, l), dim=1), self.eof), dim=1)
+            l = l.permute(0, 2, 1)
             latents.append(l)
 
         #before sending to the transformer, this is the pre-processing we need
-        latents = torch.stack(latents).permute(1, 0, 2, 3)
-        latents = latents.reshape(latents.shape[0], latents.shape[1]*latents.shape[2], latents.shape[3])
-        latents += self.positions
+        num_zeros = int(0.25 * latents.shape[1])
+        zero_indices = torch.randperm(latents.shape[1])[:num_zeros]
+        latents[:, zero_indices, :] = 0
+        latents = latents.permute(1, 0, 2)
+
+
+        attention_mask = self.get_mask_seq_cat(first_seq_len=256, second_seq_len=64).to(DEVICE)
 
         # sending the latents predicted to the transformer
-        latents_pred = self.transenc(latents)
+        latents_pred = self.transenc(latents, mask=attention_mask)
         
         latents_pred = torch.cat([x[:, 1:-1, :] for x in torch.split(latents_pred, CHUNK_UNITS+2, dim=1)], dim=1)
         latents_pred = latents_pred.reshape(SEQUENCE_LENGTH, BATCH_SIZE, CHUNK_UNITS, EMBEDDED_DIMENSION)
