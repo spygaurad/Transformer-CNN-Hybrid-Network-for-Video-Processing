@@ -47,7 +47,9 @@ class Model():
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
                     aug_image = trF.hflip(aug_image)
+                    print(aug_image.shape)
                 # Apply noise to the image, 100% of the time
+            
                 aug_image = aug_image + torch.randn(aug_image.size()).to(DEVICE) * 0.05 + 0.0
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
                 if random.random() > 0.5:
