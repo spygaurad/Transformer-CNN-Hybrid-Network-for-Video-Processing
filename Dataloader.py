@@ -33,7 +33,7 @@ class CustomDataLoader:
 
     def get_data(self):
         train_csv = "Datasets/image2image/train.csv"
-        val_csv = "Datasets/image2image/val.csv"
+        val_csv = "Datasets/image2image/valid.csv"
         test_csv = "Datasets/image2image/test.csv"
 
         train_dataset = CustomDataset(train_csv)
