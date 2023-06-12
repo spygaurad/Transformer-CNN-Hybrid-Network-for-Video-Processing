@@ -15,6 +15,7 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, index):
         image_path = self.data.iloc[index, 0]
+        print(image_path)
         image = Image.open(image_path).convert('RGB')
         transform = transforms.Compose([
             transforms.Resize((256, 256)),
@@ -31,9 +32,9 @@ class CustomDataLoader:
         self.batch_size = batch_size
 
     def get_data(self):
-        train_csv = "Datasets/BDD 100K/images/train.csv"
-        val_csv = "Datasets/BDD 100K/images/val.csv"
-        test_csv = "Datasets/BDD 100K/images/test.csv"
+        train_csv = "Datasets/image2image/train.csv"
+        val_csv = "Datasets/image2image/val.csv"
+        test_csv = "Datasets/image2image/test.csv"
 
         train_dataset = CustomDataset(train_csv)
         val_dataset = CustomDataset(val_csv)
