@@ -4,7 +4,8 @@ import random
 import os
 from PIL import Image
 from tqdm import tqdm
-import torchvision.transforms.functional as F
+import torch.nn.functional as F
+import torchvision.transforms.functional as trF
 from tensorboardX import SummaryWriter
 
 from UNet import UNet
