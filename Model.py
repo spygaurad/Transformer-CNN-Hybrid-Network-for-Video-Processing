@@ -113,11 +113,12 @@ class Model():
             for i, img in tqdm(enumerate(dataset), total=len(dataset)):
                 counter += 1
                 image = img.to(DEVICE)
-                img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
-                for _ in range(random.randint(0, 3)):
-                    x = random.randint(0, image.size(2) - 32)
-                    y = random.randint(0, image.size(3) - 32)
-                    img[:, :, x:x + 32, y:y + 32] = 0.0
+                img = image
+                # img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
+                # for _ in range(random.randint(0, 3)):
+                #     x = random.randint(0, image.size(2) - 32)
+                #     y = random.randint(0, image.size(3) - 32)
+                    # img[:, :, x:x + 32, y:y + 32] = 0.0
                 output = self.model(img)
                 pred = output[1]
                 psnr = self.psnr(output[1], image)  
