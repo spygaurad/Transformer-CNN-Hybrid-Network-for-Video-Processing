@@ -43,7 +43,7 @@ class Model():
             if random.random() > 0.5:
                 #zoom in an image
                 if random.random() > 0.8:
-                    aug_image = trF.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
+                    aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
                     aug_image = trF.hflip(aug_image)
