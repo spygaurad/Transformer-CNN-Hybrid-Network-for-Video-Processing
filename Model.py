@@ -48,7 +48,7 @@ class Model():
                     aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
                     aug_image = trF.resize(aug_image, (256, 256))
                     # print("After Interpolation: ", aug_image.shape)
-                    
+
                 # Horizontally flip the image, 30% of the time
                 if random.random() > 0.7:
                     # print("Before Flipping: ", aug_image.shape)
@@ -112,7 +112,13 @@ class Model():
         with torch.no_grad():
             for i, img in tqdm(enumerate(dataset), total=len(dataset)):
                 counter += 1
-                img = img.to(DEVICE)
+                image = img.to(DEVICE)
+                img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
+                if random.random() > 0.5:
+                    for _ in range(random.randint(0, 3)):
+                        x = random.randint(0, image.size(2) - 16)
+                        y = random.randint(0, image.size(3) - 16)
+                        img[:, :, x:x + 16, y:y + 16] = 0.0
                 output = self.model(img)
                 pred = output[1]
                 psnr = self.psnr(output[1], img)  
