@@ -24,7 +24,7 @@ class Model():
  
     def __init__(self, trained=False):
         self.model = AutoEncoder().to(DEVICE)
-        self.jaccard = JaccardScore()
+        # self.jaccard = JaccardScore()
 
     def psnr(self, reconstructed, original, max_val=1.0): return 20 * torch.log10(max_val / torch.sqrt(F.mse_loss(reconstructed, original)))        
 
@@ -65,10 +65,10 @@ class Model():
             optimizer.zero_grad()
             output = self.model(aug_image)
             loss = loss_func(output[1], image)
-            running_loss += loss.item()
-
             loss.backward()
             optimizer.step()
+            running_loss += loss.item()
+            print(running_loss)
 
             # Calculate the Jaccard score here
             psnr = self.psnr(output[1], image)
@@ -134,16 +134,16 @@ class Model():
                     pred = (pred * 255).astype('uint8')
                     image_pil = Image.fromarray(image)
                     pred_pil = Image.fromarray(pred)
-                    image_pil.save(f"saved_samples/{MODEL_NAME}/image_{epoch}.jpg")
-                    pred_pil.save(f"saved_samples/{MODEL_NAME}/pred_{epoch}.jpg")
-                    # stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
+                    # image_pil.save(f"saved_samples/{MODEL_NAME}/{epoch}_image.jpg")
+                    # pred_pil.save(f"saved_samples/{MODEL_NAME}/{epoch}_pred.jpg")
+                    stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
 
-                    # stacked_image.paste(image_pil, (0, 0))
-                    # stacked_image.paste(pred_pil, (image_pil.width, 0))
+                    stacked_image.paste(image_pil, (0, 0))
+                    stacked_image.paste(pred_pil, (image_pil.width, 0))
 
-                    # stacked_image.save("stacked_image.jpg")
+                    stacked_image.save("stacked_image.jpg")
 
-                    # stacked_image.save(f"saved_samples/{MODEL_NAME}/{epoch}.jpg")
+                    stacked_image.save(f"saved_samples/{MODEL_NAME}/{epoch}.jpg")
 
         epoch_psnr = running_psnr / counter 
         return epoch_psnr
