@@ -1,21 +1,20 @@
-from collections import deque
+import os
+import numpy as np
+import random
 import torch
 import torch.nn as nn
 import math
 import torch.optim as optim
-from AE_256_32K import Autoencoder32K
+from collections import deque
+from tqdm import tqdm
+from tensorboardX import SummaryWriter
+from torchvision import transforms
+
+
+from metric import MixedLoss
+from Autoencoder import Autoencoder
 from dataset import DataloaderSequential
 from TransformerEncoder import TransformerEncoder
-from collections import deque
-from metric import MixedLoss
-import numpy as np
-import random
-from tqdm import tqdm
-import os
-from torchvision import transforms
-from tensorboardX import SummaryWriter
-from torchsummary import summary
-
 '''
     How do we send an image to a transformer? 
 
@@ -40,14 +39,15 @@ from torchsummary import summary
 SEQUENCE_LENGTH = 5
 EMBEDDED_DIMENSION = 4096
 CHUNK_UNITS = 8
-BATCH_SIZE = 2
+BATCH_SIZE = 16
+MODEL_NAME = "CNNTRANSFORMER_UNIFIED_V1"
 # DEVICE =  "cpu"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
 
 encoderdecoder = Autoencoder32K(outputType="image")
-encoderdecoder.load_state_dict(torch.load('saved_model/autoencoder_32K_VOS_20.tar')['model_state_dict'])
+encoderdecoder.load_state_dict(torch.load('')['model_state_dict'])
 
 
 
@@ -63,7 +63,6 @@ class CNN_Encoder(nn.Module):
         return bottleneck_32K
     
 
-#generate a code 
 
 class Transformer_Encoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, num_heads, dropout):
