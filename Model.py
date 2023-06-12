@@ -39,8 +39,7 @@ class Model():
         for i, img in tqdm(enumerate(dataset), total=len(dataset)):
             counter += 1
             image = img.to(DEVICE)
-
-            aug_image = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
+            aug_image = image
             if random.random() > 0.5:
                 #zoom in an image
                 if random.random() > 0.8:
@@ -55,6 +54,7 @@ class Model():
                     aug_image = trF.hflip(aug_image)
                     # print("After Flipping: ", aug_image.shape)
             
+                aug_image = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
                 if random.random() > 0.5:
                     for _ in range(random.randint(0, 3)):
@@ -132,16 +132,18 @@ class Model():
                     pred = pred[0].cpu().numpy().transpose((1, 2, 0))
                     image = (image * 255).astype('uint8')
                     pred = (pred * 255).astype('uint8')
-                    image_pil = Image.fromarray(image)
-                    pred_pil = Image.fromarray(pred)
-                    stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
+                    image.save(f"saved_samples/{MODEL_NAME}/image_{epoch}.jpg")
+                    pred.save(f"saved_samples/{MODEL_NAME}/pred_{epoch}.jpg")
+                    # image_pil = Image.fromarray(image)
+                    # pred_pil = Image.fromarray(pred)
+                    # stacked_image = Image.new('RGB', (image_pil.width * 2, image_pil.height))
 
-                    stacked_image.paste(image_pil, (0, 0))
-                    stacked_image.paste(pred_pil, (image_pil.width, 0))
+                    # stacked_image.paste(image_pil, (0, 0))
+                    # stacked_image.paste(pred_pil, (image_pil.width, 0))
 
-                    stacked_image.save("stacked_image.jpg")
+                    # stacked_image.save("stacked_image.jpg")
 
-                    stacked_image.save(f"saved_samples/{MODEL_NAME}/{epoch}.jpg")
+                    # stacked_image.save(f"saved_samples/{MODEL_NAME}/{epoch}.jpg")
 
         epoch_psnr = running_psnr / counter 
         return epoch_psnr
