@@ -165,7 +165,8 @@ class Model():
         optimizer = optim.AdamW(self.model.parameters(), lr)
         print(f"Beginning to train...")
 
-        mixedloss = MixedLoss(0.5, 0.5)
+        # mixedloss = MixedLoss(0.5, 0.5)
+        l2loss = torch.nn.MSELoss()
 
         val_psnr_epochs = []
         writer = SummaryWriter(f'runs/{MODEL_NAME}/')
@@ -177,7 +178,7 @@ class Model():
 
             print(f"Epoch No: {epoch}")
 
-            train_loss, train_psnr = self.train(dataset=train_data, loss_func=mixedloss, optimizer=optimizer)
+            train_loss, train_psnr = self.train(dataset=train_data, loss_func=l2loss, optimizer=optimizer)
 
             val_psnr = self.validate(dataset=val_data)
             val_psnr_epochs.append(val_psnr)
