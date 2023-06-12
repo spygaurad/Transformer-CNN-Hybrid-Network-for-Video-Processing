@@ -114,14 +114,13 @@ class Model():
                 counter += 1
                 image = img.to(DEVICE)
                 img = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
-                if random.random() > 0.5:
-                    for _ in range(random.randint(0, 3)):
-                        x = random.randint(0, image.size(2) - 16)
-                        y = random.randint(0, image.size(3) - 16)
-                        img[:, :, x:x + 16, y:y + 16] = 0.0
+                for _ in range(random.randint(0, 3)):
+                    x = random.randint(0, image.size(2) - 16)
+                    y = random.randint(0, image.size(3) - 16)
+                    img[:, :, x:x + 16, y:y + 16] = 0.0
                 output = self.model(img)
                 pred = output[1]
-                psnr = self.psnr(output[1], img)  
+                psnr = self.psnr(output[1], image)  
                 running_psnr += psnr.item()
 
                 if i == num:
