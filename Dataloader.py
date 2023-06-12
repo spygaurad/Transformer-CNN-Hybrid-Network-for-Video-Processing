@@ -15,7 +15,6 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, index):
         image_path = self.data.iloc[index, 0]
-        print(image_path)
         image = Image.open(image_path).convert('RGB')
         transform = transforms.Compose([
             transforms.Resize((256, 256)),
