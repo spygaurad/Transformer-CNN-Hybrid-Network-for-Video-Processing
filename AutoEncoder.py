@@ -64,7 +64,7 @@ class DeepSupervisionBlock(nn.Module):
         x1 = self.upsample(x)
         x1 = self.relu(self.conv1(x1))
         x1 = self.relu(self.conv2(x1))
-        out = self.sigmoid(self.conv3(x1))
+        out = self.relu(self.conv3(x1))
         return out
 
 
