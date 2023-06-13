@@ -18,6 +18,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # DEVICE = "cpu"
 BATCH_SIZE = 32
 MODEL_NAME = "IMAGE2IMAGE"
+large_file_dir = '/mnt/media/wiseyak/Transformer-CNN-Hybrid-Network-for-Video-Processing/'
 
 
 class Model():
@@ -168,8 +169,8 @@ class Model():
 
         val_psnr_epochs = []
         writer = SummaryWriter(f'runs/{MODEL_NAME}/')
-        os.makedirs("checkpoints/", exist_ok=True)
-        os.makedirs("saved_model/", exist_ok=True)
+        os.makedirs(f"{large_file_dir}checkpoints/", exist_ok=True)
+        os.makedirs(f"{large_file_dir}saved_model/", exist_ok=True)
 
 
         for epoch in range(1, epochs+1):
@@ -189,11 +190,11 @@ class Model():
 
 
             if max(val_psnr_epochs) == val_psnr:
-                torch.save(self.model.state_dict(), f"checkpoints/{MODEL_NAME}.pth")
+                torch.save(self.model.state_dict(), f"{large_file_dir}checkpoints/{MODEL_NAME}.pth")
             
             if epoch%5==0:
                 print("Saving model")
-                torch.save(self.model.state_dict(), f"saved_model/{MODEL_NAME}_{epoch}.pth")
+                torch.save(self.model.state_dict(), f"{large_file_dir}saved_model/{MODEL_NAME}_{epoch}.pth")
                 test_psnr = self.test(test_data, epoch)
                 writer.add_scalar("PSNR/Test", test_psnr)
                 print("Model Saved")
