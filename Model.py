@@ -16,7 +16,7 @@ from Metrics import JaccardScore, DiceLoss, MixedLoss
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # DEVICE = "cpu"
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 MODEL_NAME = "IMAGE2IMAGE"
 large_file_dir = '/mnt/media/wiseyak/Transformer-CNN-Hybrid-Network-for-Video-Processing/'
 
