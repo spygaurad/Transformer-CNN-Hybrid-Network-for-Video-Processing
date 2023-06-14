@@ -42,19 +42,8 @@ class Model():
             image = img.to(DEVICE)
             aug_image = image
             if random.random() > 0.5:
-                #zoom in an image
-                if random.random() > 0.8:
-                    # print("Before Interpolation: ", aug_image.shape)
-                    aug_image = F.interpolate(image, scale_factor=2, mode='bilinear', align_corners=False)
-                    aug_image = trF.resize(aug_image, (256, 256))
-                    # print("After Interpolation: ", aug_image.shape)
-
-                # Horizontally flip the image, 30% of the time
-                if random.random() > 0.7:
-                    # print("Before Flipping: ", aug_image.shape)
-                    aug_image = trF.hflip(aug_image)
-                    # print("After Flipping: ", aug_image.shape)
-            
+                aug_image = trF.hflip(aug_image)
+            if random.random() > 0.8:
                 aug_image = image + torch.randn(image.size()).to(DEVICE) * 0.05 + 0.0
                 # Create 2-5 16x16 blackout patches in the image, along random locations in the axis of height and width
                 if random.random() > 0.5:
@@ -164,8 +153,8 @@ class Model():
         optimizer = optim.AdamW(self.model.parameters(), lr)
         print(f"Beginning to train...")
 
-        # mixedloss = MixedLoss(0.5, 0.5)
-        l2loss = torch.nn.MSELoss()
+        mixedloss = MixedLoss(0.5, 0.5)
+        # l2loss = torch.nn.MSELoss()
 
         val_psnr_epochs = []
         writer = SummaryWriter(f'runs/{MODEL_NAME}/')
@@ -177,7 +166,7 @@ class Model():
 
             print(f"Epoch No: {epoch}")
 
-            train_loss, train_psnr = self.train(dataset=train_data, loss_func=l2loss, optimizer=optimizer)
+            train_loss, train_psnr = self.train(dataset=train_data, loss_func=mixedloss, optimizer=optimizer)
 
             val_psnr = self.validate(dataset=val_data)
             val_psnr_epochs.append(val_psnr)
