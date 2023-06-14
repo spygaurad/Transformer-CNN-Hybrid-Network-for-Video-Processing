@@ -171,7 +171,7 @@ class Model():
             val_psnr = self.validate(dataset=val_data)
             val_psnr_epochs.append(val_psnr)
 
-            print(f"Train Loss:{train_loss}, Train Jaccard Score:{train_psnr}, Validation Jaccard Score:{val_psnr}")
+            print(f"Train Loss:{train_loss}, Train PSNR:{train_psnr}, Validation PSNR:{val_psnr}")
 
             writer.add_scalar("Loss/Train", train_loss, epoch)
             writer.add_scalar("PSNR/Train", train_psnr, epoch)

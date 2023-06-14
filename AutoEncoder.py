@@ -73,7 +73,7 @@ class DeepSupervisionBlock(nn.Module):
 class Encoder(nn.Module):
     def __init__(self):
         super().__init__()
-        filters = [8, 16, 32, 64, 128, 512] 
+        filters = [8, 16, 32, 64, 128] 
         self.drp_out = 0.3
         self.scale_img = nn.AvgPool2d(2, 2)   
 
@@ -81,8 +81,7 @@ class Encoder(nn.Module):
         self.block_2 = EncoderBlock("second", filters[0], filters[1])
         self.block_3 = EncoderBlock("third", filters[1], filters[2])
         self.block_4 = EncoderBlock("fourth", filters[2], filters[3])
-        self.block_5 = EncoderBlock("fifth", filters[3], filters[4])
-        self.block_6 = EncoderBlock("bottleneck", filters[4], filters[5])
+        self.block_5 = EncoderBlock("bottleneck", filters[3], filters[4])
 
 
     def forward(self, x):
@@ -96,27 +95,24 @@ class Encoder(nn.Module):
         x2 = self.block_2(x1, scale_img_2)
         x3 = self.block_3(x2, scale_img_3)
         x4 = self.block_4(x3, scale_img_4)
-        x5 = self.block_5(x4, scale_img_5)
-        x6 = self.block_6(x5)
-        return x6
+        x5 = self.block_5(x4)
+        return x5
 
 
 
 class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
-        filters = [512, 128, 64, 32, 16, 8]
+        filters = [128, 64, 32, 16, 8]
         self.drp_out = 0.3
 
-        self.block_5 = DecoderBlock(filters[0], filters[1])
-        self.block_4 = DecoderBlock(filters[1], filters[2])
-        self.block_3 = DecoderBlock(filters[2], filters[3])
-        self.block_2 = DecoderBlock(filters[3], filters[4])
-        self.block_1 = DecoderBlock(filters[4], filters[5])
-        self.ds = DeepSupervisionBlock(filters[5], 3)
+        self.block_4 = DecoderBlock(filters[0], filters[1])
+        self.block_3 = DecoderBlock(filters[1], filters[2])
+        self.block_2 = DecoderBlock(filters[2], filters[3])
+        self.block_1 = DecoderBlock(filters[3], filters[4])
+        self.ds = DeepSupervisionBlock(filters[4], 3)
         
     def forward(self, x):
-        x = self.block_5(x)
         x = self.block_4(x)
         x = self.block_3(x)
         x = self.block_2(x)
@@ -139,9 +135,9 @@ class AutoEncoder(nn.Module):
 
 
 
-# print("AUTOENCODER")
-# data = (torch.rand(size=(1, 3, 256, 256)))
-# AE = AutoEncoder()
-# img_out = AE(data)
-# print("Latent's Shape:", img_out[0].shape)
-# print("Output's ShapeL", img_out[1].shape)
+print("AUTOENCODER")
+data = (torch.rand(size=(1, 3, 256, 256)))
+AE = AutoEncoder()
+img_out = AE(data)
+print("Latent's Shape:", img_out[0].shape)
+print("Output's ShapeL", img_out[1].shape)
